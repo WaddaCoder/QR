@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Derivatives — Complete Rule Set</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--cd:#4B6BCC;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .logic-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px;font-family:'JetBrains Mono',monospace;}
+  .logic-table th{background:var(--ink);color:var(--page);padding:7px 10px;font-size:11px;font-weight:600;}
+  .logic-table td{padding:7px 10px;border-bottom:1px solid var(--rule);text-align:center;}
+  .logic-table tr:nth-child(even) td{background:#FAFAF8;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens p{font-size:14px;margin-top:8px;}
+  .bar-lens p:first-of-type{margin-top:0;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Derivatives — Complete Rule Set</h1>
+  <div class="subtitle">8 rules · Dr. Tariq Ismaeel · Finals &amp; NY Bar scope</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Derivatives</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">8 rules · 3 clusters</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       CLUSTER 1 — ELEMENTARY RULES
+  ════════════════════════════════════════ -->
+  <div class="section-label">Cluster 1 — Elementary Rules · Power &amp; Addition/Subtraction</div>
+
+  <!-- RULE 1: POWER RULE -->
+  <div class="topic-card open" id="d01" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d01')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 1</span>
+      <div class="topic-title">The Power Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="d01-l">
+        <div class="inner-header" onclick="togI('d01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>When you have a variable raised to a fixed number — like x³ or t² or x⁰·⁵ — the power rule tells you the derivative in one step: <strong>bring the exponent down as a multiplier, then reduce the exponent by one.</strong> That's it. Every polynomial you will ever differentiate uses this rule, and it works for any real-number exponent — positive, negative, fraction, decimal.</p>
+          <p>The power rule is the most frequently used rule in calculus. Mastering it completely means every polynomial derivative becomes instant.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">Where It Applies — and Where It Doesn't</div>
+            <p>Power rule applies when the <em>variable is in the base</em> and the exponent is a fixed constant: x³, t⁻², x^(½). It does NOT apply when the variable is in the exponent: 3ˣ, eˣ, e^(0.05t) — those need the exponential rule (Rule 5). This base-vs-exponent check is the first translation step every derivatives problem demands.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d01-m">
+        <div class="inner-header" onclick="togI('d01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Power Rule:</span> d/dx(xⁿ) = n·xⁿ⁻¹<br><br>
+            <span class="hl">Special cases worth memorising:</span><br>
+            d/dx(x¹) = 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(n=1: bring down 1, reduce to x⁰=1)<br>
+            d/dx(c) = 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(constant: n=0, result is 0·x⁻¹ = 0)<br>
+            d/dx(x½) = ½x⁻½ = 1/(2√x)   (square root as fractional power)<br>
+            d/dx(1/x) = d/dx(x⁻¹) = -x⁻² = -1/x²<br><br>
+            <span class="hl">Procedure:</span><br>
+            Step 1 — Rewrite: convert roots and fractions to xⁿ form<br>
+            Step 2 — Multiply: bring the exponent down in front<br>
+            Step 3 — Reduce: subtract 1 from the exponent<br>
+            Step 4 — Simplify: clean up negative or fractional exponents if needed
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d01-ex">
+        <div class="inner-header" onclick="togI('d01-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Three Cases — Positive, Fractional, Negative Exponents</div>
+            <p><strong>(a)</strong> f(x) = x⁵</p>
+            <div class="notation">f'(x) = 5x⁴ &nbsp;&nbsp;(bring down 5, reduce 5→4)</div>
+            <p><strong>(b)</strong> f(x) = √x = x^(½)</p>
+            <div class="notation">f'(x) = ½x^(½−1) = ½x^(−½) = 1/(2√x)</div>
+            <p><strong>(c)</strong> f(x) = 1/x³ = x^(−3)</p>
+            <div class="notation">f'(x) = −3x^(−3−1) = −3x^(−4) = −3/x⁴</div>
+            <p>In all three, the procedure is identical — rewrite, bring down, reduce by 1. The only difference is the starting form of the exponent. Rewriting as xⁿ before applying the rule avoids the most common errors.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d01-q">
+        <div class="inner-header" onclick="togI('d01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd01a">
+            <div class="q-header" onclick="togQ('qd01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A court fee schedule is modelled as F(c) = 0.04c³, where c is the claim value in millions. Find the marginal court fee — the rate at which the fee increases per additional million in claim value — and evaluate it at c = 5.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>F'(c) = 0.04 × 3c² = 0.12c²</p><p>At c = 5: F'(5) = 0.12 × 25 = <strong>3.0</strong> — the fee is increasing at Rs. 3 million per additional million in claim value at that level. The non-linear schedule means higher-value claims are penalised progressively: doubling the claim doesn't double the marginal fee, it quadruples it.</p><div class="what-tests">Power rule · marginal rate as a derivative · evaluating f' at a point · interpreting a non-linear fee schedule</div></div>
+          </div>
+          <div class="question-block" id="qd01b">
+            <div class="q-header" onclick="togQ('qd01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A statutory damages formula awards D(n) = 500√n to a plaintiff, where n is the number of verified violations. At n = 100 violations, find the rate at which additional violations increase the award.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>D(n) = 500n^(½)</p><p>D'(n) = 500 × ½ × n^(−½) = 250/√n</p><p>At n = 100: D'(100) = 250/√100 = 250/10 = <strong>25</strong> — each additional violation at the 100-violation level adds Rs. 25 to the award. Notice this rate decreases as n grows (250/√n gets smaller): the scheme is deliberately degressive — the marginal deterrence of one more violation weakens as the violation count rises, which is a real policy criticism of square-root damage formulas.</p><div class="what-tests">Power rule with fractional exponent · marginal analysis · diminishing returns in a damages formula</div></div>
+          </div>
+          <div class="question-block" id="qd01c">
+            <div class="q-header" onclick="togQ('qd01c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">An environmental regulator models the residual pollution concentration after t years of a cleanup programme as C(t) = 80/t² (in parts per million). (a) Find the rate of change of concentration at t = 4 years. (b) The legal safe threshold is 5 ppm — at what year does C(t) reach this threshold? (c) Is the cleanup rate accelerating or decelerating as t increases, and what does this imply for the cost of the final phase of cleanup?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> C(t) = 80t⁻²</p><p>C'(t) = −160t⁻³ = −160/t³</p><p>At t = 4: C'(4) = −160/64 = <strong>−2.5 ppm/year</strong> — concentration is falling at 2.5 ppm per year at year 4. The negative sign confirms improvement.</p><p><strong>(b)</strong> 80/t² = 5 → t² = 16 → t = 4 years. The threshold is reached at exactly year 4.</p><p><strong>(c)</strong> C'(t) = −160/t³ — the magnitude |C'(t)| = 160/t³ is itself decreasing over time (t³ grows). This means the rate of improvement slows down as cleanup progresses — the early years produce rapid concentration drops, but removing the final ppm takes disproportionately longer. Legally and financially, this is the "last mile" problem: the regulator will incur the majority of cost in the final phase, not the initial phase, because the mathematical rate of return on cleanup effort is highest at the start and diminishes to near zero as concentrations approach background levels. This asymmetry is often exploited in consent decree negotiations — the defendant firm pushes for performance-based milestones rather than time-based ones, knowing that later milestones are mathematically harder to hit.</p><div class="what-tests">Power rule with negative exponent · evaluating derivative at a point · solving C(t)=threshold for t · second-order interpretation (is the rate itself increasing or decreasing) · connecting diminishing-rate mathematics to litigation strategy</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d01-bar">
+        <div class="inner-header" onclick="togI('d01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Expert Witness Connection</div>
+            <p>Marginal analysis — which is simply the derivative evaluated at a specific point — is the core language of economics expert testimony in antitrust and damages litigation. A lawyer who can independently compute the marginal cost or marginal revenue figure the expert reports, from the underlying cost function, can verify it, challenge it, and cross-examine it on the stand rather than relying on the expert's number uncritically.</p>
+            <p>The "last mile" problem in environmental cleanup (T3 above) recurs across multiple bodies of law: remediation consent decrees, ADA architectural compliance timelines, and food safety corrective action plans all involve scenarios where the final percentage of compliance is exponentially more expensive than the first 90%, and the derivative's rate-of-change behaviour is the mathematical basis for every cost estimate the regulator and the regulated party will dispute.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RULE 2: ADDITION/SUBTRACTION RULE -->
+  <div class="topic-card" id="d02" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d02')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 2</span>
+      <div class="topic-title">The Addition &amp; Subtraction Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="d02-l">
+        <div class="inner-header" onclick="togI('d02-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>When a function is built by adding or subtracting several pieces, its derivative is simply the sum (or difference) of each piece's individual derivative. Each term is handled separately, independently of the others. The rule is as simple as it sounds, and the only way to apply it wrong is to panic when a function has many terms and try to treat it as one complicated whole rather than a collection of simple pieces.</p>
+          <p>This rule also underlies why the power rule alone handles any polynomial — a polynomial is just several power-rule terms added together, so you differentiate each one and add the results.</p>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d02-m">
+        <div class="inner-header" onclick="togI('d02-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Sum/Difference Rule:</span><br>
+            d/dx[f(x) ± g(x)] = f'(x) ± g'(x)<br><br>
+            <span class="hl">Extended to any number of terms:</span><br>
+            d/dx[u + v − w + z] = u' + v' − w' + z'<br><br>
+            <span class="hl">Constants ride through:</span><br>
+            d/dx[5x³] = 5 · d/dx[x³] = 5 · 3x² = 15x²<br>
+            (A constant multiplier stays attached to its term throughout)
+          </div>
+          <p>The only common slip: forgetting to carry the constant multiplier all the way through when combining with the power rule. The constant never disappears — it just multiplies whatever the power rule produces.</p>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d02-ex">
+        <div class="inner-header" onclick="togI('d02-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Full Polynomial Differentiation</div>
+            <p>A law firm's total cost function is C(x) = 4x³ − 9x² + 12x − 7, where x is the number of cases handled per month. Find the marginal cost function C'(x) and the marginal cost at x = 3.</p>
+            <div class="notation">
+              C'(x) = d/dx(4x³) − d/dx(9x²) + d/dx(12x) − d/dx(7)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 4(3x²) − 9(2x) + 12(1) − 0<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 12x² − 18x + 12<br><br>
+              At x = 3: C'(3) = 12(9) − 18(3) + 12 = 108 − 54 + 12 = <strong>66</strong>
+            </div>
+            <p>The marginal cost of handling the 3rd additional case is Rs. 66 (in whatever units C is expressed). Notice d/dx(7) = 0 — constants disappear on differentiation, because a fixed overhead cost doesn't change as you add one more case.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d02-q">
+        <div class="inner-header" onclick="togI('d02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd02a">
+            <div class="q-header" onclick="togQ('qd02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A regulatory fine schedule is modelled as F(v) = 3v⁴ − 8v² + 500, where v is the number of repeat violations. Find F'(v) and evaluate F'(2).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>F'(v) = 12v³ − 16v</p><p>F'(2) = 12(8) − 16(2) = 96 − 32 = <strong>64</strong></p><p>At 2 repeat violations, each additional violation adds Rs. 64 to the fine — and because F' itself is increasing with v (12v³ dominates), the marginal fine escalates faster the more violations accumulate.</p><div class="what-tests">Sum/difference rule combined with power rule · evaluating at a point · interpreting escalating marginal penalties</div></div>
+          </div>
+          <div class="question-block" id="qd02b">
+            <div class="q-header" onclick="togQ('qd02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Find the derivative of f(x) = 6x⁵ − (4/x²) + 3√x − 11. Rewrite all terms as powers of x before differentiating.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Rewrite: f(x) = 6x⁵ − 4x⁻² + 3x^(½) − 11</p><p>f'(x) = 30x⁴ − (−8x⁻³) + (3/2)x^(−½) − 0</p><p>f'(x) = <strong>30x⁴ + 8/x³ + 3/(2√x)</strong></p><p>The rewrite step is what makes this tractable — never try to differentiate a fraction or square root in its original form without first expressing it as xⁿ.</p><div class="what-tests">Sum/difference rule · rewriting non-standard forms before differentiating · mixed positive, negative and fractional exponents</div></div>
+          </div>
+          <div class="question-block" id="qd02c">
+            <div class="q-header" onclick="togQ('qd02c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A plaintiff's expert models the economic damage function over time as D(t) = 2t³ − 15t² + 36t (in thousands), where t is years since the breach. (a) Find D'(t). (b) Find the times at which the rate of damage is zero (set D'(t) = 0 and solve). (c) Interpret what "rate of damage = 0" means economically, and explain whether those are the times of maximum or minimum total accumulated damage.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> D'(t) = 6t² − 30t + 36</p><p><strong>(b)</strong> 6t² − 30t + 36 = 0 → 6(t² − 5t + 6) = 0 → 6(t−2)(t−3) = 0 → <strong>t = 2 and t = 3</strong></p><p><strong>(c)</strong> D'(t) = 0 means the damage function is momentarily neither increasing nor decreasing at those points — these are the "turning points" of the damage curve. At t=2, damage accumulation pauses (a local maximum of the rate) and at t=3 it reaches a local minimum — meaning between years 2 and 3, the rate of new damage was actually declining. In a legal context, this matters significantly for the damages claim: if the breach's harm peaked at t=2 and began subsiding by t=3, a defendant might argue the plaintiff had an opportunity to mitigate after year 2, reducing their liability for post-peak damages. The plaintiff would argue those turning points were mathematically inevitable given the underlying contract structure, not a failure to mitigate.</p><div class="what-tests">Sum/difference rule · solving D'(t)=0 as a factoring problem · interpreting turning points in a damages curve · connecting critical points to mitigation arguments in litigation</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="d02-bar">
+        <div class="inner-header" onclick="togI('d02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Economic Damages Connection</div>
+            <p>Setting the derivative equal to zero to find turning points — the technique in T3 above — is exactly how economic experts identify the "peak damage" date in lost-profits litigation. Courts often need to determine when the plaintiff's losses were largest, when they began to decline, and whether a reasonable plaintiff would have taken mitigation steps at the turning point. A lawyer who can identify these turning points independently from the damage model has a genuine technical advantage in either preparing or attacking such testimony.</p>
+            <p>The "constants drop out" property of differentiation is also directly relevant to how fixed costs are treated in marginal analysis: in any damages or pricing model, fixed overheads are mathematically irrelevant to marginal rates, which is why economic experts report marginal (derivative-based) figures rather than total cost figures in incremental-harm cases.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       CLUSTER 2 — COMBINATION RULES
+  ════════════════════════════════════════ -->
+  <div class="section-label">Cluster 2 — Combination Rules · Product, Quotient &amp; Chain</div>
+
+  <!-- RULE 3: PRODUCT RULE -->
+  <div class="topic-card" id="d03" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d03')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 3</span>
+      <div class="topic-title">The Product Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="d03-l">
+        <div class="inner-header" onclick="togI('d03-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>When two functions are <em>multiplied</em> together, the derivative is <strong>not</strong> simply the product of their individual derivatives — this is the single most common misconception in introductory calculus and it is wrong every time. Instead: <strong>"differentiate the first, keep the second — then keep the first, differentiate the second"</strong> and add the two results.</p>
+          <div class="pattern-warn"><div class="pw-label">The Wrong Version to Watch For</div><p>h'(x) ≠ u'(x)·v'(x). If your answer is the product of two derivatives, you've applied the wrong rule. The correct answer is always a sum of two terms.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d03-m">
+        <div class="inner-header" onclick="togI('d03-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">Product Rule:</span> if h(x) = u(x)·v(x), then<br>h'(x) = u'(x)·v(x) + u(x)·v'(x)<br><br><span class="hl">Procedure:</span> Label u and v → find u' and v' separately → assemble u'v + uv' → simplify</div>
+        </div>
+      </div>
+      <div class="inner-section" id="d03-ex">
+        <div class="inner-header" onclick="togI('d03-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Product Rule — h(x) = x³·eˣ</div>
+          <div class="notation">u = x³, v = eˣ → u' = 3x², v' = eˣ<br>h'(x) = 3x²·eˣ + x³·eˣ = eˣ(3x² + x³) = <strong>x²eˣ(3 + x)</strong></div>
+          <p>Notice v' = eˣ because the derivative of eˣ is itself. The factoring step is optional but clean — the un-factored form is fully correct on an exam.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d03-q">
+        <div class="inner-header" onclick="togI('d03-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd03a">
+            <div class="q-header" onclick="togQ('qd03a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Differentiate f(x) = x² · ln x. Show all product-rule steps.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>u = x², v = ln x → u' = 2x, v' = 1/x</p><p>f'(x) = 2x·ln x + x²·(1/x) = 2x ln x + x = <strong>x(2 ln x + 1)</strong></p><div class="what-tests">Product rule combining power and natural log derivatives</div></div>
+          </div>
+          <div class="question-block" id="qd03b">
+            <div class="q-header" onclick="togQ('qd03b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A compensation model gives settlement value as S(t) = (2t + 3)(t² − 1). Find S'(t) and evaluate at t = 2.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>u = 2t+3, v = t²−1 → u' = 2, v' = 2t</p><p>S'(t) = 2(t²−1) + (2t+3)(2t) = 2t²−2+4t²+6t = <strong>6t²+6t−2</strong></p><p>S'(2) = 24+12−2 = <strong>34</strong></p><div class="what-tests">Product rule with two polynomial factors · simplifying and evaluating</div></div>
+          </div>
+          <div class="question-block" id="qd03c">
+            <div class="q-header" onclick="togQ('qd03c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A patent royalty model gives revenue as R(q) = q·(100 − 3q). (a) Find R'(q). (b) Find the revenue-maximising quantity by setting R'(q) = 0. (c) A defendant argues their unlicensed production of 10 thousand units caused "minimal lost revenue" because "the royalty rate would have been small at that volume." Using your derivative, evaluate this claim mathematically.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> u=q, v=100−3q → u'=1, v'=−3 → R'(q) = (100−3q) + q(−3) = <strong>100−6q</strong></p><p><strong>(b)</strong> 100−6q=0 → q = <strong>16.67 thousand units</strong></p><p><strong>(c)</strong> R'(10) = 100−60 = 40. At q=10, each additional thousand units generates 40 units of marginal royalty revenue — substantial, not minimal. Since q=10 is below the revenue-maximising point of 16.67, the defendant operated in the region of maximum marginal value. The "minimal lost revenue" argument would only be defensible if production exceeded 16.67, where marginal revenue turns negative. The defendant's claim is mathematically backwards.</p><div class="what-tests">Product rule · revenue maximisation · using R' to rebut a defendant's quantitative claim · marginal vs total revenue distinction</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="d03-bar">
+        <div class="inner-header" onclick="togI('d03-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · IP &amp; Antitrust Connection</div><p>Revenue maximisation — setting R'(q)=0 — is the foundation of every lost-profits calculation in IP infringement and antitrust cases. A lawyer who can locate the revenue-maximising quantity independently can verify the expert's "but-for" baseline rather than accepting it uncritically.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULE 4: QUOTIENT RULE -->
+  <div class="topic-card" id="d04" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d04')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 4</span>
+      <div class="topic-title">The Quotient Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="d04-l">
+        <div class="inner-header" onclick="togI('d04-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>When one function is <em>divided</em> by another, use the quotient rule. The subtraction order in the numerator matters — reverse it and every sign is wrong. Memory hook: <strong>"low d-high minus high d-low, square the bottom and away we go."</strong></p>
+        </div>
+      </div>
+      <div class="inner-section" id="d04-m">
+        <div class="inner-header" onclick="togI('d04-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">Quotient Rule:</span> if h(x) = u(x)/v(x), then<br>h'(x) = [u'(x)·v(x) − u(x)·v'(x)] / [v(x)]²<br><br><span class="hl">Procedure:</span> Label u (high) and v (low) → find u', v' → assemble [u'v − uv'] → divide by v²</div>
+        </div>
+      </div>
+      <div class="inner-section" id="d04-ex">
+        <div class="inner-header" onclick="togI('d04-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Quotient Rule — h(x) = (x²+1)/(x−3)</div>
+          <div class="notation">u = x²+1, v = x−3 → u' = 2x, v' = 1<br>h'(x) = [2x(x−3) − (x²+1)(1)] / (x−3)²<br>= [2x²−6x−x²−1] / (x−3)² = <strong>(x²−6x−1) / (x−3)²</strong></div>
+          <p>The numerator is purely algebraic simplification after the rule is applied — expand, collect like terms, done.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d04-q">
+        <div class="inner-header" onclick="togI('d04-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd04a">
+            <div class="q-header" onclick="togQ('qd04a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Differentiate f(x) = eˣ / x². Show all quotient-rule steps.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>u=eˣ, v=x² → u'=eˣ, v'=2x</p><p>f'(x) = [eˣ·x² − eˣ·2x]/x⁴ = eˣ(x²−2x)/x⁴ = <strong>eˣ(x−2)/x³</strong></p><div class="what-tests">Quotient rule combining exponential and power · factoring eˣ from the numerator</div></div>
+          </div>
+          <div class="question-block" id="qd04b">
+            <div class="q-header" onclick="togQ('qd04b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A firm's average cost is AC(q) = (q² + 4q + 12)/q. Find AC'(q) using the quotient rule, then verify by simplifying the fraction first.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Quotient rule:</strong> u=q²+4q+12, v=q → u'=2q+4, v'=1</p><p>AC'(q) = [(2q+4)q − (q²+4q+12)] / q² = (q²−12)/q² = <strong>1 − 12/q²</strong></p><p><strong>Verify by simplifying first:</strong> AC(q) = q + 4 + 12/q → AC'(q) = 1 + 0 − 12/q² = 1 − 12/q² ✓</p><p>Both routes give the same answer. Recognising when simplification before differentiation is cleaner is a time-saving exam skill.</p><div class="what-tests">Quotient rule · recognising equivalent simpler approach · average cost differentiation</div></div>
+          </div>
+          <div class="question-block" id="qd04c">
+            <div class="q-header" onclick="togQ('qd04c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">An injury risk function is R(s) = s²/(s+10), where s is vehicle speed. (a) Find R'(s). (b) Evaluate R'(30) and R'(60). (c) A defendant argues that since R(60) ≈ 2×R(30), "doubling speed only doubles risk." Using R'(s), construct the precise counter-argument about marginal risk escalation.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> u=s², v=s+10 → u'=2s, v'=1</p><p>R'(s) = [2s(s+10)−s²]/(s+10)² = (s²+20s)/(s+10)²</p><p><strong>(b)</strong> R'(30) = (900+600)/1600 = <strong>0.9375</strong> · R'(60) = (3600+1200)/4900 ≈ <strong>0.9796</strong></p><p><strong>(c)</strong> The defendant compares total levels — a function-value comparison, not a rate comparison. The derivative shows that at 60 km/h, risk is growing at 0.98 units per km/h, versus 0.94 at 30 km/h. The marginal rate is converging toward 1 at high speeds: each additional km/h adds nearly one full risk unit with no diminishing effect. The function is accelerating toward a linear regime at high speeds, making each additional km/h progressively more dangerous in marginal terms. The defendant's framing conceals this escalation entirely.</p><div class="what-tests">Quotient rule · evaluating R' at two points · level vs marginal rate distinction · constructing a technical counter-argument</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="d04-bar">
+        <div class="inner-header" onclick="togI('d04-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · Products Liability Connection</div><p>The level-vs-rate distinction in T3 is one of the most common forms of expert-report sleight of hand in litigation. A lawyer who can identify which comparison is being made — function value or derivative — and demand the other where warranted removes a powerful rhetorical tool from opposing counsel. Average cost and its derivative underpin predatory pricing analysis in antitrust: the minimum of AC(q) (found by setting AC'(q)=0) defines the efficient scale, a key benchmark courts use when evaluating pricing below cost.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULE 5: CHAIN RULE -->
+  <div class="topic-card" id="d05" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d05')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 5</span>
+      <div class="topic-title">The Chain Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="d05-l">
+        <div class="inner-header" onclick="togI('d05-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The chain rule handles <strong>functions inside other functions</strong>. The signal: a standard function (power, exponential, log) applied not to a bare x but to a whole expression — like (3x²+1)⁵, e^(x²), ln(4x+7). Rule: <strong>differentiate the outside first, leaving the inside untouched — then multiply by the derivative of the inside.</strong></p>
+          <div class="pattern-warn"><div class="pw-label">Most Commonly Forgotten Step</div><p>Students differentiate the outer correctly but forget to multiply by the inner derivative. Always ask: "did I multiply by the derivative of what's inside?"</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d05-m">
+        <div class="inner-header" onclick="togI('d05-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">Chain Rule:</span> if y = f(g(x)), then dy/dx = f'(g(x)) · g'(x)<br><br><span class="hl">Common forms:</span><br>d/dx[(g(x))ⁿ] = n(g(x))ⁿ⁻¹ · g'(x)<br>d/dx[e^(g(x))] = e^(g(x)) · g'(x)<br>d/dx[ln(g(x))] = g'(x)/g(x)<br><br><span class="hl">Procedure:</span> identify outer f and inner g → differentiate outer (inner stays intact) → differentiate inner → multiply</div>
+        </div>
+      </div>
+      <div class="inner-section" id="d05-ex">
+        <div class="inner-header" onclick="togI('d05-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Three Chain Rule Forms</div>
+          <p><strong>(a)</strong> y = (3x²+5)⁴</p>
+          <div class="notation">Outer (·)⁴ → 4(·)³ · Inner g'=6x → dy/dx = <strong>24x(3x²+5)³</strong></div>
+          <p><strong>(b)</strong> y = e^(5x³)</p>
+          <div class="notation">Outer e^(·) → e^(·) · Inner g'=15x² → dy/dx = <strong>15x²e^(5x³)</strong></div>
+          <p><strong>(c)</strong> y = ln(x²+1)</p>
+          <div class="notation">Outer ln(·) → 1/(·) · Inner g'=2x → dy/dx = <strong>2x/(x²+1)</strong></div></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d05-q">
+        <div class="inner-header" onclick="togI('d05-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd05a">
+            <div class="q-header" onclick="togQ('qd05a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Differentiate f(x) = (x³−4x)⁶. Identify the outer and inner functions before applying.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Outer: (·)⁶ → 6(·)⁵. Inner: x³−4x → 3x²−4</p><p>f'(x) = <strong>6(3x²−4)(x³−4x)⁵</strong></p><div class="what-tests">Chain rule with polynomial inner · labelling outer and inner before applying</div></div>
+          </div>
+          <div class="question-block" id="qd05b">
+            <div class="q-header" onclick="togQ('qd05b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A bacterial population under drug treatment: P(t) = 1000·e^(−0.3t²). Find P'(t) and interpret its sign.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Outer: e^(·) → itself. Inner: −0.3t² → −0.6t</p><p>P'(t) = 1000·e^(−0.3t²)·(−0.6t) = <strong>−600t·e^(−0.3t²)</strong></p><p>Negative for all t>0 — population is declining: the drug is effective. The rate of decline itself scales with current population (the eˣ factor), so the drug's effect weakens as fewer bacteria remain.</p><div class="what-tests">Chain rule with exponential outer and non-linear inner · interpreting sign of P'</div></div>
+          </div>
+          <div class="question-block" id="qd05c">
+            <div class="q-header" onclick="togQ('qd05c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Litigation costs: C(t) = ln(2t²+8t+1) in millions. (a) Find C'(t). (b) Evaluate C'(1) and C'(5). (c) A defendant's insurer claims costs are "growing at a manageable, decelerating rate." Is this mathematically defensible, and does the deceleration support the insurer's framing?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Outer: ln(·) → 1/(·). Inner: 2t²+8t+1 → 4t+8</p><p>C'(t) = (4t+8)/(2t²+8t+1)</p><p><strong>(b)</strong> C'(1) = 12/11 ≈ <strong>1.09 million/month</strong> · C'(5) = 28/91 ≈ <strong>0.31 million/month</strong></p><p><strong>(c)</strong> Deceleration is real — the quadratic denominator grows faster than the linear numerator, so C'(t) genuinely falls over time. However, "manageable" is misleading: at t=1, costs grew at over 1 million per month, and C'(0)=8, meaning the rate was highest at day one. The deceleration began immediately, not after some initial stabilisation — which actually argues for early settlement, not for the insurer's exposure being manageable going forward. The insurer's framing implies costs were once worse and are now better; the mathematics says they were always decelerating from a high peak, which is a settlement argument for the plaintiff, not comfort for the insurer.</p><div class="what-tests">Chain rule with log outer and quadratic inner · evaluating at two points · distinguishing deceleration from low absolute rate · reframing an insurer's cost narrative using the derivative</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="d05-bar">
+        <div class="inner-header" onclick="togI('d05-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · Insurance &amp; Litigation Finance</div><p>Composite functions appear throughout actuarial models underlying expert testimony in insurance coverage disputes, structured settlements, and litigation finance agreements. The "deceleration doesn't mean low" distinction in T3 is a recurring form of the level-vs-rate confusion — on the LSAT this shows up in Strengthen/Weaken questions that conflate a declining rate of growth with actual decline.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       CLUSTER 3 — TRANSCENDENTAL RULES
+  ════════════════════════════════════════ -->
+  <div class="section-label">Cluster 3 — Transcendental Rules · Exponential, ln &amp; Log</div>
+
+  <!-- RULE 6: EXPONENTIAL RULE -->
+  <div class="topic-card" id="d06" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d06')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 6</span>
+      <div class="topic-title">The Exponential Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="d06-l">
+        <div class="inner-header" onclick="togI('d06-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The exponential function eˣ has a unique and extraordinary property: <strong>its derivative is itself.</strong> It is the only function in mathematics that is unchanged by differentiation. This is not a coincidence — it is the defining property of e as a number, and the reason e appears in every natural growth and decay model.</p>
+          <p>For a general base a (not e), the derivative introduces a factor of ln a — the natural logarithm of the base — because any base can be rewritten in terms of e, and that conversion leaves a ln a factor behind.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="d06-m">
+        <div class="inner-header" onclick="togI('d06-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">Base e:</span> d/dx(eˣ) = eˣ<br><span class="hl">Base e, scaled:</span> d/dx(Aeʳˣ) = rAeʳˣ &nbsp;&nbsp;(chain rule applies — r is the inner derivative)<br><span class="hl">General base a:</span> d/dx(aˣ) = aˣ · ln a<br><span class="hl">General base a, scaled:</span> d/dx(aʳˣ) = r · aʳˣ · ln a<br><br><span class="hl">Why ln a appears:</span> aˣ = e^(x ln a), so d/dx(e^(x ln a)) = e^(x ln a) · ln a = aˣ · ln a</div>
+          <div class="pattern-warn"><div class="pw-label">Vs the Power Rule — Critical Distinction</div><p>d/dx(xⁿ) = nxⁿ⁻¹ — variable in the base, constant in the exponent → Power Rule.<br>d/dx(aˣ) = aˣ ln a — constant in the base, variable in the exponent → Exponential Rule.<br>Getting these backwards is the single most tested point of confusion across all derivatives problems.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d06-ex">
+        <div class="inner-header" onclick="togI('d06-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Base e and General Base — Both Forms</div>
+          <p><strong>(a)</strong> f(x) = 500e^(0.07x) — continuous compound growth at 7%</p>
+          <div class="notation">f'(x) = 0.07 × 500 × e^(0.07x) = <strong>35e^(0.07x)</strong><br>At x=10: f'(10) = 35e^(0.7) ≈ 35 × 2.0138 ≈ 70.48 units/period</div>
+          <p><strong>(b)</strong> g(x) = 3ˣ — base 3, general exponential</p>
+          <div class="notation">g'(x) = 3ˣ · ln 3 ≈ <strong>3ˣ × 1.0986</strong><br>At x=2: g'(2) = 9 × ln 3 ≈ 9.887</div>
+          <p>Compare: if you mistakenly applied the power rule to 3ˣ, you'd get x·3^(x−1), which is completely wrong — the power rule requires the base to be the variable. This mistake gives a structurally different (and incorrect) function shape.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d06-q">
+        <div class="inner-header" onclick="togI('d06-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd06a">
+            <div class="q-header" onclick="togQ('qd06a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A firm's revenue grows as R(t) = 2000e^(0.12t). Find R'(t) and the rate of revenue growth at t=5 years.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>R'(t) = 0.12 × 2000 × e^(0.12t) = 240e^(0.12t)</p><p>R'(5) = 240e^(0.6) ≈ 240 × 1.8221 ≈ <strong>Rs. 437.3 per year</strong> at t=5.</p><div class="what-tests">Exponential rule with scaling constant · evaluating at a specific time</div></div>
+          </div>
+          <div class="question-block" id="qd06b">
+            <div class="q-header" onclick="togQ('qd06b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Differentiate f(x) = 5ˣ + 4eˣ − x³. Clearly identify which rule applies to each term.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>5ˣ → general exponential: 5ˣ · ln 5</p><p>4eˣ → base e exponential: 4eˣ</p><p>x³ → power rule: 3x²</p><p>f'(x) = <strong>5ˣ ln 5 + 4eˣ − 3x²</strong></p><div class="what-tests">Mixed rules in one problem · correctly identifying which rule applies term by term</div></div>
+          </div>
+          <div class="question-block" id="qd06c">
+            <div class="q-header" onclick="togQ('qd06c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Two competing brands grow their market share as A(t) = 200e^(0.15t) and B(t) = 350·(1.1)ᵗ. (a) Find A'(t) and B'(t). (b) Compare the growth rates at t=0 and t=10. (c) A regulator investigating market concentration argues that Brand A "will eventually dominate and should be regulated preemptively." Using your derivatives and the growth functions, evaluate whether this argument is mathematically supportable at this stage.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> A'(t) = 0.15×200×e^(0.15t) = 30e^(0.15t)</p><p>B'(t) = 350·(1.1)ᵗ·ln(1.1) ≈ 350·(1.1)ᵗ·0.09531 ≈ 33.36·(1.1)ᵗ</p><p><strong>(b)</strong> At t=0: A'(0)=30, B'(0)≈33.36 — B growing faster initially.<br>At t=10: A'(10)=30e^1.5≈134.5, B'(10)=33.36·(1.1)^10≈33.36×2.5937≈86.5 — A now growing faster.</p><p><strong>(c)</strong> The crossover in growth rates (A overtakes B somewhere between t=0 and t=10) does confirm A's trajectory is steeper. However, at t=0 Brand B still has a larger base (350 vs 200) and a higher initial growth rate — dominance is not yet established. The regulator's argument requires showing not only that A's growth rate eventually exceeds B's, but that A's total market share will overtake B's and produce sustained concentration. That requires finding the level crossover (A(t)=B(t)), not just the rate crossover. Setting 200e^(0.15t)=350·(1.1)ᵗ and solving for t gives the relevant threshold — until then, "will eventually dominate" remains a projection, not a present competitive reality, and premature regulation would be legally challengeable as anticipatory overreach without that crossover date specified and supported.</p><div class="what-tests">Exponential rule for both base-e and general base · comparing derivatives at two time points · distinguishing level crossover from rate crossover in a competition/regulation argument</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="d06-bar">
+        <div class="inner-header" onclick="togI('d06-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · Competition Law Connection</div><p>The level-vs-rate-crossover distinction in T3 is the mathematical backbone of market dominance analysis in competition law — regulators and courts frequently conflate a firm having the highest growth rate with it already having dominant market share. These are different thresholds requiring different evidence, and a lawyer who can articulate exactly which crossover point has or hasn't been demonstrated controls the framing of the entire dominance inquiry.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULE 7: NATURAL LOG RULE -->
+  <div class="topic-card" id="d07" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d07')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 7</span>
+      <div class="topic-title">The Natural Logarithm Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="d07-l">
+        <div class="inner-header" onclick="togI('d07-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The natural logarithm ln(x) is the inverse of eˣ — they undo each other. Their derivatives mirror this inverse relationship: where eˣ differentiates to itself (exponential growth), ln(x) differentiates to 1/x (which declines toward zero) — the rate of a logarithm slows continuously, which is exactly what "logarithmic growth" means in plain English.</p>
+          <p>ln(x) appears in economics, information theory, entropy calculations, and growth models wherever the rate of change is proportional to the reciprocal of the current level. In legal and statistical contexts, it also appears in the log-likelihood functions that underlie many expert statistical models — knowing how ln differentiates is prerequisite to understanding how those models are fitted.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="d07-m">
+        <div class="inner-header" onclick="togI('d07-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">Natural log rule:</span> d/dx(ln x) = 1/x &nbsp;&nbsp;(x > 0)<br><br><span class="hl">With a constant multiple:</span> d/dx(a·ln x) = a/x<br><br><span class="hl">Combined with chain rule (composite):</span><br>d/dx[ln(g(x))] = g'(x)/g(x)<br><br><span class="hl">Domain note:</span> ln x is only defined for x > 0. For expressions like ln|x|, the derivative is still 1/x but the domain extends to x ≠ 0. In word problems, the domain is almost always positive by context.</div>
+        </div>
+      </div>
+      <div class="inner-section" id="d07-ex">
+        <div class="inner-header" onclick="togI('d07-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Natural Log — Simple and Composite Forms</div>
+          <p><strong>(a)</strong> f(x) = 3 ln x</p>
+          <div class="notation">f'(x) = 3 · (1/x) = <strong>3/x</strong></div>
+          <p><strong>(b)</strong> f(x) = ln(x² + 3x)</p>
+          <div class="notation">Chain rule: outer ln(·) → 1/(·), inner g = x²+3x → g' = 2x+3<br>f'(x) = (2x+3)/(x²+3x) = <strong>(2x+3)/(x(x+3))</strong></div>
+          <p><strong>(c)</strong> f(x) = x²·ln x — requires product rule AND natural log rule</p>
+          <div class="notation">u = x², v = ln x → u' = 2x, v' = 1/x<br>f'(x) = 2x·ln x + x²·(1/x) = 2x ln x + x = <strong>x(2 ln x + 1)</strong></div></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d07-q">
+        <div class="inner-header" onclick="togI('d07-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd07a">
+            <div class="q-header" onclick="togQ('qd07a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Differentiate f(x) = 5 ln x − 2x² + 7. State which rule applies to each term.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>5 ln x → natural log rule: 5/x</p><p>2x² → power rule: 4x</p><p>7 → constant: 0</p><p>f'(x) = <strong>5/x − 4x</strong></p><div class="what-tests">Natural log rule combined with sum/difference and power rule · term-by-term identification</div></div>
+          </div>
+          <div class="question-block" id="qd07b">
+            <div class="q-header" onclick="togQ('qd07b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A utility function is U(x) = ln(3x² + 6x), representing marginal utility of x units of a good. Find U'(x) and evaluate the rate of change of utility at x = 2.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Chain rule: g = 3x²+6x → g' = 6x+6</p><p>U'(x) = (6x+6)/(3x²+6x) = 6(x+1)/(3x(x+2)) = <strong>2(x+1)/(x(x+2))</strong></p><p>U'(2) = 2(3)/(2×4) = 6/8 = <strong>0.75</strong> — utility is growing at 0.75 units per additional good at x=2, a diminishing rate consistent with the principle of diminishing marginal utility.</p><div class="what-tests">Chain rule combined with natural log · simplifying the composite · evaluating at a point · diminishing marginal utility interpretation</div></div>
+          </div>
+          <div class="question-block" id="qd07c">
+            <div class="q-header" onclick="togQ('qd07c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">An expert report models environmental harm accumulation as H(t) = t·ln(t) + 50 (measured in damage units, t in years, t≥1). (a) Find H'(t). (b) Evaluate H'(1), H'(5), H'(10). (c) A defendant argues that since ln(t) grows slowly, total harm is "barely increasing" at t=10. Construct a precise rebuttal using H'(10) and the product structure of H'(t).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Product rule on t·ln(t): u=t, v=ln t → u'=1, v'=1/t</p><p>H'(t) = 1·ln t + t·(1/t) = ln t + 1</p><p><strong>(b)</strong> H'(1) = ln 1 + 1 = 0+1 = <strong>1</strong> · H'(5) = ln 5+1 ≈ 1.609+1 = <strong>2.609</strong> · H'(10) = ln 10+1 ≈ 2.303+1 = <strong>3.303</strong></p><p><strong>(c)</strong> The defendant exploits the true but partial observation that ln(t) itself grows slowly. The full derivative is H'(t) = ln(t)+1 — the "+1" term means H'(t) never falls below 1 regardless of how slowly ln(t) grows, and the total rate at t=10 is 3.303 damage units per year — more than three times the initial rate. "Barely increasing" is mathematically false: harm accumulation is accelerating, not stabilising. The product structure of H(t) = t·ln(t) creates this acceleration precisely because both factors are growing simultaneously, even if each grows slowly in isolation. A correct characterisation is "harm accumulates at a continuously rising rate, exceeding 3 units/year by year 10."</p><div class="what-tests">Product rule combined with natural log · evaluating H' at three points · identifying selective use of ln's slow growth to mischaracterise H'(t) · constructing a precise derivative-based rebuttal</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="d07-bar">
+        <div class="inner-header" onclick="togI('d07-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · Environmental &amp; Tort Connection</div><p>The "+1 floor" in H'(t) = ln(t)+1 is an example of how product-rule structures create acceleration that each individual factor conceals — a recurring source of expert-report errors in slow-onset environmental tort cases, where defendants routinely argue that "logarithmic harm" means minimal harm. The derivative reveals that the product of two slowly-growing functions can still accelerate significantly over time.</p><p>Log-linear functions also appear in economic efficiency models (Cobb-Douglas production functions are differentiated using the log rule), and understanding ln'(x)=1/x is prerequisite to understanding diminishing marginal returns — a concept that recurs in antitrust economics, regulatory economics, and damages calculations.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULE 8: LOG BASE-a RULE -->
+  <div class="topic-card" id="d08" style="border-left-color:var(--cd)">
+    <div class="topic-header" onclick="tog('d08')">
+      <span class="lec-tag" style="background:var(--cd)">RULE 8</span>
+      <div class="topic-title">The Logarithm Rule (Base a)</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="d08-l">
+        <div class="inner-header" onclick="togI('d08-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The log base-a rule is the generalisation of the natural log rule to any base. It introduces a <strong>1/ln a</strong> factor in the denominator — the same ln a that appeared in the general exponential rule's numerator. This is not a coincidence: log base a and exponential base a are inverses of each other, and their derivative rules are mirrors.</p>
+          <p>In practice, log base 10 (written log₁₀ or simply log) appears most often in measurement scales — the Richter scale for earthquakes, the decibel scale for sound, and pH in chemistry are all base-10 logarithms. Log base 2 appears in information theory and data compression. For any of these, the derivative is the base-a rule.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="d08-m">
+        <div class="inner-header" onclick="togI('d08-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">Log base-a rule:</span> d/dx(logₐ x) = 1/(x · ln a)<br><br><span class="hl">Most common case — base 10:</span> d/dx(log₁₀ x) = 1/(x · ln 10) ≈ 1/(x · 2.3026)<br><br><span class="hl">Why the ln a denominator?</span> logₐ x = ln x / ln a (change-of-base formula). Differentiating: d/dx(ln x / ln a) = (1/x) · (1/ln a) = 1/(x ln a). The ln a in the denominator comes from dividing by a constant.<br><br><span class="hl">Combined with chain rule:</span> d/dx[logₐ(g(x))] = g'(x) / (g(x) · ln a)</div>
+        </div>
+      </div>
+      <div class="inner-section" id="d08-ex">
+        <div class="inner-header" onclick="togI('d08-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Log Base-a and Base-10 Derivatives</div>
+          <p><strong>(a)</strong> f(x) = log₁₀(x)</p>
+          <div class="notation">f'(x) = 1/(x · ln 10) ≈ <strong>1/(2.3026x)</strong></div>
+          <p><strong>(b)</strong> f(x) = log₂(3x² + 1)</p>
+          <div class="notation">Chain rule: g = 3x²+1 → g' = 6x, base a=2, ln 2 ≈ 0.6931<br>f'(x) = 6x / ((3x²+1) · ln 2) = <strong>6x / (0.6931(3x²+1))</strong></div>
+          <p><strong>Comparison — why ln is usually preferred:</strong> d/dx(ln x) = 1/x, clean. d/dx(log₁₀ x) = 1/(x ln 10), an extra constant in the denominator always. In modelling contexts, engineers and scientists use ln specifically to avoid this constant — it's not that ln is more important, it's that its derivative is simpler. When you see log₁₀ in a real-world problem, the fastest approach is often to convert via log₁₀(x) = ln(x)/ln(10) before differentiating.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="d08-q">
+        <div class="inner-header" onclick="togI('d08-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qd08a">
+            <div class="q-header" onclick="togQ('qd08a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Differentiate f(x) = 4·log₁₀(x) and g(x) = log₅(x). Leave answers in exact form.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>f'(x) = 4 · 1/(x·ln 10) = <strong>4/(x ln 10)</strong></p><p>g'(x) = 1/(x·ln 5) = <strong>1/(x ln 5)</strong></p><div class="what-tests">Log base-a rule applied to base 10 and base 5 · leaving answers in exact ln form</div></div>
+          </div>
+          <div class="question-block" id="qd08b">
+            <div class="q-header" onclick="togQ('qd08b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A sound intensity model uses S(I) = 10·log₁₀(I/I₀), where I is intensity and I₀ is a constant. Find dS/dI and interpret it — what does it mean that dS/dI decreases as I increases?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>S(I) = 10·log₁₀(I) − 10·log₁₀(I₀). I₀ is constant so its log term differentiates to zero.</p><p>dS/dI = 10 · 1/(I·ln 10) = <strong>10/(I·ln 10)</strong></p><p>As I increases, dS/dI = 10/(I·ln 10) decreases: <strong>diminishing marginal sensitivity.</strong> Each additional unit of sound intensity produces progressively smaller increases in perceived loudness (decibels). This is why the decibel scale was designed logarithmically — human hearing itself has this diminishing-returns structure, so a linear scale would be useless for expressing the enormous range of audible intensities. In an environmental noise case, this derivative shows precisely why a defendant's claim of "only a doubling of intensity" understates the perceived harm — doubling I from a low baseline adds far more perceived loudness than doubling from a high baseline.</p><div class="what-tests">Log base-10 rule · change of base · interpreting diminishing dS/dI as perceptual diminishing returns · applying to an environmental nuisance argument</div></div>
+          </div>
+          <div class="question-block" id="qd08c">
+            <div class="q-header" onclick="togQ('qd08c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">An information-theoretic damages model uses D(p) = −K·p·log₂(p), where p is the probability of a data breach occurring and K is a scaling constant. (a) Find D'(p) using the product rule and log base-2 rule. (b) Evaluate the sign of D'(p) for 0 &lt; p &lt; 1/e^(ln 2) and interpret. (c) A defendant argues that their negligence increased breach probability from 0.1 to 0.2 — "merely doubling a small probability." Using D'(p), construct the correct characterisation of the incremental harm.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> D(p) = −K·p·log₂(p). Product rule: u=p, v=log₂(p) → u'=1, v'=1/(p·ln 2)</p><p>D'(p) = −K[1·log₂(p) + p·(1/(p·ln 2))] = −K[log₂(p) + 1/ln 2]</p><p>Since 1/ln 2 = log₂(e): D'(p) = −K[log₂(p) + log₂(e)] = <strong>−K·log₂(ep)</strong></p><p><strong>(b)</strong> D'(p) = 0 when log₂(ep) = 0 → ep = 1 → p = 1/e ≈ 0.368. For p &lt; 1/e: log₂(ep) &lt; 0, so D'(p) = −K·(negative) = positive — D(p) is increasing. Harm rises as breach probability increases from 0 toward 1/e, which covers all practically relevant probability ranges (small breach probabilities are the ones that matter in most security contexts).</p><p><strong>(c)</strong> D'(0.1) = −K·log₂(e×0.1) = −K·log₂(0.2718) ≈ −K×(−1.879) = 1.879K</p><p>D'(0.2) = −K·log₂(e×0.2) = −K·log₂(0.5436) ≈ −K×(−0.879) = 0.879K</p><p>The marginal damage rate at p=0.1 is 1.879K — more than double the marginal rate at p=0.2. This means the increase from 0.1 to 0.2 passes through the region of highest marginal sensitivity. "Merely doubling a small probability" is exactly the wrong framing: moving probability in the low-p region causes the steepest incremental harm of any equivalent probability increase, not the most negligible. The defendant's characterisation inverts the mathematical reality — small probability increases near p=0 carry the highest marginal damage, which is precisely why security standards impose strict controls on negligent increases in breach likelihood in that range.</p><div class="what-tests">Product rule combined with log base-2 · simplifying using logarithm laws · finding the critical point of D'(p) · evaluating the sign of D' over a range · using the derivative to rebut a defendant's characterisation of small probability increases</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="d08-bar">
+        <div class="inner-header" onclick="togI('d08-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · Cybersecurity &amp; Data Privacy Law</div><p>Information-theoretic models (log base 2) appear increasingly in cybersecurity litigation and data privacy regulatory proceedings — the EU GDPR and US state privacy laws impose damages frameworks that implicitly or explicitly reference information-theoretic risk measures. A lawyer who can interpret D'(p) not just as an abstraction but as the "marginal harm per unit of increased breach probability" can cross-examine data security experts at their own level of technical sophistication.</p><p>The decibel-scale argument (T2-B) is a direct template for any environmental nuisance or noise pollution case where the defendant argues that a logarithmic scale means their contribution was small — the derivative shows precisely why that argument fails on its own mathematical terms: logarithmic perception means small-baseline increases are perceptually largest, not smallest.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part3-mathematical-modeling.html">← Part 3</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-part4-bivariate-regression.html">Part 4 →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Derivatives — Complete Rule Set · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>

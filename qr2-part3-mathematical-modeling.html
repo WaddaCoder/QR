@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Part 3 · Mathematical Modeling</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--c4:#1AADAD;--c5:#8A4FD4;--c6:#D4941A;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .logic-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px;}
+  .logic-table th{background:var(--ink);color:var(--page);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;padding:8px 10px;text-align:left;font-weight:600;}
+  .logic-table td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5;font-size:13px;}
+  .logic-table tr:last-child td{border-bottom:none;}
+  .logic-table tr:nth-child(even) td{background:#FAFAF8;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens p{font-size:14px;margin-top:8px;}
+  .bar-lens p:first-of-type{margin-top:0;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Part 3 — Mathematical Modeling</h1>
+  <div class="subtitle">Lec. 11–18 · Dr. Tariq Ismaeel · 10 topics</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Part 3</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">10 / 10 topics</span>
+</div>
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <!-- CLUSTER 4: LEC 11-13 -->
+  <div class="section-label">Lec. 11–13 · Linear Functions &amp; Models</div>
+
+  <!-- T01: Deterministic vs Probabilistic -->
+  <div class="topic-card" id="t01" style="border-left-color:var(--c4)">
+    <div class="topic-header" onclick="tog('t01')">
+      <span class="lec-tag" style="background:var(--c4)">LEC 11</span>
+      <div class="topic-title">Deterministic vs. Probabilistic Models</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t01-l"><div class="inner-header" onclick="togI('t01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <p>A <strong>deterministic model</strong> gives one exact output for each input. Same input, same output, every time. No randomness. "Distance = speed × time" is deterministic — 60 km/h for 2 hours is always exactly 120 km.</p>
+        <p>A <strong>probabilistic model</strong> gives a range of possible outputs with likelihoods. "A person who smokes 20 cigarettes a day has a 30% probability of lung cancer by age 60." Same input, different possible outcomes — it produces a distribution, not a single answer.</p>
+        <div class="notation"><span class="hl">Deterministic:</span> y = f(x) — one x gives exactly one y<br><span class="hl">Probabilistic:</span> P(Y|X=x) — given x, what is the probability distribution of Y?</div>
+        <div class="pattern-warn"><div class="pw-label">The Translation Question PU Will Ask</div><p>"Every person exposed to the chemical develops the disease" — deterministic (absolute claim). "A person has a 60% chance of developing the disease" — probabilistic. Casual language blurs this. Detect which model the claim implies before answering.</p></div>
+      </div></div>
+      <div class="inner-section" id="t01-m"><div class="inner-header" onclick="togI('t01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation"><span class="hl">Deterministic test:</span> does the same input always produce the identical output, with zero variation? If yes, deterministic.<br><span class="hl">Probabilistic test:</span> does the claim involve a rate, percentage, "typically," "tends to," or any language admitting exceptions? If yes, probabilistic.<br><span class="hl">Mixed claims:</span> a deterministic rule can govern a probabilistic input — e.g. "if convicted (deterministic legal consequence), sentence length follows a probabilistic distribution based on prior record."</div>
+        <p>The keyword test is fast but not foolproof — "always" can appear in a probabilistic claim used loosely ("violent offenders are always considered higher risk"), so the real test is whether the claim, taken literally and precisely, logically admits exceptions. If it does, even one, it's probabilistic regardless of how confident the wording sounds.</p>
+      </div></div>
+      <div class="inner-section" id="t01-ex"><div class="inner-header" onclick="togI('t01-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="example-block"><div class="ex-label">Classifying a Mixed Statutory Claim</div><p>"Any person who drives with a blood alcohol level above the legal limit is guilty of an offence. Studies show such drivers are involved in collisions at roughly 4 times the rate of sober drivers."</p><p><strong>First sentence:</strong> deterministic. "Is guilty" admits no exceptions once the antecedent (above the limit) is satisfied — this is a legal rule, y = f(x) with one fixed output.</p><p><strong>Second sentence:</strong> probabilistic. "Roughly 4 times the rate" is a statistical tendency drawn from a distribution of outcomes across many drivers — it says nothing certain about any individual driver.</p><p>A single paragraph can mix both model types, and the skill is classifying each claim independently rather than letting the confident tone of one infect your read of the other.</p></div>
+      </div></div>
+      <div class="inner-section" id="t01-q"><div class="inner-header" onclick="togI('t01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="question-block" id="q01a"><div class="q-header" onclick="togQ('q01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Classify each as deterministic or probabilistic: (a) "If a contract is breached, the innocent party is entitled to damages." (b) "Companies that cut R&amp;D spending typically see declining profits within 3 years." (c) "Water boils at 100°C at sea level."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><p><strong>(a) Deterministic.</strong> Legal entitlement follows from breach as a matter of rule — no probability involved.</p><p><strong>(b) Probabilistic.</strong> "Typically" signals a statistical tendency. Some companies will not follow the pattern.</p><p><strong>(c) Deterministic.</strong> Physical law under specified conditions — same input always produces the same output.</p><div class="what-tests">Classification · legal rules as deterministic · statistical tendencies as probabilistic</div></div></div>
+        <div class="question-block" id="q01b"><div class="q-header" onclick="togQ('q01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">An expert witness testifies: "In my experience, defendants who show remorse receive lighter sentences." Deterministic or probabilistic? How should a lawyer challenge this in cross-examination?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><p><strong>Probabilistic.</strong> "In my experience" and absence of absolute language marks this as a statistical claim.</p><p><strong>Cross-examination:</strong> Ask the expert to quantify — what percentage of cases? What sample size? What is the base rate of lighter sentences without remorse shown? Without quantification, the claim cannot be evaluated. A confident-sounding probabilistic claim is significantly weaker evidence than the jury may assume.</p><div class="what-tests">Probabilistic expert testimony · demanding quantification · gap between statistical tendency and legal rule</div></div></div>
+        <div class="question-block" id="q01c"><div class="q-header" onclick="togQ('q01c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A risk model predicts: "Facilities with safety scores below 60 have a 78% probability of a serious incident within 5 years." Facility X scores 55 and has had no incident. The regulator wants to close it. The facility argues: "Probability is not certainty." Analyse both positions using the deterministic/probabilistic distinction.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><p><strong>The facility is logically correct but strategically weak.</strong> The model is explicitly probabilistic — 0.78, not 1.0. No incident to date is consistent with being in the 22% that don't experience incidents. The facility correctly notes probability is not certainty.</p><p><strong>The regulator's stronger point:</strong> Regulation is anticipatory. Requiring a deterministic outcome (an actual incident) before acting defeats the purpose of probabilistic risk models entirely. The relevant question is what threshold of probability justifies preventive intervention — which is a policy question, not a logical one.</p><p><strong>The logical tension:</strong> The facility applies deterministic reasoning (no incident = no violation) to a probabilistic regulatory framework. The resolution depends on whether the regulation itself specifies a probability threshold for intervention, or uses deterministic language ("shall be closed if score below 60").</p><div class="what-tests">Probabilistic vs. deterministic regulatory frameworks · anticipatory regulation · applying the correct model type to the relevant framework</div></div></div>
+      </div></div>
+      <div class="inner-section" id="t01-bar"><div class="inner-header" onclick="togI('t01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="bar-lens"><div class="bar-label">NY Bar · Litigation Connection</div><p>Expert reports routinely present probabilistic findings using language that sounds deterministic — a lawyer who can't separate "this risk factor is associated with a 30% increase" from "this risk factor causes the outcome" will either overstate or understate the report's actual evidential weight in cross-examination.</p><p>Regulatory and sentencing frameworks frequently mix both model types in a single provision — a deterministic legal consequence (guilt, liability) triggered by an underlying probabilistic risk assessment. Spotting where the rule shifts from "if this exact fact, then this consequence" to "if this statistical threshold, then this consequence" is often the precise point where a regulation can be challenged as arbitrary or under-specified.</p></div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- T02: Linear Functions -->
+  <div class="topic-card" id="t02" style="border-left-color:var(--c4)">
+    <div class="topic-header" onclick="tog('t02')">
+      <span class="lec-tag" style="background:var(--c4)">LEC 12</span>
+      <div class="topic-title">Linear Functions &amp; Real-World Modeling</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t02-l"><div class="inner-header" onclick="togI('t02-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <p>A linear function describes a relationship where change is <strong>constant</strong>. For every additional unit of input, the output changes by the same fixed amount. The graph is a straight line.</p>
+        <div class="notation"><span class="hl">y = mx + c</span><br>m = slope = rate of change (how much y changes per unit of x)<br>c = y-intercept = value of y when x = 0 (the starting point)<br><br><span class="hl">Slope from two points:</span> m = (y₂ - y₁) / (x₂ - x₁)</div>
+        <p>In plain language: a lawyer who charges a fixed consultation fee plus an hourly rate has a linear total fee. Hourly rate = m. Fixed fee = c. Hours worked = x.</p>
+        <div class="pattern-warn"><div class="pw-label">The Word Problem Translation Step</div><p>PU describes a situation in prose. First move: identify what is <em>constant per period</em> (slope m) and what is <em>fixed regardless of x</em> (intercept c). Never write an equation before you have identified both.</p></div>
+      </div></div>
+      <div class="inner-section" id="t02-m"><div class="inner-header" onclick="togI('t02-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation"><span class="hl">Building a model from prose, step by step:</span><br>1. Find the fixed amount (appears regardless of usage) → c<br>2. Find the per-unit rate (multiplied by usage) → m<br>3. Identify the input variable and what it counts → x<br>4. Assemble: y = mx + c<br><br><span class="hl">Solving for x given y:</span> y = mx + c → x = (y − c) / m</div>
+        <p>Word problems frequently state the fixed and variable amounts in either order, or bury the fixed amount mid-sentence rather than at the start — the mechanical fix is to extract both numbers first, label them m and c explicitly, and only then write the equation, rather than trying to write the equation directly from the prose in one pass.</p>
+      </div></div>
+      <div class="inner-section" id="t02-ex"><div class="inner-header" onclick="togI('t02-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="example-block"><div class="ex-label">Building the Model</div><p>"A law firm charges a fixed registration fee of Rs. 5,000 plus Rs. 2,000 per hour."</p><p>c = 5,000 (fixed). m = 2,000 (per hour). Model: Fee = 2,000x + 5,000.</p><p>At 3 hours: 2,000(3) + 5,000 = Rs. 11,000. For Rs. 15,000 budget: 15,000 = 2,000x + 5,000 → x = 5 hours.</p></div>
+      </div></div>
+      <div class="inner-section" id="t02-q"><div class="inner-header" onclick="togI('t02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="question-block" id="q02a"><div class="q-header" onclick="togQ('q02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A court imposes a fine of Rs. 10,000 plus Rs. 500 for each day a violation continues. Write the linear model. What is the fine after 30 days? How many days until the fine reaches Rs. 35,000?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">F(d) = 500d + 10,000<br>After 30 days: F(30) = 15,000 + 10,000 = Rs. 25,000<br>When F = 35,000: 35,000 = 500d + 10,000 → d = 50 days</div><div class="what-tests">Linear model construction · evaluation · solving for x given y</div></div></div>
+        <div class="question-block" id="q02b"><div class="q-header" onclick="togQ('q02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Provider A: Rs. 3,000 fixed + Rs. 1,500/hour. Provider B: no fixed fee, Rs. 2,000/hour. At what hours do they cost the same? Which is cheaper for a 4-hour job? A 10-hour job?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">A(h) = 1,500h + 3,000 · B(h) = 2,000h<br>Equal: 1,500h + 3,000 = 2,000h → h = 6 hours<br>At h=4: A=9,000, B=8,000 → B cheaper<br>At h=10: A=18,000, B=20,000 → A cheaper</div><p>B cheaper under 6 hours. A cheaper over 6 hours. The crossover is the break-even point.</p><div class="what-tests">Two linear functions · break-even · comparative cost analysis</div></div></div>
+        <div class="question-block" id="q02c"><div class="q-header" onclick="togQ('q02c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A damages model assumes harm grows linearly at Rs. 50,000/month from breach. Actual data: Rs. 80,000 in month 1, Rs. 110,000 in month 2. Is the linear model appropriate? What does the data suggest, and what is the legal significance?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">Linear model at Rs. 50,000/month predicts:<br>Month 1: 50,000 · Month 2: 100,000<br>Actual: Month 1: 80,000 · Month 2: 110,000<br>Actual month-on-month increment: 30,000 (not 50,000)<br>Month 1 actual (80,000) exceeds prediction (50,000) — initial losses understated</div><p><strong>Model is not appropriate.</strong> The assumed rate of Rs. 50,000/month is inconsistent with the data — actual month 1 losses are 60% higher. The increment (Rs. 30,000) also differs from the assumed rate, suggesting either a different linear rate or a non-linear pattern.</p><p><strong>Legal significance:</strong> If the correct rate is higher than modelled, the plaintiff is undercompensated. The direction of error likely favours the plaintiff, not the defendant. The defendant's challenge to the model may inadvertently expose a larger damages figure.</p><div class="what-tests">Testing linear model against data · comparing predicted vs. actual · legal consequence of model error direction</div></div></div>
+      </div></div>
+      <div class="inner-section" id="t02-bar"><div class="inner-header" onclick="togI('t02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="bar-lens"><div class="bar-label">NY Bar · Billing &amp; Damages Connection</div><p>Linear fee structures (retainer plus hourly, or fixed plus per-unit damages) are the default model in legal billing and in many statutory damages schemes — a lawyer who can instantly extract m and c from a fee agreement or a damages clause can answer "what will this cost at X hours" or "at what point does Provider A become cheaper than Provider B" without needing a calculator mid-negotiation.</p><p>Testing a linear damages model against actual data, as in the T3 question above, is exactly the analysis a damages expert performs when a defendant disputes a plaintiff's claimed rate of harm — and recognising which direction a modelling error favours (under- or over-compensation) is a recurring, high-value litigation skill.</p></div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- T03: Slope and Intercept -->
+  <div class="topic-card" id="t03" style="border-left-color:var(--c4)">
+    <div class="topic-header" onclick="tog('t03')">
+      <span class="lec-tag" style="background:var(--c4)">LEC 12</span>
+      <div class="topic-title">Interpreting Slope &amp; Intercept</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t03-l"><div class="inner-header" onclick="togI('t03-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <p>Slope (m) answers: <strong>"How fast is this changing?"</strong> — the rate of change per unit of x.</p>
+        <p>Intercept (c) answers: <strong>"What is the baseline?"</strong> — the value when x is zero.</p>
+        <div class="notation"><span class="hl">Positive slope:</span> y increases as x increases — growth<br><span class="hl">Negative slope:</span> y decreases as x increases — decay or reduction<br><span class="hl">Zero slope:</span> y is constant — no relationship with x</div>
+      </div></div>
+      <div class="inner-section" id="t03-m"><div class="inner-header" onclick="togI('t03-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation"><span class="hl">Reading slope from prose:</span> look for "per," "each," "every," "rate of" — the number attached to one of these words is m, and its sign comes from whether the quantity is rising or falling.<br><span class="hl">Reading intercept from prose:</span> look for "starting," "initial," "at the outset," "before any [x] occurred" — this is the value at x=0.<br><span class="hl">Comparing two models:</span> set them equal to find the crossover point; check which has the larger |slope| to determine which changes faster long-term, regardless of which starts higher.</div>
+        <p>A model with a small intercept but large slope will eventually overtake a model with a large intercept but small slope — the crossover point is exactly where m₁x + c₁ = m₂x + c₂, solved for x.</p>
+      </div></div>
+      <div class="inner-section" id="t03-ex"><div class="inner-header" onclick="togI('t03-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="example-block"><div class="ex-label">Interpreting and Comparing Two Models</div><p>"Compliance costs for Firm A start at Rs. 200,000 and rise by Rs. 40,000 per year. Compliance costs for Firm B start at Rs. 350,000 and rise by Rs. 15,000 per year."</p><p>Firm A: c = 200,000, m = 40,000 → A(t) = 40,000t + 200,000. Firm B: c = 350,000, m = 15,000 → B(t) = 15,000t + 350,000.</p><p><strong>Crossover:</strong> 40,000t + 200,000 = 15,000t + 350,000 → 25,000t = 150,000 → t = 6 years.</p><p>Before year 6, Firm B has higher costs (larger intercept). After year 6, Firm A overtakes — its steeper slope eventually dominates the smaller starting gap. A firm choosing between the two structures needs to know its planning horizon, not just which number looks smaller today.</p></div>
+      </div></div>
+      <div class="inner-section" id="t03-q"><div class="inner-header" onclick="togI('t03-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="question-block" id="q03a"><div class="q-header" onclick="togQ('q03a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Pollution complaints: C = -15t + 300, where t = years since new regulation. Interpret the slope and intercept in plain English. When will complaints reach zero?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">m = -15: complaints decrease by 15 per year<br>c = 300: at t=0, there were 300 complaints per year<br>When C=0: 0 = -15t + 300 → t = 20 years</div><p>At this rate, complaints reach zero in 20 years. In reality, complaints may plateau above zero — the linear model is valid within the range where its assumptions hold.</p><div class="what-tests">Slope as rate of change · intercept as baseline · solving for y=0 · model limitations</div></div></div>
+        <div class="question-block" id="q03b"><div class="q-header" onclick="togQ('q03b')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Two models for a river's pollution: Model A: P = 8t + 20 (rising). Model B: P = -3t + 95 (falling). Safety threshold: P = 60. Under each model, when does the river cross the threshold? At t=5, which model gives higher pollution? What information resolves which model to rely on?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">Model A unsafe when P > 60: 8t+20=60 → t=5 years<br>Model B currently: P(0)=95 — already unsafe<br>Model B safe when: -3t+95=60 → t=11.7 years<br>At t=5: A = 8(5)+20 = 60 · B = -3(5)+95 = 80<br>Model B gives higher pollution at t=5</div><p><strong>Models give contradictory accounts</strong> — A shows rising from low base, B shows falling from high base. The regulator cannot use both.</p><p><strong>Information needed:</strong> A single current measurement resolves it immediately — A predicts 20 units today, B predicts 95 units today. One measurement distinguishes them. Historical trend data validates the slope. The cause of the trend (industrial growth vs. cleanup programme) determines which direction is correct.</p><p><strong>Legal implication:</strong> Model A says the river is at the threshold now and worsening. Model B says it is currently unsafe but improving. These call for opposite interventions. Model selection is not a technicality — it determines the entire regulatory response.</p><div class="what-tests">Competing linear models · threshold crossing in both directions · single data point disambiguation · legal consequence of model selection</div></div></div>
+      </div></div>
+      <div class="inner-section" id="t03-bar"><div class="inner-header" onclick="togI('t03-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="bar-lens"><div class="bar-label">NY Bar · Regulatory Strategy Connection</div><p>Two competing linear models making opposite directional claims about the same regulated quantity — exactly the river-pollution scenario above — is a recurring fact pattern in environmental and public-health litigation, where opposing experts each fit a line to the same underlying (often noisy) data and reach contradictory conclusions about trend direction. The cross-examination move is always the same: demand a single current, verifiable data point, since that alone discriminates between two lines that agree nowhere except possibly by coincidence.</p><p>Crossover-point analysis — at what point does Option A become better than Option B — is the standard structure behind cost-benefit arguments in regulatory compliance disputes and in advising clients on competing contractual fee structures.</p></div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- CLUSTER 5: LEC 14-16 -->
+  <div class="section-label">Lec. 14–16 · Systems of Linear Equations</div>
+
+  <!-- T04: Systems -->
+  <div class="topic-card" id="t04" style="border-left-color:var(--c5)">
+    <div class="topic-header" onclick="tog('t04')">
+      <span class="lec-tag" style="background:var(--c5)">LEC 14</span>
+      <div class="topic-title">Systems of Linear Equations</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t04-l"><div class="inner-header" onclick="togI('t04-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <p>A system of linear equations requires two or more conditions to be satisfied <strong>simultaneously</strong>. Geometrically: each equation is a line — the solution is where they cross.</p>
+        <div class="notation"><span class="hl">One solution:</span> lines cross at one point — consistent, independent<br><span class="hl">No solution:</span> lines are parallel — inconsistent<br><span class="hl">Infinite solutions:</span> lines are identical — dependent<br><br><span class="hl">Substitution:</span> solve one equation for one variable, substitute<br><span class="hl">Elimination:</span> multiply to match coefficients, then add/subtract</div>
+        <div class="pattern-warn"><div class="pw-label">Translation Step — Always First</div><p>Define variables explicitly before writing equations. "Let x = ... and y = ..." written down forces the translation and prevents setup errors. Never skip this step.</p></div>
+      </div></div>
+      <div class="inner-section" id="t04-m"><div class="inner-header" onclick="togI('t04-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation"><span class="hl">Elimination procedure:</span><br>1. Multiply one or both equations so a variable's coefficients match (or are opposite)<br>2. Add (if opposite signs) or subtract (if same sign) to cancel that variable<br>3. Solve the resulting single-variable equation<br>4. Substitute back into either original equation to find the second variable<br>5. Check both original equations with both values</div>
+        <p>Substitution is faster when one equation already isolates a variable cleanly; elimination is faster when both equations are in standard form (ax + by = c) with no variable pre-isolated. Word problems rarely tell you which to use — recognising the equations' shape after translation is what determines the efficient method, not a rule to memorise in isolation.</p>
+      </div></div>
+      <div class="inner-section" id="t04-ex"><div class="inner-header" onclick="togI('t04-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="example-block"><div class="ex-label">Solving by Elimination</div><p>"A settlement fund pays Party X and Party Y. Three times Party X's payment plus Party Y's payment totals Rs. 280,000. Party X's payment minus Party Y's payment is Rs. 40,000."</p><div class="notation">Let X = Party X payment, Y = Party Y payment<br>Eq.1: 3X + Y = 280,000<br>Eq.2: X − Y = 40,000<br><br>Add Eq.1 + Eq.2 (Y cancels): 4X = 320,000 → X = 80,000<br>Substitute into Eq.2: 80,000 − Y = 40,000 → Y = 40,000<br>Check Eq.1: 3(80,000) + 40,000 = 280,000 ✓</div><p>Party X receives Rs. 80,000, Party Y receives Rs. 40,000 — elimination was faster here than substitution because both equations were already in a form where adding them directly cancelled Y.</p></div>
+      </div></div>
+      <div class="inner-section" id="t04-q"><div class="inner-header" onclick="togI('t04-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="question-block" id="q04a"><div class="q-header" onclick="togQ('q04a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Two parties in a dispute each claim a share of a Rs. 500,000 fund. Party A claims twice what Party B claims. Both claims total Rs. 500,000. Find each party's claim. If a mediator splits the fund equally, what does each party receive?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">Let A = Party A claim, B = Party B claim<br>A = 2B · A + B = 500,000<br>2B + B = 500,000 → B = 166,667 · A = 333,333<br>Equal split: each receives Rs. 250,000</div><p>Party A accepts Rs. 83,333 less than claimed. Party B receives Rs. 83,333 more than claimed. The equal split clearly favours the weaker claimant.</p><div class="what-tests">Two-variable system · substitution · interpreting the solution in a dispute context</div></div></div>
+        <div class="question-block" id="q04b"><div class="q-header" onclick="togQ('q04b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A car travels 200 km partly at 40 km/h and partly at 60 km/h. Total time: 4 hours. Find the distance at each speed. (This is the QR-I past paper Q2-ii — the disguised systems question.)</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">Let d₁ = distance at 40 km/h · d₂ = distance at 60 km/h<br>Eq.1 (distance): d₁ + d₂ = 200<br>Eq.2 (time):     d₁/40 + d₂/60 = 4<br><br>From Eq.1: d₁ = 200 - d₂<br>Substitute: (200-d₂)/40 + d₂/60 = 4<br>Multiply by 120: 3(200-d₂) + 2d₂ = 480<br>600 - d₂ = 480 → d₂ = 120 km · d₁ = 80 km<br>Check: 80/40 + 120/60 = 2 + 2 = 4 hours ✓</div><div class="what-tests">Distance-time word problem as system · the translation step that stumped QR-I students · time = distance/speed as second equation</div></div></div>
+        <div class="question-block" id="q04c"><div class="q-header" onclick="togQ('q04c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Two companies set prices: P_A = 3Q + 10 and P_B = -Q + 50 (Q = thousands of units). At what quantity do they charge the same price? A regulator argues: "If both firms are at this quantity, they are coordinating." Is this logically valid? What additional evidence would be needed?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">3Q + 10 = -Q + 50 → 4Q = 40 → Q = 10<br>Price at Q=10: P = 3(10)+10 = 40 ✓ Check: -10+50=40 ✓</div><p><strong>The regulator's logic is not valid as stated.</strong> Equal prices at the same quantity is the natural market equilibrium — the intersection of their pricing formulas. In a competitive market, firms naturally converge to this point.</p><p><strong>Additional evidence needed:</strong> (1) Evidence one firm communicated its pricing formula to the other — coincident outcomes do not prove communication. (2) Evidence both firms departed from what their independent cost structures would suggest. (3) Suspicious timing — sudden simultaneous convergence rather than gradual market adjustment. The logical error is post hoc: coincident pricing at equilibrium does not imply coordination caused the coincidence.</p><div class="what-tests">System intersection as market equilibrium · correlation vs. causation in regulatory enforcement · what constitutes evidence of collusion beyond price similarity</div></div></div>
+      </div></div>
+      <div class="inner-section" id="t04-bar"><div class="inner-header" onclick="togI('t04-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="bar-lens"><div class="bar-label">NY Bar · Antitrust &amp; Settlement Connection</div><p>The pricing-intersection scenario above is the actual structure of "parallel pricing" antitrust disputes — courts consistently hold that identical or converging prices alone, without independent evidence of an agreement, do not establish collusion, precisely because competitive markets naturally produce price convergence at equilibrium. Knowing where that intersection point sits mathematically, and that it's an expected market outcome rather than a tell of misconduct, sharpens an antitrust defence considerably.</p><p>Multi-party settlement allocation — splitting a fund according to two or more stated conditions — is routinely a two-variable system in practice, and a lawyer who can set up and solve it directly avoids relying on a mediator's potentially self-serving framing of "fair" division.</p></div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- T05: Inequalities -->
+  <div class="topic-card" id="t05" style="border-left-color:var(--c5)">
+    <div class="topic-header" onclick="tog('t05')">
+      <span class="lec-tag" style="background:var(--c5)">LEC 15</span>
+      <div class="topic-title">Linear Inequalities &amp; Their Applications</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t05-l"><div class="inner-header" onclick="togI('t05-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <p>An inequality describes a <strong>range</strong> of acceptable values. Legal thresholds, regulatory limits, and damage caps are inequalities in disguise.</p>
+        <div class="notation"><span class="hl">Solving rule — the one that trips everyone:</span><br>When you multiply or divide both sides by a NEGATIVE number,<br>the inequality sign FLIPS direction.<br><br>2x &gt; 10 → x &gt; 5 (divided by +2, unchanged)<br>-2x &gt; 10 → x &lt; -5 (divided by -2, FLIPS)</div>
+        <p>Build the habit: every time you divide or multiply by a negative, explicitly pause, check, and flip.</p>
+      </div></div>
+      <div class="inner-section" id="t05-m"><div class="inner-header" onclick="togI('t05-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation"><span class="hl">Compound inequality:</span> a ≤ x ≤ b means BOTH x ≥ a AND x ≤ b must hold simultaneously — never just one<br><span class="hl">Quadratic inequality procedure:</span> 1. Move everything to one side (≤ 0 or ≥ 0 form) 2. Factor 3. Find the roots 4. Determine the sign of the parabola between/outside the roots based on whether it opens up or down<br><span class="hl">Sign chart shortcut:</span> for (x−r₁)(x−r₂), the expression is negative between the roots and positive outside them, when the parabola opens upward</div>
+        <p>The single most exam-relevant fact about compound inequalities: a value satisfying only one half of a two-sided constraint has not satisfied the constraint at all — this is the same ∀ vs. ∃ distinction from Part 1, now showing up inside ordinary algebra rather than formal logic notation.</p>
+      </div></div>
+      <div class="inner-section" id="t05-ex"><div class="inner-header" onclick="togI('t05-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="example-block"><div class="ex-label">Solving a Quadratic Inequality Step by Step</div><p>Solve: x² - 2x - 15 ≥ 0</p><div class="notation">Already in ≥ 0 form.<br>Factor: (x-5)(x+3) ≥ 0<br>Roots: x = 5, x = -3<br>Parabola opens upward (positive x² coefficient) → expression is POSITIVE outside the roots, negative between them<br>Since we want ≥ 0 (positive or zero): x ≤ -3 OR x ≥ 5</div><p>Check with a test point in each region: x=0 (between roots) → (0-5)(0+3) = -15, negative — correctly excluded. x=6 (outside, right) → (6-5)(6+3)=9, positive — correctly included. The test-point check is the fast way to confirm a sign chart without re-deriving the parabola's shape from scratch.</p></div>
+      </div></div>
+      <div class="inner-section" id="t05-q"><div class="inner-header" onclick="togI('t05-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="question-block" id="q05a"><div class="q-header" onclick="togQ('q05a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Compliance budget cannot exceed Rs. 500,000. Fixed costs Rs. 200,000. Variable cost Rs. 15,000 per audit. Write the inequality and find the maximum audits. Also solve: 7x + 3 ≤ 3x + 11 and x² - 7x - 30 ≤ 0.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">15,000a + 200,000 ≤ 500,000 → a ≤ 20 audits<br><br>7x + 3 ≤ 3x + 11 → 4x ≤ 8 → x ≤ 2<br><br>x² - 7x - 30 ≤ 0<br>Factor: (x-10)(x+3) ≤ 0<br>Parabola opens upward → negative between roots<br>Solution: -3 ≤ x ≤ 10</div><div class="what-tests">Word problem to inequality · linear inequality · quadratic inequality via factoring · direct QR-I past paper type</div></div></div>
+        <div class="question-block" id="q05b"><div class="q-header" onclick="togQ('q05b')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Sentencing guideline: 24 ≤ T ≤ 120 months for a category B offence. A judge imposes T=18 citing mitigating circumstances. The prosecution says this violates the guideline. The defence argues T=18 satisfies -T + 120 ≥ 0. Analyse all three mathematical claims.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">Guideline: 24 ≤ T ≤ 120 (compound inequality — BOTH must hold)<br>T = 18: Is 18 ≥ 24? NO. Lower bound violated.<br>         Is 18 ≤ 120? Yes. Upper bound satisfied.<br>Result: VIOLATES the guideline — lower bound not met.<br><br>Defence claim: -T + 120 ≥ 0 simplifies to T ≤ 120.<br>T=18 satisfies this — technically correct.<br>But this is only the upper bound. The lower bound is omitted.</div><p><strong>The prosecution is correct.</strong> T=18 falls below the mandatory minimum of 24.</p><p><strong>The defence's error:</strong> It checked only half the compound inequality and presented that partial satisfaction as if it meant full compliance. Formally, the defence substituted ∃-satisfaction (satisfying one condition) for ∀-satisfaction (satisfying all conditions simultaneously). This maps directly back to Part 1 — a compound constraint requires all its elements to be met, not just some.</p><div class="what-tests">Compound inequality · two-sided constraint evaluation · selective presentation of mathematical truth · connection to ∀ vs. ∃ from Part 1</div></div></div>
+      </div></div>
+      <div class="inner-section" id="t05-bar"><div class="inner-header" onclick="togI('t05-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="bar-lens"><div class="bar-label">NY Bar · Sentencing &amp; Compliance Connection</div><p>Sentencing guidelines, regulatory thresholds, and statutory damage caps are compound inequalities in the overwhelming majority of real statutory drafting — "not less than X and not more than Y" is literally a ≤ T ≤ b written in prose. The defence's error in the worked example above (checking only one bound and presenting it as full compliance) is a genuinely common, exploitable advocacy mistake, and spotting it instantly is a direct payoff of this exact skill.</p><p>On the LSAT, "necessary but not sufficient" reasoning errors map onto exactly this pattern — satisfying one half of a two-part requirement is frequently presented as if it satisfies the whole, and the correct answer choice in a Flaw question often names precisely this gap.</p></div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- T06: Linear Programming -->
+  <div class="topic-card" id="t06" style="border-left-color:var(--c5)">
+    <div class="topic-header" onclick="tog('t06')">
+      <span class="lec-tag" style="background:var(--c5)">LEC 16</span>
+      <div class="topic-title">Introduction to Linear Programming</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t06-l"><div class="inner-header" onclick="togI('t06-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <p>Linear programming answers: <strong>"Given constraints, what is the best possible outcome?"</strong> It optimises an objective function subject to inequality constraints.</p>
+        <div class="notation"><span class="hl">1. Decision variables:</span> what you are choosing (x, y)<br><span class="hl">2. Objective function:</span> what to maximise or minimise<br><span class="hl">3. Constraints:</span> the limitations (budget, capacity, regulatory limits)<br><br>The optimal solution always occurs at a corner point of the feasible region.</div>
+        <p>A regulator allocating inspection resources, a law firm deciding how to allocate associate time across cases, a company maximising output within environmental permit limits — all are linear programming problems.</p>
+      </div></div>
+      <div class="inner-section" id="t06-m"><div class="inner-header" onclick="togI('t06-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation"><span class="hl">Corner point method, step by step:</span><br>1. Graph every constraint inequality<br>2. Identify the feasible region — the area satisfying all constraints simultaneously<br>3. Find every corner (vertex) of that region by solving pairs of constraint equations together<br>4. Evaluate the objective function at every corner<br>5. The maximum (or minimum) always occurs at one of those corners — never in the interior, never on an edge's midpoint</div>
+        <p>The corner-point guarantee is what makes linear programming tractable by hand: instead of checking infinitely many points in the feasible region, you only ever need to check a small, finite list of vertices. Missing a corner is the single most common source of a wrong "optimal" answer — always count the corners systematically rather than eyeballing the graph for the best-looking point.</p>
+      </div></div>
+      <div class="inner-section" id="t06-ex"><div class="inner-header" onclick="togI('t06-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="example-block"><div class="ex-label">Full LP Setup and Corner Point Evaluation</div><p>A firm produces two products, P and Q. Each unit of P needs 2 hours labour and yields Rs. 30 profit. Each unit of Q needs 4 hours labour and yields Rs. 50 profit. Available labour: 40 hours. Maximum 15 units of P can be sold (market cap).</p><div class="notation">Maximise Z = 30P + 50Q<br>Subject to: 2P + 4Q ≤ 40 &nbsp;(labour)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P ≤ 15 &nbsp;(market cap)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P, Q ≥ 0</div><p><strong>Finding the corners:</strong> (0,0): Z=0. (15,0): labour used = 30 ≤ 40, feasible, Z=450. (0,10): from 2(0)+4Q=40, Z=500. (15,2.5): intersection of P=15 and 2(15)+4Q=40 → Q=2.5, Z=30(15)+50(2.5)=575.</p><p><strong>Optimal: P=15, Q=2.5, Z=575.</strong> Notice the highest-profit corner isn't the one using all labour on the highest per-unit-profit product (Q) alone — it's the intersection of two binding constraints together, which is exactly why checking every corner systematically matters more than reasoning informally about which product "seems" better.</p></div>
+      </div></div>
+      <div class="inner-section" id="t06-q"><div class="inner-header" onclick="togI('t06-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="question-block" id="q06a"><div class="q-header" onclick="togQ('q06a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A legal aid office handles civil (C) and criminal (Cr) cases. Civil: 3 hours, 4 impact points. Criminal: 5 hours, 7 impact points. Available: 60 hours/week. Write the LP and find what combination maximises impact points.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">Maximise Z = 4C + 7Cr<br>Subject to: 3C + 5Cr ≤ 60 · C,Cr ≥ 0<br><br>Corner points:<br>(0,0): Z=0 · (20,0): Z=80 · (0,12): Z=84<br><br>Maximum: Z=84 at (0,12) — 12 criminal cases, 0 civil</div><p>Criminal cases generate more impact per hour (7/5=1.4) than civil (4/3=1.33). The office maximises impact by focusing entirely on criminal cases given the time constraint.</p><div class="what-tests">LP formulation · corner point method · efficiency comparison per unit of constraint</div></div></div>
+        <div class="question-block" id="q06b"><div class="q-header" onclick="togQ('q06b')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A regulator allocates teams between factory inspections (F: Rs. 8,000, 2 days, prevents 3 incidents) and river monitoring (R: Rs. 5,000, 1 day, prevents 2 incidents). Budget: Rs. 80,000. Time: 25 days. Formulate the LP, find optimal allocation, and explain what changes if the budget is cut to Rs. 60,000.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="q-body"><div class="notation">Maximise Z = 3F + 2R<br>Subject to: 8,000F + 5,000R ≤ 80,000<br>            2F + R ≤ 25 · F,R ≥ 0<br><br>Corner points (within both constraints):<br>(0,0): Z=0 · (10,0): Z=30 · (0,16): Z=32<br>Optimal: F=0, R=16 → Z=32 incidents prevented<br><br>At Rs. 60,000 budget: (0,12): Z=24<br>Optimal unchanged — still all river visits</div><p><strong>Budget cut from Rs. 80,000 to Rs. 60,000</strong> reduces optimal prevention from 32 to 24 incidents — 25% reduction for 25% budget cut. River visits remain optimal at both levels: 2/5,000 = 0.0004 impact per rupee vs. 3/8,000 = 0.000375 for factory inspections.</p><div class="what-tests">Full LP with two constraints · corner point enumeration · sensitivity to budget change · efficiency per rupee comparison</div></div></div>
+      </div></div>
+      <div class="inner-section" id="t06-bar"><div class="inner-header" onclick="togI('t06-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="bar-lens"><div class="bar-label">NY Bar · Resource Allocation Connection</div><p>Regulatory agencies, legal aid organisations, and law firms routinely face exactly this optimisation problem — limited hours, limited budget, multiple case types or compliance activities competing for the same constrained resources. A lawyer who can formalise "maximise impact subject to a budget and time constraint" as an actual LP, rather than allocating by instinct or precedent, brings a genuinely persuasive, defensible basis to resource-allocation arguments in budget hearings or amicus submissions on agency rulemaking.</p><p>The sensitivity question in the worked example — what happens to the optimal solution when a constraint tightens — mirrors exactly how courts and regulators evaluate "least restrictive means" arguments: showing that a tighter constraint still permits an effective, near-optimal outcome is a standard move in defending a regulation against an overbreadth challenge.</p></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Lec. 17–18 · Linear vs. Exponential Growth &amp; Decay</div>
+
+  <!-- TOPIC 7: Linear vs Exponential — The Core Distinction -->
+  <div class="topic-card" id="t07" style="border-left-color:var(--c6)">
+    <div class="topic-header" onclick="tog('t07')">
+      <span class="lec-tag" style="background:var(--c6)">LEC 17</span>
+      <div class="topic-title">Linear vs. Exponential Growth — The Core Distinction</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t07-lang">
+        <div class="inner-header" onclick="togI('t07-lang')">
+          <span class="inner-label">Language First — The Single Most Important Distinction in Part 3</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p><strong>Linear growth:</strong> you add the same amount each period. Like saving Rs. 1,000 every month — each month the total increases by a fixed amount.</p>
+          <p><strong>Exponential growth:</strong> you multiply by the same factor each period. Like a bank account growing at 10% per year — each year the increase is larger than the last because you are earning interest on a bigger balance.</p>
+          <p>The difference in plain language: linear adds, exponential multiplies.</p>
+          <div class="notation">
+            <span class="hl">Linear:</span>      y = mt + c       — add m every period<br>
+            <span class="hl">Exponential:</span>  y = a · bᵗ      — multiply by b every period<br>
+            where a = initial value,  b = growth factor<br><br>
+            <span class="hl">Growth factor b:</span><br>
+            b &gt; 1  →  growth  (e.g. b=1.15 means 15% increase per period)<br>
+            0 &lt; b &lt; 1  →  decay  (e.g. b=0.80 means 20% decrease per period)
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The QR-I Killer — Now in QR-II</div>
+            <p>This is the exact category that produced the base-conversion question in QR-I. PU will give you a word problem and you must decide: does this situation add a fixed amount (linear) or multiply by a fixed factor (exponential)? Salary increase by Rs. 5,000/year — linear. Salary increase by 8% per year — exponential. Population growing by 200 people/year — linear. Population growing at 3% per year — exponential. The signal words: "by X per period" (linear) vs. "by X% per period" or "grows at a rate of" (exponential).</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-mech">
+        <div class="inner-header" onclick="togI('t07-mech')">
+          <span class="inner-label">Mechanics &amp; Key Formulas</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Exponential growth:</span>   A = P(1 + r)ᵗ<br>
+            P = initial value · r = rate (as decimal) · t = time periods<br><br>
+            <span class="hl">Exponential decay:</span>    A = P(1 - r)ᵗ<br><br>
+            <span class="hl">Continuous growth (natural e):</span>  A = Peʳᵗ<br>
+            Used when growth is continuous rather than periodic<br><br>
+            <span class="hl">Doubling time (Rule of 70):</span><br>
+            Approximate years to double = 70 / (rate as percentage)<br>
+            At 7% growth: doubles in ≈ 10 years
+          </div>
+          <table class="logic-table" style="margin-top:14px;">
+            <thead><tr><th>Situation</th><th>Model Type</th><th>Signal Word</th></tr></thead>
+            <tbody>
+              <tr><td>Fine increases by Rs. 500/day</td><td>Linear</td><td>"by Rs. X per"</td></tr>
+              <tr><td>Fine increases by 5% per day</td><td>Exponential</td><td>"by X% per"</td></tr>
+              <tr><td>Population grows by 1,000/year</td><td>Linear</td><td>fixed amount</td></tr>
+              <tr><td>Population grows at 2%/year</td><td>Exponential</td><td>percentage rate</td></tr>
+              <tr><td>Drug concentration halves every 4 hours</td><td>Exponential decay</td><td>"halves"</td></tr>
+              <tr><td>Asset depreciates Rs. 10,000/year</td><td>Linear</td><td>fixed amount lost</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-ex">
+        <div class="inner-header" onclick="togI('t07-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Identifying the Model Before Computing</div>
+            <p>"A fine schedule increases by 8% of the current fine for each week of continued violation, starting from Rs. 50,000." Find the fine after 6 weeks.</p>
+            <p><strong>Step 1 — identify the model:</strong> "8% of the current fine" is a percentage of an already-changing base — exponential, not linear. The trap here is that a careless reader sees a single number (8%) and a starting value and reaches for A = P + rt out of habit; the percentage-of-current-value structure is the signal that overrides that instinct.</p>
+            <div class="notation">A = P(1 + r)ᵗ = 50,000(1.08)⁶<br>(1.08)⁶ ≈ 1.5869<br>A ≈ 50,000 × 1.5869 ≈ Rs. 79,345</div>
+            <p><strong>Step 2 — sanity-check against the wrong linear answer:</strong> if mistakenly treated as linear at 8% of the original 50,000 per week (Rs. 4,000/week), the answer would be 50,000 + 6(4,000) = Rs. 74,000 — close enough to the correct figure to look plausible, but wrong, and the gap widens every additional week. This is exactly the kind of near-miss PU exploits, because a linear error here doesn't produce an obviously absurd number.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-q">
+        <div class="inner-header" onclick="togI('t07-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q07a">
+            <div class="q-header" onclick="togQ('q07a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A social media influencer has 10,000 followers at the start of the year. His follower count grows at 15% per month. How many followers will he have at the end of 6 months? (This is the exact QR-II past paper Q4.)</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Model type: Exponential (grows at 15% per month — percentage rate)<br><br>
+                A = P(1 + r)ᵗ<br>
+                P = 10,000 · r = 0.15 · t = 6<br><br>
+                A = 10,000 × (1.15)⁶<br>
+                (1.15)⁶ = 1.15 × 1.15 × 1.15 × 1.15 × 1.15 × 1.15<br>
+                = 1.3225 × 1.3225 × 1.3225... ≈ 2.313<br><br>
+                A ≈ 10,000 × 2.313 = 23,130 followers
+              </div>
+              <p>The first and most important step was identifying this as exponential, not linear. If solved as linear (adding 1,500 per month): 10,000 + 6(1,500) = 19,000 — significantly understated. The exponential model gives ~23,130.</p>
+              <div class="what-tests">Exponential growth identification · A=P(1+r)ᵗ application · comparison with incorrect linear approach · directly from QR-II past paper</div>
+            </div>
+          </div>
+          <div class="question-block" id="q07b">
+            <div class="q-header" onclick="togQ('q07b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A court judgment debt of Rs. 200,000 accrues interest at 12% per year compounded annually. How much is owed after 3 years? A debtor claims: "I owe Rs. 272,000 — that's Rs. 24,000 interest per year for 3 years." Is the debtor correct?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Correct model: Exponential (compounded annually)<br>
+                A = 200,000 × (1.12)³<br>
+                (1.12)³ = 1.12 × 1.12 × 1.12 = 1.404928<br>
+                A = 200,000 × 1.404928 ≈ Rs. 280,986<br><br>
+                Debtor's calculation: 200,000 + 3(24,000) = 272,000<br>
+                This is simple interest — LINEAR model<br><br>
+                Difference: Rs. 280,986 − Rs. 272,000 = Rs. 8,986 underpayment
+              </div>
+              <p><strong>The debtor is wrong.</strong> "Compounded annually" specifies exponential growth — interest accrues on the growing balance each year, not on the original principal only. The debtor applied simple (linear) interest to a compound (exponential) debt. The correct amount owed is approximately Rs. 280,986.</p>
+              <div class="what-tests">Compound vs. simple interest as exponential vs. linear · the real-world cost of misidentifying the model · direct legal application to judgment debt calculation</div>
+            </div>
+          </div>
+          <div class="question-block" id="q07c">
+            <div class="q-header" onclick="togQ('q07c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">Two environmental contamination models are proposed for a site: Model L (linear): C(t) = -8t + 100. Model E (exponential): C(t) = 100 × (0.92)ᵗ. Both start at C=100 (units of contamination) at t=0. A safety threshold is C=20. Using each model, find when the site becomes safe. At t=5, which model gives higher contamination? What does the difference between models mean for a remediation timeline presented to a court?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Model L: C = 20 when -8t + 100 = 20  →  8t = 80  →  t = 10 years<br><br>
+                Model E: C = 20 when 100(0.92)ᵗ = 20<br>
+                (0.92)ᵗ = 0.20<br>
+                t·ln(0.92) = ln(0.20)<br>
+                t = ln(0.20)/ln(0.92) = -1.6094 / -0.0834 ≈ 19.3 years<br><br>
+                At t = 5:<br>
+                Model L: C = -8(5)+100 = 60<br>
+                Model E: C = 100(0.92)⁵ = 100(0.659) = 65.9<br><br>
+                Model E gives higher contamination at t=5 (65.9 vs. 60)
+              </div>
+              <p><strong>What the difference means for a remediation timeline:</strong> The linear model predicts safety in 10 years. The exponential model predicts safety in ~19 years — nearly double. The exponential model's decay is faster initially (steep early decline) but slows as contamination levels decrease — the percentage reduction is constant but the absolute reduction shrinks each year. The linear model assumes constant absolute reduction regardless of remaining contamination level.</p>
+              <p><strong>Court implications:</strong> If the defendant's expert uses the linear model and the plaintiff's expert uses the exponential, they will give dramatically different remediation timelines to the court. The choice of model is not a technical detail — it determines whether the site is safe in 10 or 19 years, which directly affects damages (loss of use of land), injunctive relief duration, and remediation cost estimates. The court would need to determine which model is empirically supported by contamination data from similar sites.</p>
+              <div class="what-tests">Exponential decay · solving for t using logarithms · comparing models at a specific point · the legal consequence of model selection for remediation timelines · the inherent difference between linear and exponential decay behaviour at different concentration levels</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-bar">
+        <div class="inner-header" onclick="togI('t07-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Litigation Connection</div>
+            <p>Expert witness testimony in environmental, financial, and medical cases almost always involves a choice between linear and exponential models. A litigator who cannot identify which model an expert is using — and whether it is appropriate — cannot effectively cross-examine. The question "does your model assume constant absolute change or constant percentage change?" is the single most productive opening for challenging a quantitative expert's methodology.</p>
+            <p>Compound interest on judgment debts, damages calculations in long-running disputes, and present-value calculations in commercial litigation all use exponential models. A lawyer who defaults to linear intuition will misread every financial damages report they receive.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 8: Exponential functions and base conversion -->
+  <div class="topic-card" id="t08" style="border-left-color:var(--c6)">
+    <div class="topic-header" onclick="tog('t08')">
+      <span class="lec-tag" style="background:var(--c6)">LEC 17</span>
+      <div class="topic-title">Exponential Equations &amp; Base Conversion</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t08-lang">
+        <div class="inner-header" onclick="togI('t08-lang')">
+          <span class="inner-label">Language First — The QR-I Killer, Addressed Directly</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>An exponential equation is one where the variable appears in the exponent: 4^(x+5) = 8^(x-1). You cannot solve this by standard algebra because x is not multiplied — it is in the power position.</p>
+          <p>The technique: <strong>convert both sides to the same base</strong>, then set the exponents equal.</p>
+          <p>Why does this work? If bᵃ = bᶜ, then a = c — equal powers of the same base must have equal exponents. This is only usable once both sides share the same base.</p>
+          <div class="notation">
+            <span class="hl">The hidden step:</span>  Before any algebra, ask —<br>
+            "Can both sides be written as powers of the same number?"<br><br>
+            4 = 2²  and  8 = 2³  →  both are powers of 2<br>
+            This is the recognition step. Miss it and the equation is unsolvable by this method.
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">This Is Exactly What Stumped QR-I</div>
+            <p>The question 4^(x+5) = 8^(x-1) cannot be solved by treating it like a linear equation. The trap is starting to manipulate x without first recognising that 4 and 8 are both powers of 2. The recognition step comes before any algebra. Build the habit: see an exponential equation — ask "what is the common base?" before writing anything else.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t08-mech">
+        <div class="inner-header" onclick="togI('t08-mech')">
+          <span class="inner-label">Mechanics — Full Worked Solution</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Solving 4^(x+5) = 8^(x-1) — The QR-I Question</div>
+            <p><strong>Step 1 — Recognise the common base:</strong> 4 = 2², 8 = 2³. Both are powers of 2.</p>
+            <p><strong>Step 2 — Rewrite both sides:</strong></p>
+            <p class="mono" style="font-family:'JetBrains Mono',monospace;font-size:13px;">(2²)^(x+5) = (2³)^(x-1)</p>
+            <p><strong>Step 3 — Apply power rule (multiply exponents):</strong></p>
+            <p class="mono" style="font-family:'JetBrains Mono',monospace;font-size:13px;">2^(2(x+5)) = 2^(3(x-1))</p>
+            <p><strong>Step 4 — Same base, set exponents equal:</strong></p>
+            <p class="mono" style="font-family:'JetBrains Mono',monospace;font-size:13px;">2(x+5) = 3(x-1)<br>2x + 10 = 3x - 3<br>10 + 3 = 3x - 2x<br>x = 13</p>
+            <p><strong>Verify:</strong> 4^18 = (2²)^18 = 2^36. 8^12 = (2³)^12 = 2^36. ✓</p>
+          </div>
+          <div class="notation">
+            <span class="hl">Common base pairs to know:</span><br>
+            4 = 2²   ·   8 = 2³   ·   16 = 2⁴   ·   32 = 2⁵<br>
+            9 = 3²   ·   27 = 3³  ·   81 = 3⁴<br>
+            25 = 5²  ·   125 = 5³<br>
+            If no common integer base exists → use logarithms
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t08-q">
+        <div class="inner-header" onclick="togI('t08-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q08a">
+            <div class="q-header" onclick="togQ('q08a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">Solve: 9^(x-1) = 27^(x+2)</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Step 1: Common base — 9 = 3², 27 = 3³<br>
+                Step 2: (3²)^(x-1) = (3³)^(x+2)<br>
+                Step 3: 3^(2(x-1)) = 3^(3(x+2))<br>
+                Step 4: 2(x-1) = 3(x+2)<br>
+                        2x - 2 = 3x + 6<br>
+                        -2 - 6 = 3x - 2x<br>
+                        x = -8<br><br>
+                Verify: 9^(-9) = (3²)^(-9) = 3^(-18)<br>
+                        27^(-6) = (3³)^(-6) = 3^(-18) ✓
+              </div>
+              <div class="what-tests">Base conversion · power rule · linear equation from equated exponents · same technique as QR-I question</div>
+            </div>
+          </div>
+          <div class="question-block" id="q08b">
+            <div class="q-header" onclick="togQ('q08b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">Solve: 16^(2x+1) = 32^(x-1)</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Step 1: Common base — 16 = 2⁴, 32 = 2⁵<br>
+                Step 2: (2⁴)^(2x+1) = (2⁵)^(x-1)<br>
+                Step 3: 2^(4(2x+1)) = 2^(5(x-1))<br>
+                Step 4: 4(2x+1) = 5(x-1)<br>
+                        8x + 4 = 5x - 5<br>
+                        3x = -9<br>
+                        x = -3<br><br>
+                Verify: 16^(-5) = 2^(-20) · 32^(-4) = 2^(-20) ✓
+              </div>
+              <div class="what-tests">Base conversion with larger powers · same four-step method</div>
+            </div>
+          </div>
+          <div class="question-block" id="q08c">
+            <div class="q-header" onclick="togQ('q08c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A forensic accountant models fraudulent asset growth as A₁ = 4^(t+2) and compares it to a legitimate benchmark B₁ = 8^t. At what time t do they coincide? What does the intersection mean financially, and what happens to the ratio A₁/B₁ as t increases beyond the intersection?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Set 4^(t+2) = 8^t<br>
+                Common base: 4=2², 8=2³<br>
+                (2²)^(t+2) = (2³)^t<br>
+                2^(2t+4) = 2^(3t)<br>
+                2t + 4 = 3t<br>
+                t = 4
+              </div>
+              <p><strong>At t=4 they coincide.</strong> Verify: 4^6 = 4096. 8^4 = 4096. ✓</p>
+              <p><strong>Financial meaning:</strong> At t=4, the fraudulent asset value equals the legitimate benchmark. Before t=4, compare: at t=0, A₁=4²=16, B₁=8⁰=1 — the fraud starts far above the benchmark. The fraud appears to outperform legitimately early on. At t=4 they converge. After t=4, B₁=8^t grows faster (base 8 > base 4 after conversion — effectively 2³ per period vs. 2² per period for the exponent increment).</p>
+              <p><strong>Ratio A₁/B₁ after t=4:</strong> A₁/B₁ = 2^(2t+4)/2^(3t) = 2^(4-t). For t>4, this is 2^(negative) = fraction less than 1. So after t=4, the legitimate benchmark overtakes the fraudulent model — the fraud's inflated early returns are unsustainable and the gap inverts. This is the mathematical signature of a Ponzi-like structure: early apparent outperformance followed by inevitable underperformance relative to legitimate growth.</p>
+              <div class="what-tests">Base conversion equation · intersection of two exponential models · financial interpretation of intersection · ratio behaviour after intersection · Tier 3 because it requires solving the equation, interpreting the solution in context, and analysing post-intersection dynamics</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t08-bar">
+        <div class="inner-header" onclick="togI('t08-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Securities Fraud Connection</div>
+            <p>The Ponzi-structure ratio analysis above is a real forensic accounting technique — investigators use exactly this kind of growth-rate comparison to identify investment schemes whose advertised returns are mathematically unsustainable relative to legitimate market benchmarks. A lawyer who can set up and solve the intersection of two exponential models can independently verify (or challenge) an expert's claim about when a fraudulent scheme's "outperformance" was bound to collapse.</p>
+            <p>Base-conversion fluency also matters directly for any compound-interest or present-value calculation in commercial litigation, where judgment debts, lease escalations, and royalty structures are frequently expressed as exponential growth requiring exactly this algebraic technique to solve for an unknown rate or time period.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 9: Rate of Change / Derivatives intro -->
+  <div class="topic-card" id="t09" style="border-left-color:var(--c6)">
+    <div class="topic-header" onclick="tog('t09')">
+      <span class="lec-tag" style="background:var(--c6)">LEC 18</span>
+      <div class="topic-title">Rate of Change &amp; Introduction to Derivatives</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t09-lang">
+        <div class="inner-header" onclick="togI('t09-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>The <strong>rate of change</strong> answers: "How fast is this changing right now?" For a linear function, the rate of change is constant — it is the slope m, the same at every point. For a non-linear or exponential function, the rate of change varies — it is different at each point.</p>
+          <p>The <strong>derivative</strong> is the mathematical tool that gives you the instantaneous rate of change at any specific point. This is the topic the QR-II past paper tested in Q5: "find the rate of change of P(t) = 1000e^(0.05t)".</p>
+          <div class="notation">
+            <span class="hl">For exponential P(t) = Aeʳᵗ:</span><br>
+            Rate of change = dP/dt = rAeʳᵗ = r · P(t)<br><br>
+            In plain English: the rate of change of an exponential function<br>
+            is proportional to the current value.<br>
+            The bigger the population, the faster it grows.<br><br>
+            <span class="hl">Basic derivative rules needed:</span><br>
+            d/dt (Aeʳᵗ) = rAeʳᵗ<br>
+            d/dt (aᵗ) = aᵗ · ln(a)<br>
+            d/dt (tⁿ) = ntⁿ⁻¹  (power rule)
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The QR-II Past Paper Q5 — Directly</div>
+            <p>P(t) = 1000e^(0.05t). "Find the rate of change at any time t" means find dP/dt. Apply the rule: d/dt(Aeʳᵗ) = rAeʳᵗ. Here r=0.05, A=1000. So dP/dt = 0.05 × 1000 × e^(0.05t) = 50e^(0.05t). "Rate of change after 10 years" means evaluate at t=10: dP/dt = 50e^(0.5) ≈ 50 × 1.6487 ≈ 82.4 individuals per year.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-m">
+        <div class="inner-header" onclick="togI('t09-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Choosing the right rule — identify the function's shape first:</span><br>
+            Variable in the exponent (Aeʳᵗ, aᵗ) → use the exponential derivative rules<br>
+            Variable in the base, raised to a fixed power (tⁿ) → use the power rule: d/dt(tⁿ) = ntⁿ⁻¹<br>
+            Sum of terms → differentiate each term separately, then add the results
+          </div>
+          <p><strong>Procedure for evaluating a derivative at a specific point:</strong> first find the general derivative formula (a function of t), then substitute the specific t-value in afterward — never substitute first and differentiate a constant, which gives zero and loses all the information the question is asking for.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-ex">
+        <div class="inner-header" onclick="togI('t09-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Applying the Power Rule — Not Every Rate of Change Is Exponential</div>
+            <p>A firm's revenue (in thousands of rupees) is modelled as R(t) = 5t² + 30t, where t is months since launch. Find the rate of change of revenue, and find it specifically at t=4 months.</p>
+            <div class="notation">
+              R(t) = 5t² + 30t — sum of two power terms, not exponential<br>
+              dR/dt = 5(2t) + 30(1) = 10t + 30 — power rule applied to each term separately<br><br>
+              At t=4: dR/dt = 10(4) + 30 = 70
+            </div>
+            <p>Revenue is growing at Rs. 70,000 per month at the 4-month mark. Notice this rate itself changes with t (10t + 30 is not constant) — even though this isn't an exponential model, the rate of change still varies over time, because the underlying function is non-linear. Constant rate of change is a property of linear functions specifically, not the absence of exponential growth.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-q">
+        <div class="inner-header" onclick="togI('t09-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q09a">
+            <div class="q-header" onclick="togQ('q09a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">P(t) = 1000e^(0.05t). (a) Find the rate of change at any time t. (b) What is the rate of change after 10 years? (This is the exact QR-II past paper Q5.)</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                (a) P(t) = 1000e^(0.05t)<br>
+                    dP/dt = 0.05 × 1000 × e^(0.05t)<br>
+                    dP/dt = 50e^(0.05t)<br><br>
+                (b) At t = 10:<br>
+                    dP/dt = 50e^(0.05×10) = 50e^(0.5)<br>
+                    e^(0.5) ≈ 1.6487<br>
+                    dP/dt ≈ 50 × 1.6487 ≈ 82.4 individuals per year
+              </div>
+              <p>The rate of change is itself an exponential function of t — it increases over time. At t=10, the population is growing at approximately 82 individuals per year. At t=0 it was growing at 50 individuals per year. This accelerating growth is the defining characteristic of exponential models.</p>
+              <div class="what-tests">Derivative of exponential function · evaluation at a specific point · directly from QR-II past paper Q5</div>
+            </div>
+          </div>
+          <div class="question-block" id="q09b">
+            <div class="q-header" onclick="togQ('q09b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A contamination level follows C(t) = 500e^(-0.1t). (a) Find dC/dt. (b) What does the negative sign in the derivative mean physically? (c) At what rate is contamination decreasing at t=5?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                (a) C(t) = 500e^(-0.1t)<br>
+                    dC/dt = -0.1 × 500 × e^(-0.1t)<br>
+                    dC/dt = -50e^(-0.1t)<br><br>
+                (b) Negative sign: contamination is decreasing — the rate of change is negative,<br>
+                    meaning C gets smaller as t increases. Exponential decay.<br><br>
+                (c) At t = 5:<br>
+                    dC/dt = -50e^(-0.5) = -50 × 0.6065 ≈ -30.3 units per year<br>
+                    Contamination is decreasing at ~30 units per year at t=5.
+              </div>
+              <div class="what-tests">Derivative of exponential decay · interpreting the sign of the derivative · rate of change as a physical quantity</div>
+            </div>
+          </div>
+          <div class="question-block" id="q09c">
+            <div class="q-header" onclick="togQ('q09c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A lawyer argues in a damages case: "The rate of harm is increasing — therefore damages should be calculated using the current rate of harm, not the rate at the time of injury." The defendant responds: "The rate of harm was lower at the time of injury, so that is the correct baseline." Assuming harm follows H(t) = 200e^(0.08t), calculate the rate of harm at t=0 (time of injury) and t=5 (current time). Evaluate both legal arguments using the mathematics.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                H(t) = 200e^(0.08t)<br>
+                dH/dt = 0.08 × 200 × e^(0.08t) = 16e^(0.08t)<br><br>
+                At t=0 (time of injury): dH/dt = 16e⁰ = 16 units/year<br>
+                At t=5 (current):        dH/dt = 16e^(0.4) = 16 × 1.4918 ≈ 23.9 units/year
+              </div>
+              <p><strong>Evaluation of the plaintiff's argument:</strong> Mathematically correct that the rate is increasing — from 16 to ~24 units/year over 5 years. Using the current (higher) rate to calculate ongoing damages captures the actual current impact. This is relevant to prospective damages: future harm will continue to increase.</p>
+              <p><strong>Evaluation of the defendant's argument:</strong> Also has mathematical basis — at the moment of injury, the rate was 16 units/year, not 24. For retrospective damages (compensating harm already suffered), the rate at the time of each harm event is the correct measure. A single current-rate snapshot understates early harm and overstates early damages.</p>
+              <p><strong>The correct resolution:</strong> Neither argument alone is complete. Retrospective damages should integrate the rate over time: total harm from t=0 to t=5 = ∫₀⁵ 16e^(0.08t)dt = [200e^(0.08t)]₀⁵ = 200e^(0.4) − 200 ≈ 297.4 − 200 = 97.4 units total. Prospective damages should use the current and projected rate. The dispute is actually about the time frame of damages being calculated, not which rate is correct — both parties are right about their respective time frames.</p>
+              <div class="what-tests">Derivative of exponential · evaluating rate at two points · applying rate of change to a legal damages argument · the distinction between retrospective and prospective damages as a mathematical time-frame question · Tier 3 because it requires computing two rates, evaluating both legal positions, and identifying that they address different time frames rather than contradicting each other</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-bar">
+        <div class="inner-header" onclick="togI('t09-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Damages Calculation Connection</div>
+            <p>Economic damages experts routinely report a "rate of loss" or "marginal cost" figure — that figure is, mathematically, a derivative, whether or not the expert's report calls it one. A lawyer who can independently verify that the reported rate matches what the underlying growth or decline model actually implies has a genuine, technically grounded basis for challenging an inflated or understated rate.</p>
+            <p>The retrospective-vs-prospective damages distinction in the T3 question above is a real, recurring tension in personal injury and commercial damages litigation — knowing that it can be resolved mathematically (integrate the rate for past harm, project the current rate for future harm) gives a structured way to reconcile experts who each seem to have a defensible but different number.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 10: Integrated Modeling -->
+  <div class="topic-card" id="t10" style="border-left-color:var(--c6)">
+    <div class="topic-header" onclick="tog('t10')">
+      <span class="lec-tag" style="background:var(--c6)">LEC 18</span>
+      <div class="topic-title">Integrated Modeling — Full Analysis</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t10-lang">
+        <div class="inner-header" onclick="togI('t10-lang')">
+          <span class="inner-label">The Full Translation Checklist</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>This is the master checklist for any Part 3 word problem. Read the problem once, then work through these four questions before writing a single equation:</p>
+          <div class="notation">
+            <span class="hl">Step 1 — What type of change?</span><br>
+            Fixed amount added each period → Linear (y = mt + c)<br>
+            Fixed percentage each period  → Exponential (y = a·bᵗ)<br>
+            Two unknowns, two constraints → System of linear equations<br>
+            Optimise subject to limits    → Linear programming<br><br>
+            <span class="hl">Step 2 — Define variables explicitly.</span><br>
+            "Let x = ..." before any equation. Always.<br><br>
+            <span class="hl">Step 3 — Write the model.</span><br>
+            Equation(s), objective function, constraints — depending on type.<br><br>
+            <span class="hl">Step 4 — Answer the specific question asked.</span><br>
+            Not "solve the model." Answer the question. Evaluate at the right point,<br>
+            find the right intersection, interpret the result in context.
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t10-ex">
+        <div class="inner-header" onclick="togI('t10-ex')">
+          <span class="inner-label">Worked Example — Step 1 in Isolation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Recognising the Model Before Computing Anything</div>
+            <p>Step 1 of the checklist — identifying the model type — is where most marks are actually lost, not in the algebra afterward. Four short scenarios, classified on sight, no computation:</p>
+            <p><strong>(a)</strong> "A licensing fee rises by Rs. 2,000 every year." → <strong>Linear.</strong> Fixed amount, not a percentage.</p>
+            <p><strong>(b)</strong> "Two firms' combined market share is 100%, and Firm A's share is three times Firm B's." → <strong>System of linear equations.</strong> Two unknowns (the two shares), two stated constraints.</p>
+            <p><strong>(c)</strong> "A fine doubles for each repeated violation." → <strong>Exponential.</strong> "Doubles" is a multiplicative (percentage-equivalent) change, not a fixed addition.</p>
+            <p><strong>(d)</strong> "A firm wants to maximise profit, subject to a labour cap and a materials budget." → <strong>Linear programming.</strong> An objective to optimise, plus multiple inequality constraints.</p>
+            <p>None of these required writing a single equation to classify correctly — the classification comes entirely from recognising the verbal signal (fixed amount, two constraints on two unknowns, multiplicative change, optimisation subject to limits) before any symbol is written down. Get this step right and the remaining three steps are mechanical; get it wrong and no amount of correct algebra recovers the right answer.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t10-q">
+        <div class="inner-header" onclick="togI('t10-q')">
+          <span class="inner-label">Final Integration Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q10a">
+            <div class="q-header" onclick="togQ('q10a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A car travels 200 km partly at 40 km/h and partly at 60 km/h. The total time taken is 4 hours. Find the distance travelled at each speed. (This is the QR-I past paper Q2-ii.)</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Model type: System of linear equations.</strong> Two unknowns, two constraints.</p>
+              <div class="notation">
+                Let d₁ = distance at 40 km/h · d₂ = distance at 60 km/h<br><br>
+                Equation 1 (total distance): d₁ + d₂ = 200<br>
+                Equation 2 (total time):     d₁/40 + d₂/60 = 4<br><br>
+                From Eq.1: d₁ = 200 - d₂<br>
+                Sub into Eq.2: (200-d₂)/40 + d₂/60 = 4<br><br>
+                Multiply through by 120:<br>
+                3(200-d₂) + 2d₂ = 480<br>
+                600 - 3d₂ + 2d₂ = 480<br>
+                -d₂ = -120  →  d₂ = 120 km<br>
+                d₁ = 200 - 120 = 80 km<br><br>
+                Check: 80/40 + 120/60 = 2 + 2 = 4 hours ✓
+              </div>
+              <div class="what-tests">Recognising a distance-time word problem as a system of equations · the translation step that stumped QR-I students · time = distance/speed as the second equation</div>
+            </div>
+          </div>
+          <div class="question-block" id="q10b">
+            <div class="q-header" onclick="togQ('q10b')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A regulatory agency monitors two factories. Factory A's emissions follow E_A(t) = 80 - 4t (linear reduction from a cleaning programme). Factory B's emissions follow E_B(t) = 60·(0.85)ᵗ (exponential reduction). A limit of 20 units is the legal threshold. Find when each factory falls below the threshold. At t=8, which factory has lower emissions? A lawyer argues: "Factory B is clearly performing better — it started lower and is reducing faster." Evaluate this argument using the mathematics.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Factory A below 20:  80 - 4t = 20  →  4t = 60  →  t = 15 years<br><br>
+                Factory B below 20:  60(0.85)ᵗ = 20<br>
+                (0.85)ᵗ = 1/3<br>
+                t·ln(0.85) = ln(1/3)<br>
+                t = ln(0.333)/ln(0.85) = -1.0986/-0.1625 ≈ 6.76 years<br><br>
+                At t=8:<br>
+                E_A(8) = 80-32 = 48 units  (still above threshold)<br>
+                E_B(8) = 60(0.85)⁸ = 60(0.2725) ≈ 16.4 units  (below threshold ✓)
+              </div>
+              <p><strong>Evaluating the lawyer's argument:</strong> The lawyer's claim has two parts — "started lower" and "reducing faster." Let's test each.</p>
+              <p><strong>"Started lower":</strong> At t=0, E_A=80, E_B=60. True — Factory B started lower.</p>
+              <p><strong>"Reducing faster":</strong> Factory A reduces by 4 units/year (constant linear rate). Factory B's rate of reduction: dE_B/dt = 60·ln(0.85)·(0.85)ᵗ. At t=0: 60·(-0.1625)·1 ≈ -9.75 units/year. Factory B initially reduces faster. But by t=10: dE_B/dt = 60·(-0.1625)·(0.85)^10 ≈ -60·0.1625·0.1969 ≈ -1.92 units/year — slower than Factory A's constant 4 units/year. So "reducing faster" is only true early on.</p>
+              <p><strong>Overall verdict:</strong> The lawyer is correct that Factory B falls below the legal threshold first (~6.76 years vs. 15 years for A). In regulatory terms, Factory B achieves compliance sooner. However, the argument that it is "clearly performing better" based on initial conditions and early rate is an oversimplification — the comparison depends entirely on the time frame and the specific metric (compliance date, total emissions over a period, current level).</p>
+              <div class="what-tests">Linear vs. exponential model comparison · solving for threshold crossing · evaluating a two-part legal argument using mathematical evidence · the time-dependence of "reducing faster" for exponential vs. linear decay · full integration of Part 3 modeling skills in a single problem</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t10-bar">
+        <div class="inner-header" onclick="togI('t10-bar')">
+          <span class="inner-label">Bar &amp; Overall Connection</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">Bringing It Together — QR-II to Bar Pathway</div>
+            <p>The mathematical modeling skills in Part 3 underpin three recurring Bar competencies: reading and challenging expert witness testimony (knowing whether a model is linear or exponential, and what that implies for predictions); calculating damages and present values (exponential compound interest, discounting); and evaluating regulatory compliance arguments (threshold crossings, rate comparisons, model selection).</p>
+            <p>The translation checklist — identify model type, define variables, write model, answer specific question — is the same four-step discipline as IRAC. Issue (what type of problem?), Rule (which model?), Application (solve), Conclusion (answer in context). QR-II and legal reasoning are the same cognitive skill applied to different domains. That is not a coincidence — it is the reason this subject exists in an LLB programme.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part2-logic-in-action.html">← Part 2</a>
+  <a class="nav-link" href="index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-part4-bivariate-regression.html">Part 4 →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Part 3 · Mathematical Modeling · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>

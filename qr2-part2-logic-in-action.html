@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Part 2 · Logic in Action</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;
+    --bar-bg:#F0EDE6;--bar-border:#C9A84C;--c3:#E05A28;--t2:#1A5C3A;--t3:#5C1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .intro-block{background:#fff;border:1px solid var(--rule);border-left:4px solid var(--c3);padding:20px;margin-top:16px;border-radius:2px;}
+  .intro-block p{font-size:15px;margin-top:10px;}
+  .intro-block p:first-child{margin-top:0;}
+  .topic-card{border:1px solid var(--rule);border-left:4px solid var(--c3);background:#fff;margin-top:12px;border-radius:2px;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .scenario-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;background:var(--c3);flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .scenario-box{background:#F7F4EF;border:1px solid #DDD8CF;border-radius:2px;padding:16px 18px;margin-top:12px;}
+  .scenario-box .sc-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--c3);font-weight:600;margin-bottom:10px;}
+  .scenario-box p{font-size:14px;margin-top:8px;}
+  .scenario-box p:first-of-type{margin-top:0;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens p{font-size:14px;margin-top:8px;}
+  .bar-lens p:first-of-type{margin-top:0;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Part 2 — Logic in Action</h1>
+  <div class="subtitle">Lec. 8–10 Extension · Applied Reasoning Scenarios · 6 scenario sets</div>
+</header>
+
+<div class="progress-strip">
+  <span class="ps-label">Part 2</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">6 / 6 scenario sets</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <div class="intro-block">
+    <p><strong>What Part 2 is for.</strong> Part 1 built each logical tool in isolation. Part 2 applies them to extended scenarios where the tool is not labelled — you must identify which tool is needed before using it. This is the translation skill that separates Tier 2 from Tier 3 performance.</p>
+    <p>Each scenario set presents a real-world context, then asks questions that draw on multiple topics from Part 1 simultaneously. No scenario tells you which logical concept to apply.</p>
+  </div>
+
+  <div class="section-label">Six Scenario Sets — Applied Logic</div>
+
+  <!-- SCENARIO 1: CONTRACT DISPUTE -->
+  <div class="topic-card" id="s01">
+    <div class="topic-header" onclick="tog('s01')">
+      <span class="scenario-tag">SCENARIO 1</span>
+      <div class="topic-title">The Contract Dispute</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="s01-context">
+        <div class="inner-header" onclick="togI('s01-context')">
+          <span class="inner-label">Scenario</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="scenario-box">
+            <div class="sc-label">Facts</div>
+            <p>A supply agreement contains three clauses:</p>
+            <p><strong>Clause 1:</strong> "If payment is received by the 5th of the month, delivery will occur by the 10th."</p>
+            <p><strong>Clause 2:</strong> "Delivery will occur by the 10th if and only if the goods have cleared customs."</p>
+            <p><strong>Clause 3:</strong> "If delivery does not occur by the 10th, the buyer may claim a penalty."</p>
+            <p>Payment was received on the 3rd. Delivery did not occur by the 10th. The supplier argues no penalty is owed because the goods did not clear customs.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="s01-q">
+        <div class="inner-header" onclick="togI('s01-q')">
+          <span class="inner-label">Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="qs01a">
+            <div class="q-header" onclick="togQ('qs01a')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Using Clause 1 alone, what was the supplier obligated to do given that payment was received on the 3rd?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Clause 1: p → q  (payment by 5th → delivery by 10th)<br>
+                Payment on 3rd: p = T<br>
+                By Modus Ponens: q = T — delivery by 10th was obligated
+              </div>
+              <p>Clause 1 created an obligation to deliver by the 10th once payment was received by the 5th. The supplier was obligated to deliver.</p>
+              <div class="what-tests">Modus Ponens · conditional obligation</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs01b">
+            <div class="q-header" onclick="togQ('qs01b')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Clause 2 uses "if and only if." What does this add that a simple conditional would not? Does the customs failure affect the Clause 1 obligation?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Clause 2: D ↔ C  (delivery by 10th iff customs cleared)<br>
+                Clause 1: P → D  (payment by 5th → delivery by 10th)
+              </div>
+              <p><strong>What the biconditional adds:</strong> Clause 2 makes customs clearance both necessary and sufficient for delivery. A simple conditional (C → D) would only say customs clearance is sufficient — delivery could occur some other way. The biconditional closes that: no delivery without customs, no customs without delivery. They are logically equivalent.</p>
+              <p><strong>Does customs failure affect the Clause 1 obligation?</strong> This is the crux. Clause 1 creates an obligation (P → D). Clause 2 creates a factual condition (D ↔ C). If customs clearance is genuinely impossible, then D cannot occur — but the question is whether the supplier undertook to ensure customs clearance as part of the Clause 1 obligation, or whether customs is a force majeure condition outside the contract. Logic alone cannot resolve this — it requires contractual interpretation of whether the obligation is absolute or conditional on customs.</p>
+              <div class="what-tests">Biconditional vs. conditional · necessary and sufficient conditions · the limits of logic in contractual interpretation</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs01c">
+            <div class="q-header" onclick="togQ('qs01c')">
+              <span class="tier-badge t3-badge">T3</span>
+              <span class="q-text">The supplier argues: "Delivery didn't happen, but that's because customs didn't clear — so no penalty." Reconstruct this as a formal argument, identify its logical form, and assess whether it is valid. What is the buyer's strongest logical counter?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Supplier's argument:<br>
+                P1: D ↔ C        (Clause 2 — delivery iff customs cleared)<br>
+                P2: ¬C           (customs not cleared)<br>
+                P3: P → D        (Clause 1 — payment triggers delivery obligation)<br>
+                P4: P            (payment made)<br>
+                Supplier claims: ¬penalty despite ¬D<br><br>
+                Implicit premise needed: ¬C excuses the Clause 1 obligation
+              </div>
+              <p><strong>Logical assessment:</strong> The argument is valid only if the implicit premise holds — that customs failure excuses performance. From P1+P2, ¬D follows (biconditional modus tollens). But this only establishes why delivery didn't occur, not that the supplier is excused from the Clause 3 penalty. Clause 3 simply says: if ¬D, then penalty. It does not contain a customs exception.</p>
+              <p><strong>Buyer's strongest counter:</strong> Clause 3 is unconditional — ¬D → penalty, full stop. The reason for non-delivery is irrelevant to the penalty clause as drafted. If the supplier wanted a customs force majeure exception, it should have been written into the contract. The supplier is arguing for an implicit exception that the text does not contain — importing external reasoning into a formally closed conditional.</p>
+              <div class="what-tests">Multi-clause argument reconstruction · implicit premise identification · unconditional vs. conditional penalty clauses · the limits of extra-textual reasoning in contract interpretation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 2: CRIMINAL EVIDENCE -->
+  <div class="topic-card" id="s02">
+    <div class="topic-header" onclick="tog('s02')">
+      <span class="scenario-tag">SCENARIO 2</span>
+      <div class="topic-title">The Evidence Chain</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="s02-context">
+        <div class="inner-header" onclick="togI('s02-context')">
+          <span class="inner-label">Scenario</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="scenario-box">
+            <div class="sc-label">Facts</div>
+            <p>In a fraud trial, the prosecution presents the following chain of reasoning:</p>
+            <p>"All persons who signed the document knew its contents. All persons who knew its contents and signed were complicit. Person A signed the document. Therefore Person A was complicit."</p>
+            <p>Defence counsel argues: "My client signed under instructions and did not read the document. Furthermore, some signatories were told it was a routine form."</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="s02-q">
+        <div class="inner-header" onclick="togI('s02-q')">
+          <span class="inner-label">Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="qs02a">
+            <div class="q-header" onclick="togQ('qs02a')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Reconstruct the prosecution's argument in formal notation and identify the inference pattern used.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                P1: ∀x, signed(x) → knew(x)             [all signatories knew contents]<br>
+                P2: ∀x, knew(x) ∧ signed(x) → complicit(x)  [knowing signatories are complicit]<br>
+                P3: signed(A) = T                        [Person A signed]<br><br>
+                From P1 + P3 (Modus Ponens): knew(A) = T<br>
+                From P2 + knew(A) + signed(A) (Modus Ponens): complicit(A) = T ✓
+              </div>
+              <p>Pattern: Hypothetical syllogism across two universals, then modus ponens on the specific instance. Valid if all premises are true.</p>
+              <div class="what-tests">Multi-premise argument formalisation · hypothetical syllogism · universal instantiation</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs02b">
+            <div class="q-header" onclick="togQ('qs02b')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Defence says some signatories were told it was a routine form. Which premise does this attack and how? What logical tool does this represent?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>This attacks P1:</strong> "All persons who signed knew its contents."</p>
+              <p>The defence is producing the negation of P1: ∃x, signed(x) ∧ ¬knew(x) — there exists at least one signatory who did not know the contents (because they were told it was a routine form). One such person is sufficient to defeat the universal P1.</p>
+              <p><strong>Logical tool:</strong> Negation of a universal statement — providing a counterexample (∃x ¬P(x)) to destroy a ∀ claim. Once P1 is defeated, the chain from signing to knowledge to complicity breaks at the first link.</p>
+              <div class="what-tests">Counterexample as ∀ negation · identifying which premise an argument attacks · chain argument vulnerability</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs02c">
+            <div class="q-header" onclick="togQ('qs02c')">
+              <span class="tier-badge t3-badge">T3</span>
+              <span class="q-text">The prosecution responds: "Even if some signatories didn't know, Person A specifically was briefed on the document." Analyse how this repairs the prosecution's argument and whether the repaired argument is stronger or weaker than the original. What fallacy, if any, did the original argument risk?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>How the repair works:</strong> The prosecution drops the universal P1 and replaces it with a specific factual assertion: knew(A) = T (established by direct evidence of briefing). The argument now runs:</p>
+              <div class="notation">
+                P1 (revised): knew(A) = T  [specific to Person A, not universal]<br>
+                P2: knew(A) ∧ signed(A) → complicit(A)<br>
+                P3: signed(A) = T<br>
+                ∴ complicit(A) = T  ✓
+              </div>
+              <p><strong>Is the repaired argument stronger or weaker?</strong> Paradoxically, it is <em>stronger</em>. The original universal P1 was vulnerable to any single counterexample. The revised argument abandons the universal claim entirely and rests on a specific factual finding about Person A — which cannot be defeated by showing that other signatories did not know. The defence's counterexample no longer applies because the argument no longer depends on the universal.</p>
+              <p><strong>Fallacy risk in the original:</strong> The original argument committed to a sweeping universal (all signatories knew) where only a specific claim was needed (this signatory knew). This is an example of over-generalisation — arguing at a broader level than the conclusion requires, which creates unnecessary vulnerability. The repaired argument is more surgically targeted and therefore more logically robust.</p>
+              <div class="what-tests">Argument repair · universal to specific narrowing · why a narrower premise is sometimes stronger than a universal · over-generalisation as a strategic error · the difference between logical validity and argumentative robustness</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 3: REGULATORY COMPLIANCE -->
+  <div class="topic-card" id="s03">
+    <div class="topic-header" onclick="tog('s03')">
+      <span class="scenario-tag">SCENARIO 3</span>
+      <div class="topic-title">The Regulatory Gap</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="s03-context">
+        <div class="inner-header" onclick="togI('s03-context')">
+          <span class="inner-label">Scenario</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="scenario-box">
+            <div class="sc-label">Facts</div>
+            <p>An environmental regulation states: "Any facility that discharges more than 50 litres of effluent per day into a waterway must obtain a permit."</p>
+            <p>Facility X discharges 45 litres per day directly into a river. No permit was obtained.</p>
+            <p>An inspector argues: "This facility is discharging into a waterway without a permit — it must be in violation." The facility's lawyer responds: "The regulation does not apply to us."</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="s03-q">
+        <div class="inner-header" onclick="togI('s03-q')">
+          <span class="inner-label">Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="qs03a">
+            <div class="q-header" onclick="togQ('qs03a')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Formalise the regulation as a universal conditional and determine whether the regulation applies to Facility X on these facts.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Let D(x) = "x discharges &gt;50L/day into a waterway"<br>
+                Let P(x) = "x must obtain a permit"<br>
+                Regulation: ∀x, D(x) → P(x)<br><br>
+                Facility X: discharges 45L/day → D(X) = F<br>
+                Antecedent is false → conditional vacuously true<br>
+                But: P(X) is NOT triggered — no permit required
+              </div>
+              <p>The regulation does not apply. The facility's lawyer is correct. 45 litres is below the 50-litre threshold, so the antecedent is not satisfied and the obligation to obtain a permit is never triggered.</p>
+              <div class="what-tests">Universal conditional with a numerical threshold · vacuous truth when antecedent fails · threshold-based regulatory application</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs03b">
+            <div class="q-header" onclick="togQ('qs03b')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">The inspector's argument contains a logical flaw. Identify it precisely and name the fallacy.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Fallacy: Affirming the Consequent.</strong> The inspector reasons: the facility discharges into a waterway (partial q), has no permit (¬P), therefore violation. But this confuses the structure of the regulation.</p>
+              <p>More precisely, the inspector dropped the quantitative condition (&gt;50L) from the antecedent — treating "discharging into a waterway" as if it alone triggered the permit requirement. The full antecedent is D(x) = "&gt;50L/day AND into a waterway." By stripping the threshold, the inspector constructed a different, broader rule and applied it as if it were the actual regulation.</p>
+              <div class="what-tests">Antecedent truncation · affirming a modified consequent · the importance of reading all conditions of a legal rule precisely</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs03c">
+            <div class="q-header" onclick="togQ('qs03c')">
+              <span class="tier-badge t3-badge">T3</span>
+              <span class="q-text">An environmental advocate argues: "The 50-litre threshold is arbitrary. Any discharge into a waterway should require a permit. The facility is exploiting a loophole." Evaluate this argument logically and legally. Is the facility exploiting a loophole, or operating within the law? What is the difference?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Logically:</strong> The advocate is arguing for a different regulation — one with no threshold (∀x, discharges(x) → permit(x)) — rather than challenging the facility's compliance with the existing one. This is a policy argument, not a legal compliance argument. The advocate is conflating "the law should be different" with "the facility has violated the existing law."</p>
+              <p><strong>Legally:</strong> The facility is operating within the law as written. Compliance with the literal terms of a regulation is not a loophole — it is what compliance means. A loophole typically refers to a situation where the letter of the law is followed while its purpose is circumvented through some creative interpretation. Here, the facility is simply below the statutory threshold.</p>
+              <p><strong>The difference:</strong> A loophole involves arguable tension between the text and the purpose. Operating below a clearly stated numerical threshold does not involve such tension — the legislature or regulator drew the line at 50 litres, and 45 litres is on the compliant side of that line. Whether 45 litres is environmentally harmful is a policy question that might justify amending the regulation — but it does not constitute non-compliance with the existing one.</p>
+              <p><strong>Bar connection:</strong> This distinction — compliance vs. loophole exploitation — is central to tax law, regulatory law, and statutory interpretation. The advocate's argument is the structure of a legislative reform proposal, not a legal claim.</p>
+              <div class="what-tests">Policy argument vs. legal compliance argument · the definition of a loophole · text vs. purpose in statutory interpretation · the limits of logic in normative legal arguments</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 4: WITNESS TESTIMONY -->
+  <div class="topic-card" id="s04">
+    <div class="topic-header" onclick="tog('s04')">
+      <span class="scenario-tag">SCENARIO 4</span>
+      <div class="topic-title">The Witness Problem</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="s04-context">
+        <div class="inner-header" onclick="togI('s04-context')">
+          <span class="inner-label">Scenario</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="scenario-box">
+            <div class="sc-label">Facts</div>
+            <p>Three witnesses testified in a civil case. The following statements are made:</p>
+            <p><strong>Statement 1:</strong> "All three witnesses are credible."</p>
+            <p><strong>Statement 2:</strong> "At least one witness has a financial interest in the outcome."</p>
+            <p><strong>Statement 3:</strong> "No credible witness has a financial interest in the outcome."</p>
+            <p>The opposing party argues these three statements cannot all be true simultaneously.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="s04-q">
+        <div class="inner-header" onclick="togI('s04-q')">
+          <span class="inner-label">Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="qs04a">
+            <div class="q-header" onclick="togQ('qs04a')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Formalise all three statements and determine whether the opposing party is correct that they cannot all be true simultaneously.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                S1: ∀x ∈ {witnesses}, credible(x)<br>
+                S2: ∃x ∈ {witnesses}, financial_interest(x)<br>
+                S3: ∀x, credible(x) → ¬financial_interest(x)<br><br>
+                From S1: credible(w) = T for all witnesses w<br>
+                From S3 + S1: ¬financial_interest(w) = T for all witnesses w<br>
+                But S2 requires: ∃w, financial_interest(w) = T<br>
+                Contradiction ✗
+              </div>
+              <p><strong>The opposing party is correct.</strong> S1 and S3 together imply no witness has a financial interest. S2 requires at least one does. The three statements form a contradiction — they cannot all be true simultaneously.</p>
+              <div class="what-tests">Three-statement consistency check · identifying contradiction through logical chain · practical application to witness credibility</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs04b">
+            <div class="q-header" onclick="togQ('qs04b')">
+              <span class="tier-badge t3-badge">T3</span>
+              <span class="q-text">The party who made all three statements argues: "Statement 3 reflects a general principle, not an absolute rule — there are exceptions." Analyse what this concession does to the logical structure of the argument. Which statement must be revised, and how?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>The concession downgrades S3 from a universal to a general tendency.</strong> "No credible witness has a financial interest" (∀x credible(x) → ¬financial_interest(x)) becomes "most credible witnesses do not have financial interests" — a statistical claim, not a universal one.</p>
+              <p>Once S3 is not a strict universal, the contradiction dissolves: it becomes possible for a witness to be credible AND have a financial interest if they fall within the acknowledged exceptions.</p>
+              <p><strong>Which statement must be revised:</strong> S3. The revision: "Credible witnesses generally do not have financial interests, though exceptions exist where the interest is disclosed and does not materially affect testimony." This is now a contingent claim rather than an absolute one.</p>
+              <p><strong>What this costs the argument:</strong> The original S3 provided strong deductive support for the proposition that financial interest disqualifies credibility. The revised S3 only provides probabilistic support — it can no longer guarantee that a financially interested witness lacks credibility. The argument has moved from deductive to inductive, which weakens its force but removes the contradiction.</p>
+              <div class="what-tests">Universal to probabilistic downgrade · contradiction resolution through premise weakening · the cost of resolving a contradiction by weakening a premise · deductive to inductive argument transition</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 5: CONSTITUTIONAL CHALLENGE -->
+  <div class="topic-card" id="s05">
+    <div class="topic-header" onclick="tog('s05')">
+      <span class="scenario-tag">SCENARIO 5</span>
+      <div class="topic-title">The Constitutional Challenge</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="s05-context">
+        <div class="inner-header" onclick="togI('s05-context')">
+          <span class="inner-label">Scenario</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="scenario-box">
+            <div class="sc-label">Facts</div>
+            <p>A petitioner challenges a law under a constitutional provision. The following structure of argument emerges in court:</p>
+            <p><strong>Petitioner:</strong> "Any law that restricts fundamental rights without a compelling state interest is unconstitutional. This law restricts the right to assembly. The state has not demonstrated a compelling interest. Therefore this law is unconstitutional."</p>
+            <p><strong>State:</strong> "Public safety is a compelling interest. This law protects public safety. Therefore the law is constitutional."</p>
+            <p><strong>Judge:</strong> "Even if public safety is compelling, we must ask whether this law is the least restrictive means of achieving it."</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="s05-q">
+        <div class="inner-header" onclick="togI('s05-q')">
+          <span class="inner-label">Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="qs05a">
+            <div class="q-header" onclick="togQ('qs05a')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Formalise the petitioner's argument and the state's argument separately. Identify the inference pattern each uses.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Petitioner:<br>
+                P1: ∀x, restricts_rights(x) ∧ ¬compelling(x) → unconstitutional(x)<br>
+                P2: restricts_rights(Law) = T<br>
+                P3: ¬compelling(Law) = T  [state failed to demonstrate]<br>
+                ∴ unconstitutional(Law)  — Modus Ponens ✓<br><br>
+                State:<br>
+                P1: compelling(public_safety) = T<br>
+                P2: protects(Law, public_safety) = T<br>
+                Implicit claim: therefore compelling(Law) = T<br>
+                ∴ constitutional(Law)
+              </div>
+              <p>The petitioner uses a clean Modus Ponens. The state's argument has an implicit premise: that a law which protects a compelling interest thereby has a compelling interest behind it. The state is using Modus Ponens but with an implicit premise that requires scrutiny.</p>
+              <div class="what-tests">Formalising multi-party legal arguments · identifying implicit premises · comparing inference patterns across opposing arguments</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs05b">
+            <div class="q-header" onclick="togQ('qs05b')">
+              <span class="tier-badge t3-badge">T3</span>
+              <span class="q-text">The judge introduces "least restrictive means" as an additional condition. How does this change the logical structure of the constitutional test? Formalise the complete test with the judge's addition and explain what the state now bears the burden of proving.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Without judge's addition:<br>
+                Constitutional(x) iff: restricts_rights(x) → compelling(x)<br><br>
+                With judge's addition — the full strict scrutiny test:<br>
+                Constitutional(x) iff: compelling(x) ∧ least_restrictive(x)<br><br>
+                Both conditions necessary. Neither alone sufficient.
+              </div>
+              <p>The judge has converted the constitutional test from a single-condition conditional to a two-condition biconditional. A law is constitutional if and only if it serves a compelling interest AND uses the least restrictive means. Having a compelling interest is now necessary but no longer sufficient.</p>
+              <p><strong>What the state must now prove:</strong> (1) That public safety is a compelling interest — already asserted. (2) That this specific law, among all laws that could protect public safety, is the one that restricts rights the least. This is a much harder burden — it requires surveying alternative regulatory approaches and demonstrating that none achieves the same safety objective with less rights restriction.</p>
+              <p><strong>Bar connection:</strong> This is the US constitutional strict scrutiny framework precisely. The logical structure here — adding a second necessary condition to a test — is the same move courts make when elevating the standard of review from rational basis to intermediate or strict scrutiny.</p>
+              <div class="what-tests">Adding a necessary condition to a legal test · biconditional constitutional structure · strict scrutiny as a two-condition test · the shift from sufficient to necessary+sufficient · directly maps to constitutional law on the NY Bar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 6: MULTI-PARTY DISPUTE -->
+  <div class="topic-card" id="s06">
+    <div class="topic-header" onclick="tog('s06')">
+      <span class="scenario-tag">SCENARIO 6</span>
+      <div class="topic-title">The Three-Party Dispute — Full Integration</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="s06-context">
+        <div class="inner-header" onclick="togI('s06-context')">
+          <span class="inner-label">Scenario</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="scenario-box">
+            <div class="sc-label">Facts — Full Integration Exercise</div>
+            <p>Three parties — Person A, Person B, and a regulator — are in a dispute about liability for an industrial accident.</p>
+            <p><strong>Person A's argument:</strong> "All employers who failed to provide safety training are liable. Person B is an employer who failed to provide safety training. Therefore Person B is liable."</p>
+            <p><strong>Person B's response:</strong> "I provided safety training. Some employees chose not to attend. A person cannot be held liable for another's voluntary choices."</p>
+            <p><strong>Regulator:</strong> "Our investigation found that no employees received adequate training. Some training sessions were held, but they did not meet the minimum statutory standard."</p>
+            <p><strong>Person B replies:</strong> "The regulator is wrong — training was provided. And even if it was inadequate, inadequate training is not the same as no training. The statute uses the word 'failed to provide,' not 'provided inadequate training.'"</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="s06-q">
+        <div class="inner-header" onclick="togI('s06-q')">
+          <span class="inner-label">Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="qs06a">
+            <div class="q-header" onclick="togQ('qs06a')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">Formalise Person A's argument. Then identify exactly which premise Person B is attacking and how.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Person A:<br>
+                P1: ∀x, employer(x) ∧ failed_training(x) → liable(x)<br>
+                P2: employer(B) = T<br>
+                P3: failed_training(B) = T<br>
+                ∴ liable(B)  — Modus Ponens ✓
+              </div>
+              <p><strong>Person B attacks P3.</strong> Person B asserts failed_training(B) = F — training was provided (albeit not attended by all). If P3 is false, the conjunction in P1's antecedent fails and the conclusion does not follow. Person B is not challenging the rule (P1) or their status as an employer (P2) — only the factual premise that they failed to provide training.</p>
+              <div class="what-tests">Formalisation · identifying which factual premise is disputed · the difference between attacking the rule and attacking the facts</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs06b">
+            <div class="q-header" onclick="togQ('qs06b')">
+              <span class="tier-badge t2-badge">T2</span>
+              <span class="q-text">The regulator says "no employees received adequate training." Person B says this is not the same as "failed to provide training." Is Person B making a valid logical distinction? What type of reasoning does this represent?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Person B is making a valid logical distinction.</strong></p>
+              <div class="notation">
+                failed_to_provide(x)    ≠    provided_inadequate(x)<br><br>
+                These are different predicates with different truth conditions.<br>
+                One can be false while the other is true.
+              </div>
+              <p>Person B is arguing that the predicate in the statute (failed_to_provide) was not satisfied, even if a different predicate (provided_inadequately) was. This is the same logic as antecedent satisfaction analysis — the regulator's finding satisfies a different antecedent from the one in the statute.</p>
+              <p><strong>Type of reasoning:</strong> This is predicate logic applied to statutory interpretation — specifically, the argument that the statutory language must be read literally and that a different state of affairs from the one described in the statute does not trigger the statute's consequence.</p>
+              <div class="what-tests">Predicate distinction · literal statutory interpretation as logical predicate analysis · the difference between two predicates that are related but not equivalent</div>
+            </div>
+          </div>
+          <div class="question-block" id="qs06c">
+            <div class="q-header" onclick="togQ('qs06c')">
+              <span class="tier-badge t3-badge">T3</span>
+              <span class="q-text">Person A responds: "Providing inadequate training is functionally equivalent to failing to provide training, because the purpose of the statute is worker safety, not box-ticking." Evaluate this argument. Does purpose-based interpretation change the logical structure of the statute? What is the deepest logical tension in this entire dispute?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Person A's argument:</strong> Purposive interpretation — the statute should be read in light of its objective (worker safety), not just its literal text. This means "failed to provide training" should be interpreted as "failed to provide training that achieves the statutory purpose," which includes inadequate training.</p>
+              <p><strong>Does this change the logical structure?</strong> Yes. Person A is proposing to redefine the predicate failed_to_provide(x) to mean failed_to_provide_adequate(x). If this definitional expansion is accepted, Person B's distinction collapses — the predicates become equivalent by interpretive fiat rather than literal meaning.</p>
+              <div class="notation">
+                Literal reading:    failed_to_provide(B) = F  →  P3 false  →  no liability<br>
+                Purposive reading:  failed_to_provide(B) = T  →  P3 true   →  liability<br><br>
+                The dispute is fundamentally about which reading of the predicate governs.
+              </div>
+              <p><strong>The deepest logical tension:</strong> The entire dispute reduces to a disagreement about the domain of the predicate "failed to provide training." Person B argues for a narrow, literal domain (training occurred or did not). Person A argues for a purposive domain (training achieved its statutory goal or did not). Logic cannot resolve this tension — it can only make it visible. The resolution requires a jurisprudential choice: does this court apply literal or purposive statutory interpretation?</p>
+              <p>This is the deepest truth about logic in law: formal logic clarifies the structure of arguments with crystalline precision, but it cannot determine which premises to accept when the premises themselves are contested. The judge must make a normative choice about the meaning of a predicate, and that choice is not a logical one.</p>
+              <div class="what-tests">Purposive vs. literal interpretation as predicate redefinition · the limits of logic in resolving interpretive disputes · the deepest tension in applied legal logic — logic clarifies, it does not resolve normative disagreements · full integration of predicate logic, universal conditionals, and statutory interpretation in a single scenario</div>
+            </div>
+          </div>
+          <div class="inner-section" id="s06-bar">
+            <div class="inner-header" onclick="togI('s06-bar')">
+              <span class="inner-label">Bar &amp; LSAT Lens</span>
+              <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="inner-body">
+              <div class="bar-lens">
+                <div class="bar-label">NY Bar · LSAT Connection</div>
+                <p>This scenario contains every major logical tool from Part 1: universal conditionals, predicate analysis, argument reconstruction, implicit premise identification, and the limits of formal logic in normative contexts. On the NY Bar, statutory interpretation questions — particularly on the MPT — ask exactly this: given a statute's text and purpose, which reading applies to these facts?</p>
+                <p>On the LSAT, "Method of Reasoning" and "Point of Disagreement" questions require identifying precisely what two parties are arguing about — which predicate they define differently, which premise they contest. Scenario 6 is a complete LSAT argument analysis exercise embedded in a legal context.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part1-logic-foundations.html">← Part 1</a>
+  <a class="nav-link" href="index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-part3-mathematical-modeling.html">Part 3 →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Part 2 · Logic in Action · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>

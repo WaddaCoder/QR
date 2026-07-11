@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Quantifiers &amp; Negation — Deep Treatment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--qc:#1B6B72;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .phase-block{background:#E8F5F6;border-left:3px solid var(--qc);padding:12px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .phase-block .phase-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--qc);font-weight:600;margin-bottom:8px;}
+  .phase-block p{font-size:14px;margin-top:8px;}
+  .checklist{background:#F0F8F9;border:1px solid #B2D8DC;border-radius:2px;padding:12px 14px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;}
+  .checklist .ck-label{font-weight:600;color:var(--qc);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens p{font-size:14px;margin-top:8px;}
+  .bar-lens p:first-of-type{margin-top:0;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Quantifiers &amp; Negation — Deep Treatment</h1>
+  <div class="subtitle">3 topics · ∀ · ∃ · Negation · Universal Conditionals · Finals &amp; NY Bar scope</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Quantifiers</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">3 topics · 3 phases each</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <div class="section-label">Topic 1 · Universal &amp; Existential Quantifiers — Translation First</div>
+
+  <div class="topic-card open" id="q01" style="border-left-color:var(--qc)">
+    <div class="topic-header" onclick="tog('q01')">
+      <span class="lec-tag" style="background:var(--qc)">TOPIC 1</span>
+      <div class="topic-title">∀ and ∃ — Reading and Writing Quantified Statements</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="q01-ph1">
+        <div class="inner-header" onclick="togI('q01-ph1')"><span class="inner-label">Phase 1 — Translation (English Only, No Symbols)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Before touching a symbol, the only question that matters is: <strong>does this claim need to hold for EVERY member of the group, or only for AT LEAST ONE?</strong></p>
+          <p>That single question is the entire translation step. Everything else — the symbol, the direction, the negation — follows mechanically once you've answered it correctly.</p>
+          <div class="phase-block">
+            <div class="phase-label">Phase 1 Drill — English Signals</div>
+            <p><strong>EVERY signals → ∀ (universal):</strong> all, every, any, each, whenever, whoever, no exception, without exception, each and every, any person who, a person who [general rule], for all.</p>
+            <p><strong>AT LEAST ONE signals → ∃ (existential):</strong> some, at least one, there exists, there is a/an, certain [people/things], one or more, several, a few.</p>
+            <p><strong>Trickiest signals:</strong></p>
+            <p>"No contractor is exempt." → EVERY contractor is NOT exempt → ∀ with negation (not ∃).</p>
+            <p>"Not every claim was valid." → AT LEAST ONE claim was NOT valid → ∃ with negation (not ∀).</p>
+            <p>"Only licensed professionals may practise." → EVERY person who practises IS licensed → ∀ reading what the rule requires of anyone who practises.</p>
+            <p>"None of the appeals succeeded." → EVERY appeal did NOT succeed → ∀ with negation.</p>
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Domain Is Not Optional</div>
+            <p>"Every person is entitled to a fair trial" and "every person in this jurisdiction is entitled to a fair trial" use the same quantifier but have different scopes. The domain — the set of things x ranges over — is part of the statement, not background noise. Always name it before writing the symbol. Exams test this by presenting a valid ∀ claim over a narrow domain and asking whether it extends to a broader one: it never automatically does.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q01-ph2">
+        <div class="inner-header" onclick="togI('q01-ph2')"><span class="inner-label">Phase 2 — Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Universal quantifier:</span> ∀x P(x) — "for all x in the domain, P(x) holds"<br>
+            <span class="hl">Existential quantifier:</span> ∃x P(x) — "there exists at least one x in the domain such that P(x) holds"<br><br>
+            <span class="hl">Proving and disproving — the asymmetry:</span><br>
+            To PROVE ∀x P(x): must verify P for EVERY element → heavy burden<br>
+            To DISPROVE ∀x P(x): need only ONE counterexample → light burden<br>
+            To PROVE ∃x P(x): exhibit ONE example where P holds → light burden<br>
+            To DISPROVE ∃x P(x): must verify P fails for EVERY element → heavy burden<br><br>
+            <span class="hl">Quantified conditionals:</span><br>
+            ∀x [P(x) → Q(x)] — "for all x, if x has P then x has Q"<br>
+            True for x when: P(x)=F (vacuously true), or P(x)=T and Q(x)=T<br>
+            False for x when: P(x)=T and Q(x)=F — a counterexample<br><br>
+            <span class="hl">∀ with negation:</span><br>
+            "No x has P" → ∀x ¬P(x)<br>
+            "Not every x has P" → ¬∀x P(x) ← this is NOT the same as ∀x ¬P(x)<br>
+            ¬∀x P(x) = ∃x ¬P(x) (at least one x lacks P)
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q01-ph3">
+        <div class="inner-header" onclick="togI('q01-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">English → Symbol → Evaluate → English Check → Legal Application</div>
+            <p><strong>Sentence:</strong> "Every public authority that receives a complaint must acknowledge it within 14 days. At least one authority failed to do so last quarter."</p>
+            <p><strong>Step 1 — Phase 1:</strong> "every public authority" → ∀. "At least one authority" → ∃. Two separate statements.</p>
+            <p><strong>Step 2 — Define:</strong></p>
+            <div class="notation">
+              Domain: all public authorities<br>
+              R(x) = "x received a complaint last quarter"<br>
+              A(x) = "x acknowledged within 14 days"<br>
+              Claim 1: ∀x [R(x) → A(x)]<br>
+              Claim 2: ∃x [R(x) ∧ ¬A(x)]
+            </div>
+            <p><strong>Step 3 — Evaluate the tension:</strong> Claim 1 is a universal rule (obligation). Claim 2 is an existential fact (at least one violation). These are in direct tension — Claim 2 provides a counterexample to Claim 1 as applied in practice. The rule was not universally followed.</p>
+            <p><strong>Step 4 — What can we infer?</strong> From ∃x [R(x) ∧ ¬A(x)], call that authority X. R(X)=T and ¬A(X)=T. Substituting into Claim 1: R(X) → A(X) should hold, but A(X)=F. This is a genuine violation of the rule, not a vacuous case.</p>
+            <p><strong>Step 5 — English check:</strong> ∀x [R(x)→A(x)] = "every authority that received a complaint acknowledged it within 14 days." ∃x [R(x)∧¬A(x)] = "there exists at least one authority that received a complaint but did not acknowledge within 14 days." Both match originals. The formalisation is correct, and it immediately reveals the precise nature of the violation.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q01-q">
+        <div class="inner-header" onclick="togI('q01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qq01a">
+            <div class="q-header" onclick="togQ('qq01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Identify ∀ or ∃ and formalise: (i) "Every judgment must be served within 30 days." (ii) "Some arbitration clauses are unenforceable." (iii) "No expert witness testified to direct causation." (iv) "Not all disclosures were made on time."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(i) ∀ — "every." Domain: all judgments. S(x)="x must be served within 30 days." ∀x J(x)→S(x) where J(x)="x is a judgment."</p>
+              <p>(ii) ∃ — "some." Domain: all arbitration clauses. U(x)="x is unenforceable." ∃x [A(x)∧U(x)] where A(x)="x is an arbitration clause."</p>
+              <p>(iii) ∀ with negation — "no." Domain: all expert witnesses. T(x)="x testified to direct causation." ∀x [E(x)→¬T(x)] or equivalently ¬∃x [E(x)∧T(x)].</p>
+              <p>(iv) ∃ with negation — "not all." Domain: all required disclosures. D(x)="x was made on time." ∃x [Req(x)∧¬D(x)] where Req(x)="x is a required disclosure."</p>
+              <div class="what-tests">Four quantifier identification cases · "no" = ∀¬ · "not all" = ∃¬ · domain specification · compound predicate notation</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq01b">
+            <div class="q-header" onclick="togQ('qq01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A regulator claims: "All factories in the district comply with emissions standards." (a) What does the regulator need to prove this claim? (b) A journalist finds one factory that fails. What does this establish? (c) The regulator responds: "That one factory is an anomaly — most comply." Does this save the original claim?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Original claim: ∀x [F(x)→C(x)] where F(x)="x is a factory in the district" and C(x)="x complies with emissions standards."</p>
+              <p><strong>(a) To prove ∀x [F(x)→C(x)]:</strong> the regulator must verify compliance for every single factory — there are no exceptions permitted by a universal claim. One unverified factory leaves the claim unproven.</p>
+              <p><strong>(b) One non-compliant factory:</strong> let Factory Z have F(Z)=T and C(Z)=F. This is a direct counterexample: F(Z)→C(Z) is false. This establishes ¬∀x [F(x)→C(x)] = ∃x [F(x)∧¬C(x)]. The original universal claim is <em>disproved</em> — definitively, not probabilistically. One counterexample is sufficient.</p>
+              <p><strong>(c) "Most comply" does not save the claim.</strong> ∀x [F(x)→C(x)] means every factory, not most factories. The regulator has implicitly retreated from a universal claim to a weaker existential-majority claim ("most" ≈ "many" ≈ ∃ a majority). These are logically different claims — the original universal was disproved; the weaker "most" claim may still be true but was not what was originally asserted. In legal advocacy, this shift from ∀ to "most" is a concession, not a defence.</p>
+              <div class="what-tests">Burden to prove ∀ · single counterexample disproves ∀ · the universally-disproved vs "most" distinction · recognising an implicit retreat from ∀ to a weaker claim</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq01c">
+            <div class="q-header" onclick="togQ('qq01c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Formalise: "Only a licensed advocate may appear before the Supreme Court." Then determine: (a) Does this say anything about what unlicensed persons may do in other courts? (b) Does it imply every licensed advocate does appear before the Supreme Court? (c) Can an unlicensed person appear before the Supreme Court?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>"Only A may do B" → every person who does B is A → ∀x [App(x)→Lic(x)] where App(x)="x appears before the Supreme Court" and Lic(x)="x is a licensed advocate."</p>
+              <p><strong>(a) Unlicensed persons in other courts:</strong> the domain is Supreme Court appearances. The formalisation says nothing about other courts — the quantifier's scope is limited to Supreme Court appearances. No inference extends to District Courts, High Courts, or tribunals from this statement alone.</p>
+              <p><strong>(b) Does every licensed advocate appear?</strong> No. ∀x [App(x)→Lic(x)] means "everyone who appears is licensed" — the arrow goes from appearance to licensing, not the other way. The converse (∀x [Lic(x)→App(x)]) would mean every licensed advocate appears, which is not stated. Licensing is necessary for appearance, not sufficient.</p>
+              <p><strong>(c) Can an unlicensed person appear?</strong> ∀x [App(x)→Lic(x)] says if you appear, you are licensed. If someone unlicensed appears, they make App(x)=T and Lic(x)=F — a direct violation of the universal rule. The rule prohibits this, but it does not make it logically impossible; it makes it a breach of the rule.</p>
+              <div class="what-tests">"Only A may B" as ∀x[B(x)→A(x)] · domain scope · the converse error · necessary vs sufficient · rule-prohibition vs logical impossibility</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq01d">
+            <div class="q-header" onclick="togQ('qq01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Two statements: (1) ∀x [P(x)→Q(x)] and (2) ∀x [P(x)→R(x)]. Can you conclude ∀x [P(x)→(Q(x)∧R(x))]? Can you conclude ∀x [Q(x)→R(x)]? Show your reasoning for each.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Can we conclude ∀x [P(x)→(Q(x)∧R(x))]?</strong> Yes. For any x where P(x)=T: from (1), Q(x)=T; from (2), R(x)=T. So Q(x)∧R(x)=T. For any x where P(x)=F: the conditional P(x)→(Q(x)∧R(x)) is vacuously true. Therefore ∀x [P(x)→(Q(x)∧R(x))] holds for every x in the domain. Conclusion: valid.</p>
+              <p><strong>Can we conclude ∀x [Q(x)→R(x)]?</strong> No — this does not follow. We know that whenever P holds, both Q and R hold. But there may be elements where Q holds without P holding — and for those, we have no information about R. Example: suppose P(x)=F, Q(x)=T, R(x)=F. Both (1) and (2) hold vacuously (false antecedent). But Q(x)→R(x) would be T→F=F. So Q(x)→R(x) fails. Conclusion: invalid inference.</p>
+              <div class="what-tests">Combining two universal conditionals · valid conjunction derivation · the invalid Q→R inference · why vacuously true conditionals leave Q and R unrelated when P is false</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq01e">
+            <div class="q-header" onclick="togQ('qq01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A statute states: "Any person who knowingly assists in the preparation of a fraudulent document is liable for the fraud." Prosecutor argues: "Paralegal X prepared documents that turned out to be fraudulent, so X is liable." (a) Formalise the statute. (b) Identify the precise predicate the prosecutor must establish. (c) The defence argues X had no knowledge of the fraud. Evaluate the defence argument using the formal structure. (d) Propose a formalisation of a related but weaker civil standard: "A person who assists in the preparation of a fraudulent document, regardless of knowledge, is jointly and severally liable."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> Domain: all persons. K(x)="x knowingly assisted in preparing a fraudulent document." L(x)="x is liable for the fraud." Statute: ∀x [K(x)→L(x)].</p>
+              <p><strong>(b) Precise predicate:</strong> the prosecutor must establish K(X)=T for Paralegal X — that X both assisted in preparation AND did so knowingly. Preparing the documents alone (without the knowledge element) does not satisfy K(X). The "knowingly" modifier is part of the predicate definition, not an add-on.</p>
+              <p><strong>(c) Defence argument:</strong> structurally sound. If X lacked knowledge of the fraud, K(X)=F regardless of whether X prepared the documents. With K(X)=F, the antecedent of ∀x [K(x)→L(x)] is false for X, making the conditional vacuously true — but critically, L(X) is not established. The rule does not make X liable. The defence argument correctly identifies that the mens rea element (knowingly) is a necessary component of K(X) and attacks the predicate at its definitional boundary.</p>
+              <p><strong>(d) Civil standard (strict liability):</strong> A(x)="x assisted in preparing a fraudulent document" (no knowledge requirement). J(x)="x is jointly and severally liable." Civil rule: ∀x [A(x)→J(x)]. Under this formulation, K(X) is irrelevant — only A(X) matters. Since X did prepare the documents, A(X)=T → J(X)=T. The civil standard makes X liable without proving knowledge, which is why the criminal and civil standards produce different outcomes from identical facts: the predicates themselves are defined differently.</p>
+              <div class="what-tests">Statutory formalisation · identifying the precise predicate element required · the mens rea component as part of the predicate definition · comparing criminal and civil predicates for the same conduct</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq01f">
+            <div class="q-header" onclick="togQ('qq01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A labour regulation states: "Every employer with more than 50 employees must establish a grievance redressal committee." Factory F has 47 employees. Factory G has 53 employees and has no committee. Factory H has 200 employees, has a committee, but it has never met. (a) Formalise the regulation. (b) Evaluate compliance for F, G, and H. (c) The regulator issues notices to both G and H. G concedes non-compliance. H argues "we have a committee, which is all the rule requires." Evaluate H's argument using your formalisation. (d) Propose a formalisation of an extended rule that would also require the committee to be operational.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> Domain: all employers. E₅₀(x)="x has more than 50 employees." G(x)="x has established a grievance redressal committee." Regulation: ∀x [E₅₀(x)→G(x)].</p>
+              <p><strong>(b) Evaluation:</strong> Factory F: E₅₀(F)=F (47 employees) → antecedent false → vacuously compliant. No obligation. Factory G: E₅₀(G)=T (53 employees), G(G)=F (no committee) → antecedent true, consequent false → rule violated. Factory H: E₅₀(H)=T (200 employees), G(H)=T (committee exists) → antecedent true, consequent true → rule satisfied as written.</p>
+              <p><strong>(c) H's argument:</strong> structurally valid against the rule as written. ∀x [E₅₀(x)→G(x)] requires only that a committee be established — "established" is the predicate G(x), and H satisfies it. The rule says nothing about whether the committee must meet, function, or resolve grievances. H's argument is a legitimate plain-text reading of the formal rule. The regulator's notice to H is not supported by the rule as formalised.</p>
+              <p><strong>(d) Extended rule:</strong> add O(x)="x's committee is operational (meets regularly and processes grievances)." Extended rule: ∀x [E₅₀(x)→(G(x)∧O(x))]. Under this formalisation, H's committee satisfying G(H)=T but O(H)=F (never met) would mean G(H)∧O(H)=F → rule violated despite having a committee. The regulator's notice would then be supported. This illustrates how the choice of predicate definition determines legal outcomes — a rule about "having" a committee and a rule about "having an operational" committee are formally different obligations even when their English descriptions seem similar.</p>
+              <div class="what-tests">Three-entity evaluation · vacuously compliant vs non-compliant vs technically compliant · plain-text argument using formal structure · extending a rule's predicate to close a gap · predicate definition as a policy choice</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="q01-bar">
+        <div class="inner-header" onclick="togI('q01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Statutory Interpretation &amp; LSAT Logical Reasoning</div>
+            <p>The "only one counterexample disproves a universal" rule is the mathematical foundation of regulatory non-compliance findings, constitutional as-applied challenges, and the "pattern or practice" standard in employment discrimination — one documented violation doesn't establish pattern, but it definitively disproves a claim of universal compliance. Understanding the asymmetric burden (heavy to prove ∀, light to disprove it) tells you which side of a regulatory dispute has the harder job.</p>
+            <p>LSAT Logical Reasoning's "Weaken" questions are almost always universal-counterexample problems: the stimulus contains a ∀ generalisation, and the correct answer provides (or implies) one exception. Recognising "this answer provides a counterexample to the ∀ claim in the stimulus" is the pattern that unlocks these questions across all content areas.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-label">Topic 2 · Negation of Simple Quantified Statements</div>
+
+  <div class="topic-card" id="q02" style="border-left-color:var(--qc)">
+    <div class="topic-header" onclick="tog('q02')">
+      <span class="lec-tag" style="background:var(--qc)">TOPIC 2</span>
+      <div class="topic-title">Negating ∀x P(x) and ∃x P(x) — The Flip-and-Negate Rule</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="q02-ph1">
+        <div class="inner-header" onclick="togI('q02-ph1')"><span class="inner-label">Phase 1 — Translation (What the Negation Means in English)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Before any symbols: what does it mean to negate a claim about "all" or "some"?</p>
+          <p><strong>Negating "all X are Y":</strong> the opposite of "all X are Y" is NOT "all X are not Y" (that's the contrary, stronger than necessary). The opposite is simply "at least one X is not Y" — one exception is enough to make the original claim false.</p>
+          <p><strong>Negating "some X are Y":</strong> the opposite of "some X are Y" is NOT "some X are not Y." The opposite is "no X are Y" — every single X fails to be Y, leaving zero exceptions.</p>
+          <div class="phase-block">
+            <div class="phase-label">Phase 1 Sanity Check — Always Do This Last</div>
+            <p>After producing the negation symbolically, translate it back into plain English and ask: <strong>is this the exact opposite of the original? If the original is true, is my negation false? If the original is false, is my negation true?</strong></p>
+            <p>"All contracts require consideration" (∀) → negation = "at least one contract does not require consideration" (∃¬). Check: if it's true that all contracts require consideration, then it's false that any lacks it — correct, these are perfect opposites.</p>
+            <p>"Some defendants cooperated" (∃) → negation = "no defendant cooperated" (∀¬). Check: if it's true that some cooperated, then it's false that none did — correct.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q02-ph2">
+        <div class="inner-header" onclick="togI('q02-ph2')"><span class="inner-label">Phase 2 — The Four-Step Checklist (Mechanics)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="checklist">
+            <span class="ck-label">The Negation Checklist — Run This Every Time</span>
+            ☐ Step 1: Identify the quantifier (∀ or ∃)<br>
+            ☐ Step 2: Flip the quantifier (∀ ↔ ∃)<br>
+            ☐ Step 3: Negate the predicate (P becomes ¬P)<br>
+            ☐ Step 4: English check — does the result mean the exact opposite?
+          </div>
+          <div class="notation">
+            <span class="hl">The two rules:</span><br>
+            ¬[∀x P(x)] = ∃x ¬P(x) &nbsp;&nbsp;— "not all have P" = "at least one lacks P"<br>
+            ¬[∃x P(x)] = ∀x ¬P(x) &nbsp;&nbsp;— "none have P" = "every element lacks P"<br><br>
+            <span class="hl">Domain never changes:</span> x still ranges over the same set after negation<br><br>
+            <span class="hl">With compound predicates:</span><br>
+            ¬[∀x (P(x)∧Q(x))] = ∃x ¬(P(x)∧Q(x)) = ∃x (¬P(x)∨¬Q(x))<br>
+            ¬[∃x (P(x)∧Q(x))] = ∀x ¬(P(x)∧Q(x)) = ∀x (¬P(x)∨¬Q(x))
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Two Most Common Errors</div>
+            <p><strong>Error 1 — Only negating the predicate, forgetting to flip the quantifier:</strong> ¬[∀x P(x)] → ∀x ¬P(x). Wrong — this says "every element lacks P," which is much stronger than "at least one lacks P." The correct negation is ∃x ¬P(x).</p>
+            <p><strong>Error 2 — Only flipping the quantifier, forgetting to negate the predicate:</strong> ¬[∀x P(x)] → ∃x P(x). Wrong — this says "at least one has P," which is unrelated to the original's negation. Both steps must happen together, every time.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q02-ph3">
+        <div class="inner-header" onclick="togI('q02-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Negating Both Directions with English Check</div>
+            <p><strong>Statement A:</strong> "All witnesses who testified were cross-examined."</p>
+            <div class="notation">
+              Step 1 — Phase 1: "all witnesses who testified" → ∀<br>
+              Domain: witnesses. W(x)="x testified." C(x)="x was cross-examined."<br>
+              Formalise: ∀x [W(x)→C(x)]<br><br>
+              Wait — this is a quantified conditional, not a simple ∀x P(x). The predicate here is compound: [W(x)→C(x)]. Negating it uses Topic 3's rule. But for a simple predicate version:<br><br>
+              Simplified: P(x) = "x was cross-examined" over domain {witnesses who testified}<br>
+              Statement: ∀x P(x)<br>
+              Step 2 — Flip: ∃<br>
+              Step 3 — Negate P: ¬P(x) = "x was NOT cross-examined"<br>
+              Negation: ∃x ¬P(x)<br>
+              Step 4 — English: "At least one witness who testified was NOT cross-examined." ✓ Exact opposite.
+            </div>
+            <p><strong>Statement B:</strong> "Some evidence was obtained without a valid warrant."</p>
+            <div class="notation">
+              Step 1: "some" → ∃. Domain: all evidence. V(x)="x was obtained without a valid warrant."<br>
+              Statement: ∃x [E(x)∧V(x)] where E(x)="x is evidence in this case"<br>
+              Step 2 — Flip: ∀<br>
+              Step 3 — Negate: ¬(E(x)∧V(x)) = ¬E(x)∨¬V(x)<br>
+              Negation: ∀x [¬E(x)∨¬V(x)] = ∀x [E(x)→¬V(x)]<br>
+              Step 4 — English: "Every item in this case was obtained with a valid warrant." ✓<br><br>
+              Legal meaning: to defeat the ∃ claim ("some evidence was obtained illegally"), the defence must show EVERY piece of evidence was lawfully obtained — a heavy burden, which is why existential allegations of illegality shift the burden of production.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q02-q">
+        <div class="inner-header" onclick="togI('q02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qq02a">
+            <div class="q-header" onclick="togQ('qq02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Negate each statement using the four-step checklist and provide the plain English negation: (i) ∀x L(x) — "every licence is valid." (ii) ∃x B(x) — "some bids were non-compliant." (iii) ∀x [R(x)∧S(x)] — "every report was submitted and signed."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(i) ¬[∀x L(x)] → ∃x ¬L(x) — "at least one licence is NOT valid."</p>
+              <p>(ii) ¬[∃x B(x)] → ∀x ¬B(x) — "no bid was non-compliant" = "every bid was compliant."</p>
+              <p>(iii) ¬[∀x (R(x)∧S(x))] → ∃x ¬(R(x)∧S(x)) → ∃x (¬R(x)∨¬S(x)) — "at least one report was either not submitted OR not signed (or both)."</p>
+              <div class="what-tests">Four-step checklist applied · both directions · De Morgan on compound predicate negation</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq02b">
+            <div class="q-header" onclick="togQ('qq02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">The prosecution claims: "Every piece of physical evidence was properly logged." The defence wishes to challenge this. (a) What is the precise negation the defence must establish? (b) How much evidence does the defence need to produce? (c) If the prosecution then retreats to "almost all evidence was properly logged," is this the same claim? What has the prosecution conceded?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Prosecution: ∀x [E(x)→L(x)] — every piece of evidence was properly logged.</p>
+              <p><strong>(a) Precise negation:</strong> ∃x [E(x)∧¬L(x)] — there exists at least one piece of evidence that was NOT properly logged.</p>
+              <p><strong>(b) How much evidence:</strong> one. A single documented instance of improperly logged evidence disproves the universal claim completely. The defence needs one exhibit, not a pattern.</p>
+              <p><strong>(c) "Almost all" is not the same claim.</strong> ∀x [E(x)→L(x)] is a strict universal with zero exceptions permitted. "Almost all" implicitly concedes ∃x [E(x)∧¬L(x)] — at least some evidence was not properly logged. The prosecution has conceded precisely what the defence was trying to prove. "Almost all" is not a weakened version of the same claim — it is the admission of the claim's negation, dressed in qualified language.</p>
+              <div class="what-tests">Negation of ∀ in prosecution context · minimum evidence to disprove a universal · recognising "almost all" as an admission of ∃¬</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq02c">
+            <div class="q-header" onclick="togQ('qq02c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Negate and give the English meaning: "Some directors approved the resolution." Then: a shareholder argues this negated statement is what must be proved to invalidate the resolution. Is the shareholder right about the negation? What additional legal elements would actually be needed to invalidate a resolution on this basis?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Statement: ∃x [D(x)∧A(x)] — some director approved the resolution.</p>
+              <p>Negation: ∀x [D(x)→¬A(x)] — no director approved the resolution (every director failed to approve it).</p>
+              <p><strong>Is the shareholder right about the negation?</strong> Yes, logically. The negation of "some directors approved" is "no directors approved" — the shareholder has correctly identified the negation.</p>
+              <p><strong>What would actually invalidate the resolution:</strong> merely proving ∀x [D(x)→¬A(x)] (no director approved) would establish a procedural defect. But invalidity also requires: (i) that approval by directors was a necessary condition for the resolution (a separate rule of company law), (ii) that the defect was not subsequently ratified, and (iii) that the shareholder has standing to challenge. The logical negation provides the evidentiary foundation, not the complete legal argument — a distinction courts are careful to maintain.</p>
+              <div class="what-tests">Negation of ∃ · distinguishing the logical negation from the complete legal argument for invalidity · predicate logic as evidence foundation not full legal conclusion</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq02d">
+            <div class="q-header" onclick="togQ('qq02d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Identify the error in each negation attempt: (i) ¬[∀x P(x)] → ∀x ¬P(x). (ii) ¬[∃x P(x)] → ∃x ¬P(x). (iii) ¬[∀x P(x)] → ∃x P(x). For each, state which of the two common errors it commits.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(i) <strong>Error 1 — forgot to flip the quantifier, only negated the predicate.</strong> ¬[∀x P(x)] should be ∃x ¬P(x). The result ∀x ¬P(x) is the contrary of ∀x P(x) (both can be false simultaneously when only some have P), not its contradictory negation.</p>
+              <p>(ii) <strong>Error 1 — forgot to flip the quantifier, only negated the predicate.</strong> ¬[∃x P(x)] should be ∀x ¬P(x). The result ∃x ¬P(x) says "some lack P," which can be true at the same time as the original "some have P" — not a negation at all.</p>
+              <p>(iii) <strong>Error 2 — flipped the quantifier but forgot to negate the predicate.</strong> ¬[∀x P(x)] should be ∃x ¬P(x). The result ∃x P(x) says "some have P," which is completely unrelated to whether ∀x P(x) holds or not — not a negation.</p>
+              <div class="what-tests">Diagnosing the two error types · contrary vs contradictory · why each wrong version fails as a genuine negation</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq02e">
+            <div class="q-header" onclick="togQ('qq02e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">An audit report states: "Every transaction above Rs. 500,000 was reviewed by a senior officer AND recorded in the compliance log." Management challenges the report by asserting: "Some large transactions were not reviewed." (a) Formalise the audit report's claim. (b) Negate it correctly using the four-step checklist. (c) Is management's assertion the correct negation, and what exactly does it fail to establish if it isn't? (d) What would management need to prove to fully negate the audit report's claim?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> Domain: all transactions. T(x)="x is a transaction above Rs. 500,000." R(x)="x was reviewed by a senior officer." L(x)="x was recorded in the compliance log." Audit claim: ∀x [T(x)→(R(x)∧L(x))].</p>
+              <p><strong>(b) Correct negation using checklist:</strong></p>
+              <p>Step 1: quantifier is ∀. Step 2: flip to ∃. Step 3: negate the predicate [T(x)→(R(x)∧L(x))]. The negation of a conditional P→Q is P∧¬Q. So ¬[T(x)→(R(x)∧L(x))] = T(x)∧¬(R(x)∧L(x)) = T(x)∧(¬R(x)∨¬L(x)). Step 4: assemble: ∃x [T(x)∧(¬R(x)∨¬L(x))].</p>
+              <p>English: "There exists at least one transaction above Rs. 500,000 that was either NOT reviewed by a senior officer, OR NOT recorded in the compliance log, or both."</p>
+              <p><strong>(c) Is management's assertion the correct negation?</strong> Partially. "Some large transactions were not reviewed" = ∃x [T(x)∧¬R(x)], which satisfies the review component of the negation. But it does not fully negate the audit claim — the audit claim has two conjuncts (R∧L), and the negation requires showing at least one of the two failed. Management's assertion addresses only ¬R, ignoring ¬L. If every large transaction was reviewed but some weren't logged, that also negates the audit claim — management's partial assertion misses this path.</p>
+              <p><strong>(d) What management needs to prove:</strong> ∃x [T(x)∧(¬R(x)∨¬L(x))] — at least one transaction above Rs. 500,000 where either the review or the log entry (or both) is missing. Proving just one of the two conjunction components failed, for one transaction, is sufficient. Management doesn't need to prove both R and L failed — one counterexample to either element of the conjunction negates the whole audit claim.</p>
+              <div class="what-tests">Full negation of a quantified conditional with compound consequent · partial negation vs complete negation · De Morgan on the consequent · minimum evidence to disprove a conjunctive universal obligation</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq02f">
+            <div class="q-header" onclick="togQ('qq02f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A human rights report states: "In every detention facility inspected, at least one detainee was held without charge for more than 72 hours." The government negates this as: "Not all detention facilities hold uncharged detainees." (a) Formalise the report's claim. (b) Formalise the government's negation attempt. (c) Is the government's negation the correct negation of the report? If not, what error did they commit and what is the actual negation? (d) What is the evidentiary and legal significance of the correct negation in a habeas corpus context?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Report's claim:</strong> Domain: all inspected detention facilities. F(x)="x is an inspected facility." U(x)="at least one detainee in x was held without charge for more than 72 hours." Report: ∀x [F(x)→U(x)].</p>
+              <p><strong>(b) Government's negation attempt:</strong> "Not all detention facilities hold uncharged detainees" = ∃x [F(x)∧¬U(x)] — there exists at least one inspected facility with no such detainee.</p>
+              <p><strong>(c) Is the government's negation correct?</strong> Yes — structurally. ¬[∀x (F(x)→U(x))] = ∃x [F(x)∧¬U(x)], which matches exactly what the government stated. The government correctly applied the flip-and-negate rule. However, the government's phrasing ("not all facilities hold uncharged detainees") is weaker-sounding in English than the logic requires — "not all" sounds like a mild qualification, but formally it only requires showing that one facility is clean. If the government can find even one facility among those inspected with no such violations, the universal claim is disproved.</p>
+              <p><strong>(d) Habeas corpus significance:</strong> in habeas corpus proceedings, the relevant predicate is individual — whether a specific named detainee (U(individual)) was held beyond the lawful period. The report's ∀ claim (every facility had at least one such case) is a systemic finding, not an individual finding. The government negating the systemic ∀ claim has no direct effect on individual habeas petitions — a court addressing "was Detainee X held unlawfully?" is evaluating U(X), not whether ∃x[F(x)∧¬U(x)] is true across facilities. The government's negation, even if proved, is a statistical and political defence, not a logical defence against individual habeas writs. Each individual petition stands or falls on its own predicate evaluation.</p>
+              <div class="what-tests">∀x [F(x)→U(x)] negation · confirming government's negation is structurally correct · systemic finding vs individual predicate · why a systemic negation doesn't defeat individual habeas claims</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="q02-bar">
+        <div class="inner-header" onclick="togI('q02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Evidentiary Standards &amp; LSAT Necessary Assumption</div>
+            <p>The "∃x establishes a claim, ∀x is needed to defeat it" asymmetry is the mathematical basis of why class action plaintiffs need only show a common pattern (∃x with the defect) while defendants must show the entire class was treated correctly (∀x without defect) to defeat certification. Knowing which side carries the ∀ burden and which carries the ∃ burden predicts which party has the harder evidentiary task without reading the procedural rules.</p>
+            <p>LSAT Necessary Assumption questions routinely involve negating the conclusion: if the negation of the conclusion destroys the argument, the conclusion is a necessary assumption. The negation technique here — flip quantifier, negate predicate, English check — is the mechanical tool that makes these questions systematic rather than intuitive. Examinees who know the checklist never have to guess which answer "sounds like" the right negation.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-label">Topic 3 · Negation of Universal Conditionals — The Hardest Case</div>
+
+  <div class="topic-card" id="q03" style="border-left-color:var(--qc)">
+    <div class="topic-header" onclick="tog('q03')">
+      <span class="lec-tag" style="background:var(--qc)">TOPIC 3</span>
+      <div class="topic-title">Negating ∀x [P(x)→Q(x)] — P Stays Unnegated, Three Things Change</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="q03-ph1">
+        <div class="inner-header" onclick="togI('q03-ph1')"><span class="inner-label">Phase 1 — Why This Case Is Different (English First)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The universal conditional ∀x [P(x)→Q(x)] is the most common form of legal rule. "Every person who [condition P] must [consequence Q]." To negate it, you need to show the rule fails for at least one person — and the rule fails for a person exactly when P holds but Q doesn't.</p>
+          <p>In plain English: <strong>the negation of "if P then Q, for all x" is "there exists an x where P holds AND Q fails."</strong></p>
+          <p>The critical point: <strong>P does not get negated.</strong> The counterexample must be someone who genuinely satisfies the condition P — that's what makes them a real counterexample to the rule, rather than a case where the rule simply never applied. A person who doesn't satisfy P is irrelevant to the rule — you need someone the rule actually covers, where the promised consequence Q didn't follow.</p>
+          <div class="phase-block">
+            <div class="phase-label">Phase 1 Intuition — The Counterexample Must Be Inside the Rule's Reach</div>
+            <p>"Every employee who works overtime is entitled to additional pay." A counterexample is: <strong>an employee who worked overtime and did NOT receive additional pay.</strong> That's it. Not "an employee who didn't work overtime" — that person was never covered by the rule. And not "a non-employee who worked overtime" — outside the domain entirely. Only an overtime worker denied payment counts as a counterexample.</p>
+            <p>This is why P stays unnegated: the counterexample must be someone the antecedent P is TRUE for. Making P false would make the rule vacuously true for that person — no counterexample.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q03-ph2">
+        <div class="inner-header" onclick="togI('q03-ph2')"><span class="inner-label">Phase 2 — The Three-Change Checklist (Mechanics)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="checklist">
+            <span class="ck-label">The Three-Change Checklist — All Three Must Happen Together</span>
+            ☐ Change 1: ∀ flips to ∃<br>
+            ☐ Change 2: → (conditional) becomes ∧ (conjunction)<br>
+            ☐ Change 3: Q becomes ¬Q &nbsp;&nbsp;[P stays exactly as it was — DO NOT negate P]
+          </div>
+          <div class="notation">
+            <span class="hl">The rule:</span><br>
+            ¬[∀x (P(x)→Q(x))] = ∃x (P(x) ∧ ¬Q(x))<br><br>
+            <span class="hl">Why → becomes ∧:</span><br>
+            ¬(P→Q) = ¬(¬P∨Q) = P∧¬Q &nbsp;&nbsp;[by De Morgan and implication equivalence]<br>
+            The negation of a conditional is the conjunction of the antecedent with the negated consequent<br><br>
+            <span class="hl">What each change means:</span><br>
+            ∀→∃: not universally true → at least one exception exists<br>
+            →→∧: not "if P then Q" → P held AND Q still failed<br>
+            Q→¬Q: not "Q follows" → Q did not follow<br>
+            P unchanged: the exception must be someone P actually applies to
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Single Most Common Error in This Topic</div>
+            <p>Students negate P as well as Q, producing ∃x (¬P(x) ∧ ¬Q(x)). This is wrong. A person where P is false is not a counterexample to the rule — the rule makes no claim about them. The counterexample must have P true and Q false. If you find yourself writing ¬P anywhere in the negation of ∀x [P(x)→Q(x)], stop — you have made this error. P comes through unchanged.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q03-ph3">
+        <div class="inner-header" onclick="togI('q03-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Complete Negation — Three Legal Rules, Three Counterexamples</div>
+            <p><strong>Rule A:</strong> "Every employee who works overtime is entitled to additional pay."</p>
+            <div class="notation">
+              Formalise: ∀x [O(x)→E(x)] where O(x)="x works overtime," E(x)="x is entitled to additional pay"<br>
+              Change 1: ∀→∃<br>
+              Change 2: →→∧<br>
+              Change 3: E→¬E &nbsp;(O stays as O)<br>
+              Negation: ∃x [O(x) ∧ ¬E(x)]<br>
+              English: "There exists an employee who worked overtime and was NOT entitled to additional pay."<br>
+              Check: the counterexample works overtime (P true) but gets no entitlement (Q false). ✓
+            </div>
+            <p><strong>Rule B:</strong> "Any contractor who misses a deadline is liable for liquidated damages."</p>
+            <div class="notation">
+              ∀x [M(x)→L(x)] where M(x)="x missed a deadline," L(x)="x is liable for liquidated damages"<br>
+              Negation: ∃x [M(x) ∧ ¬L(x)]<br>
+              English: "Some contractor missed a deadline and was NOT liable for liquidated damages."<br>
+              Note: this could happen if a force majeure clause applies — the contractor missed the deadline (M true) but was excused from liability (L false). That's exactly a legal counterexample to the rule.
+            </div>
+            <p><strong>Rule C:</strong> "All persons convicted of a drug offence shall have their licence suspended."</p>
+            <div class="notation">
+              ∀x [C(x)→S(x)] where C(x)="x was convicted of a drug offence," S(x)="x's licence was suspended"<br>
+              Negation: ∃x [C(x) ∧ ¬S(x)]<br>
+              English: "There exists a person who was convicted of a drug offence whose licence was NOT suspended."<br>
+              Wrong version students write: ∃x [¬C(x) ∧ ¬S(x)] — "someone not convicted had no suspension." This is irrelevant to the rule — the rule says nothing about non-convicted persons. It is NOT a counterexample.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="q03-q">
+        <div class="inner-header" onclick="togI('q03-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qq03a">
+            <div class="q-header" onclick="togQ('qq03a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Apply the three-change checklist to negate each rule, then write the English counterexample: (i) ∀x [R(x)→F(x)] — "every registered firm must file quarterly returns." (ii) ∀x [A(x)→N(x)] — "any applicant who meets the criteria is notified." (iii) ∀x [D(x)→C(x)] — "all defendants who plead guilty are offered counselling."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(i) ∃x [R(x) ∧ ¬F(x)] — "some registered firm did NOT file quarterly returns." Counterexample: a firm that is registered (R true) but failed to file (F false).</p>
+              <p>(ii) ∃x [A(x) ∧ ¬N(x)] — "some applicant who met the criteria was NOT notified." Counterexample: an applicant who qualifies (A true) but received no notification (N false).</p>
+              <p>(iii) ∃x [D(x) ∧ ¬C(x)] — "some defendant who pled guilty was NOT offered counselling." Counterexample: a guilty-plea defendant (D true) who was denied or not offered the counselling (C false).</p>
+              <div class="what-tests">Three-change checklist applied three times · English counterexample · confirming P appears unnegated in each result</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq03b">
+            <div class="q-header" onclick="togQ('qq03b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A student negates "Every licensed driver who causes an accident must report it within 24 hours" as: ∃x [¬L(x) ∧ ¬Rep(x)] — "some unlicensed person didn't report an accident." Identify precisely what error was committed. Then produce the correct negation and explain why the student's version fails as a counterexample to the rule.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Rule: ∀x [(L(x)∧Acc(x))→Rep(x)] where L(x)="x is a licensed driver," Acc(x)="x caused an accident," Rep(x)="x reported within 24 hours."</p>
+              <p><strong>Error committed:</strong> the student negated the antecedent predicates (making L false) instead of negating only the consequent (Rep). This is the classic "negate P as well as Q" error. An unlicensed person was never covered by the rule in the first place — the rule applies to licensed drivers who cause accidents. Showing an unlicensed person didn't report says nothing about whether the rule fails for those it covers.</p>
+              <p><strong>Correct negation:</strong> ∃x [L(x) ∧ Acc(x) ∧ ¬Rep(x)] — "there exists a licensed driver who caused an accident and did NOT report it within 24 hours." This person satisfies the antecedent (L=T, Acc=T) and violates the consequent (Rep=F), making them a genuine counterexample.</p>
+              <p><strong>Why the student's version fails:</strong> ∃x [¬L(x) ∧ ¬Rep(x)] is compatible with the rule being perfectly satisfied — every licensed driver who caused an accident could have reported perfectly while unlicensed drivers (outside the rule's scope) were doing something else entirely. The student's "counterexample" doesn't touch the rule at all.</p>
+              <div class="what-tests">Diagnosing the P-negation error · why antecedent-false cases don't challenge the rule · correct negation of a compound antecedent conditional</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq03c">
+            <div class="q-header" onclick="togQ('qq03c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Rule: "Whenever an inspector finds a violation, the facility must be shut down immediately." An inspector found a violation at Facility Z but the facility continued operating for three days. (a) Formalise the rule. (b) Apply the three-change checklist to write the negation. (c) Does the Facility Z situation instantiate the negation? Show which predicates are satisfied.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> "Whenever" → ∀. Domain: all inspector-facility-finding events. V(x)="inspector found a violation at x." S(x)="x was shut down immediately." Rule: ∀x [V(x)→S(x)].</p>
+              <p><strong>(b) Three-change checklist:</strong> Change 1: ∀→∃. Change 2: →→∧. Change 3: S→¬S (V unchanged). Negation: ∃x [V(x) ∧ ¬S(x)] — "some facility had a violation found but was NOT shut down immediately."</p>
+              <p><strong>(c) Facility Z:</strong> V(Z)=T (inspector found a violation) ∧ ¬S(Z)=T (facility continued operating — not shut down immediately). Both conjuncts of the negation are satisfied by Facility Z. This is a direct instantiation of ∃x [V(x) ∧ ¬S(x)], confirming the rule was violated. The three-day operation period is evidence that ¬S(Z)=T and that the rule was not followed, not a vacuous case.</p>
+              <div class="what-tests">Three-change checklist on "whenever" trigger · confirming the negation is instantiated by the facts · evaluating P and ¬Q for a specific entity</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq03d">
+            <div class="q-header" onclick="togQ('qq03d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Negate the following rule at two levels: first write ¬[∀x [P(x)→Q(x)]] in symbolic form, then write ¬[∀x [P(x)→Q(x)]] where P(x)="x is a public official" and Q(x)="x filed an asset declaration." Finally write the English counterexample and state what evidence a court would need to establish it.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Symbolic (general):</strong> ¬[∀x (P(x)→Q(x))] = ∃x (P(x) ∧ ¬Q(x))</p>
+              <p><strong>With defined predicates:</strong> ∃x (Public(x) ∧ ¬Filed(x)) where Public(x)="x is a public official" and Filed(x)="x filed an asset declaration."</p>
+              <p><strong>English counterexample:</strong> "There exists a public official who did NOT file an asset declaration."</p>
+              <p><strong>Evidence a court needs:</strong> (i) proof that the person is a public official — establishing Public(x)=T through their appointment, gazette notification, or official records; (ii) proof that no asset declaration was filed — through absence of records in the relevant registry, certified by the competent authority. Both conjuncts must be independently evidenced. It is not sufficient to show they hold public office without confirming the absence of a filing, nor to confirm an unfiled declaration exists without proving the person's official status.</p>
+              <div class="what-tests">Negation at symbolic and concrete levels · dual conjunct evidence requirement · what each predicate requires independently</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq03e">
+            <div class="q-header" onclick="togQ('qq03e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A statutory rule states: "Every person who occupies a public office and receives a gift above Rs. 5,000 in value must disclose it within 7 days." Official O received a watch worth Rs. 12,000 from a contractor and did not disclose it. (a) Formalise the rule with a compound antecedent. (b) Apply the three-change checklist, being careful with compound P. (c) Instantiate the negation with Official O — what must be proved for each element? (d) Official O argues: "I didn't know the watch was worth over Rs. 5,000." Does this argument engage with the formal structure of the rule, and what additional element would need to be added to the rule for this argument to succeed?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> Domain: all persons. Off(x)="x occupies public office." G(x)="x received a gift above Rs. 5,000." D(x)="x disclosed within 7 days." Rule: ∀x [(Off(x)∧G(x))→D(x)].</p>
+              <p><strong>(b) Three-change checklist with compound antecedent:</strong> Change 1: ∀→∃. Change 2: →→∧. Change 3: D→¬D. The compound antecedent (Off∧G) stays entirely unchanged. Negation: ∃x [(Off(x)∧G(x)) ∧ ¬D(x)].</p>
+              <p><strong>(c) Instantiating with O:</strong> Off(O)=T (must prove: official appointment records), G(O)=T (must prove: the watch exists and its value exceeds Rs. 5,000 — independent valuation evidence required), ¬D(O)=T (must prove: no disclosure was made within 7 days — absence of record in the disclosure registry). All three elements of the conjunction must be independently established. Failure to prove any one means the negation is not instantiated for O.</p>
+              <p><strong>(d) O's knowledge argument:</strong> "I didn't know the watch was worth over Rs. 5,000" does not engage with the rule's formal structure as written. The predicate G(x) is defined as "received a gift above Rs. 5,000 in value" — this is an objective fact about the gift's value, not a predicate about O's knowledge of that value. The rule as written has no knowledge element in the antecedent; whether O knew the value is irrelevant to whether G(O)=T. To make O's argument succeed, the rule would need to be amended to read: ∀x [(Off(x)∧G(x)∧K(x))→D(x)] where K(x)="x knew the gift's value exceeded Rs. 5,000." With K as a third conjunct in the antecedent, O could argue K(O)=F, making the compound antecedent false and the rule vacuously applicable — no violation. This is precisely why mens rea elements must be explicitly drafted into statutory predicates rather than implied.</p>
+              <div class="what-tests">Compound antecedent negation · all antecedent elements unchanged · three independent evidence requirements · an ignorance argument that fails because the predicate has no knowledge element · the drafting implication: mens rea must be explicit in the predicate</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qq03f">
+            <div class="q-header" onclick="togQ('qq03f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Two defence lawyers are challenging the same rule: ∀x [Supp(x)→Ref(x)] — "every supplier who receives government contracts must be on the approved vendor list." Lawyer A's strategy: "Our client is not a supplier in the relevant sense — it's a subcontractor." Lawyer B's strategy: "Our client is a supplier and is on the approved list — the prosecution has the facts wrong." Lawyer C (a third case) argues: "Our client is a supplier not on the list, but the contract was awarded via emergency procurement and the rule doesn't apply to emergency procurement." (a) Evaluate which of the three strategies correctly instantiates or avoids the rule's negation. (b) Which strategy goes beyond the formal predicate structure to a rule-scope argument? (c) What is the formal structure of a rule-scope argument, and is it logically equivalent to negating the universal conditional?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Evaluating the three strategies:</strong></p>
+              <p><strong>Lawyer A:</strong> arguing Supp(client)=F — the client doesn't satisfy the antecedent predicate. If correct, the rule's antecedent is false for the client, making the conditional vacuously true — no violation. This is a valid formal strategy: attack P to make the antecedent false, removing the client from the rule's scope. Formally: ¬Supp(client)=T → rule inapplicable.</p>
+              <p><strong>Lawyer B:</strong> arguing Ref(client)=T — the client does satisfy the consequent. Supp(client)=T and Ref(client)=T → the conditional is true and no violation occurred. This is also a valid formal strategy: concede P, establish Q, show the conditional holds. Formally: the rule was satisfied, not violated.</p>
+              <p><strong>Lawyer C:</strong> arguing the rule itself doesn't apply — not that the predicates are false, but that this specific contract falls outside the rule's scope (emergency procurement). This is a rule-scope argument, not a predicate evaluation.</p>
+              <p><strong>(b) Rule-scope argument:</strong> Lawyer C's strategy goes beyond the formal predicate structure. It doesn't negate any predicate — it challenges whether the rule's quantifier covers this case at all. The argument is that the domain of ∀x [Supp(x)→Ref(x)] excludes emergency procurement contracts.</p>
+              <p><strong>(c) Formal structure of a rule-scope argument:</strong> if the rule is ∀x∈D [Supp(x)→Ref(x)] where D is the domain (non-emergency government contracts), then Lawyer C is arguing the client's contract is in domain D' (emergency contracts) where D'∩D=∅. Formally: ∀x∈D' [rule inapplicable]. This is NOT logically equivalent to negating the universal conditional within D — it operates at a different level, restricting the domain rather than finding a counterexample within it. In legal terms, this is a jurisdictional or scope-exception argument, structurally different from an on-the-merits defence. Courts treat these differently: a scope argument (domain question) is often decided before reaching the merits (predicate evaluation), and if the scope argument succeeds, the merits are never reached.</p>
+              <div class="what-tests">Three distinct formal strategies against a universal conditional · antecedent-false vs consequent-true vs domain-scope arguments · rule-scope as a domain argument not a predicate negation · why courts resolve scope before merits</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="q03-bar">
+        <div class="inner-header" onclick="togI('q03-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Statutory Drafting &amp; Constitutional Challenges</div>
+            <p>The "P stays unnegated" rule is the formal explanation of why constitutional as-applied challenges require a plaintiff who satisfies the statute's trigger condition — you cannot challenge a law as applied to you if you never met the law's antecedent in the first place. Only someone who is P (meets the condition) but was denied Q (the promised right or outcome, or had the burden imposed) has standing to instantiate the negation. This explains standing doctrine in formal predicate terms.</p>
+            <p>The three-strategy taxonomy in T3-B (attack P, establish Q, challenge domain) maps exactly onto the three tiers of constitutional litigation strategy: argue the plaintiff lacks standing (¬P), argue the government satisfied the standard (Q holds), or argue the law doesn't apply to this case at all (domain exclusion). A lawyer who has internalised the formal structure can identify which tier a case is on — and which tier offers the strongest ground — without relying on pattern recognition alone.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-predicates.html">← Predicates</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-part1-logic-foundations.html">Part 1 →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Quantifiers &amp; Negation — Deep Treatment · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>

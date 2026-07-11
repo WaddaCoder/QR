@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Predicates — Deep Treatment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--pd:#7A3FA0;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .phase-block{background:#F0EBF8;border-left:3px solid var(--pd);padding:12px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .phase-block .phase-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--pd);font-weight:600;margin-bottom:8px;}
+  .phase-block p{font-size:14px;margin-top:8px;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens p{font-size:14px;margin-top:8px;}
+  .bar-lens p:first-of-type{margin-top:0;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Predicates — Deep Treatment</h1>
+  <div class="subtitle">3 topics · Unary · Binary · Predicates with Quantifiers · Finals &amp; NY Bar scope</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Predicates</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">3 topics · 3 phases each</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <!-- NOTE ON STRUCTURE: This file uses a three-phase approach inside each topic because all three
+       breakdown areas (translation, mechanics, symbolic→English pipeline) were identified as broken.
+       Phase 1 = Translation (English recognition, no symbols)
+       Phase 2 = Mechanics (symbols only, no meaning)
+       Phase 3 = Full pipeline (English in → symbols → evaluation → English out)
+       Standard Language First label is replaced with Phase 1 label to make this explicit. -->
+
+  <div class="section-label">Topic 1 · Unary Predicates — The Fundamental Break from Propositional Logic</div>
+
+  <div class="topic-card open" id="p01" style="border-left-color:var(--pd)">
+    <div class="topic-header" onclick="tog('p01')">
+      <span class="lec-tag" style="background:var(--pd)">TOPIC 1</span>
+      <div class="topic-title">Unary Predicates — What Makes P(x) Different from p</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="p01-ph1">
+        <div class="inner-header" onclick="togI('p01-ph1')"><span class="inner-label">Phase 1 — Translation (English Only)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>In propositional logic, <strong>p</strong> is a complete, self-contained sentence: "The defendant is liable." It is either true or false, full stop. There is nothing to plug in, nothing to evaluate — it's just a fact about the world, fixed.</p>
+          <p>A <strong>predicate</strong> is different in one crucial way: it is a <em>template</em>, not a sentence. "x is liable" is not yet a statement — it has a blank in it (the x). It only becomes true or false once you plug something specific into that blank. Until then, it's a question waiting to be asked of each possible subject.</p>
+          <div class="phase-block">
+            <div class="phase-label">Phase 1 Test — English Recognition</div>
+            <p>Before writing a single symbol, ask: <strong>"Is this complete, or does it have a blank?"</strong></p>
+            <p>"The defendant was negligent." → Complete, no blank → propositional (p, q, r).</p>
+            <p>"x was negligent." → Has a blank (who is x?) → predicate, needs a subject to be evaluated.</p>
+            <p>"x employed y." → Has two blanks (who employs whom?) → predicate with two variables.</p>
+            <p>If you can't determine whether the sentence is true or false without knowing "who is x," you have a predicate. This test works even when x is disguised as "the person," "any contractor," or "someone."</p>
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Disguise Pattern</div>
+            <p>PU and LSAT problems almost never present predicates with x explicitly labelled. Instead: "A contractor who misses a deadline is liable for penalties." This is the predicate L(c) = "contractor c is liable" applied to all contractors who miss deadlines — the x is hidden inside "a contractor" and "who misses a deadline." Recognising predicates through their natural-language disguises is the entire skill of Phase 1.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p01-ph2">
+        <div class="inner-header" onclick="togI('p01-ph2')"><span class="inner-label">Phase 2 — Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Unary predicate:</span> P(x) — one variable, one property<br>
+            Read as "x has property P" or "P holds for x"<br><br>
+            <span class="hl">Domain:</span> the set of things x is allowed to be<br>
+            P(x) = "x is a licensed lawyer" over the domain {all persons} gives a different truth set than over {all lawyers in Pakistan}<br><br>
+            <span class="hl">Evaluating a predicate at a specific individual:</span><br>
+            Substitute the individual for x, then determine true or false<br>
+            P(a) = "a is licensed" — true if a is licensed, false if not<br><br>
+            <span class="hl">Compound predicates (connectives apply to predicates too):</span><br>
+            P(x) ∧ Q(x) — x has both properties P and Q<br>
+            P(x) ∨ Q(x) — x has at least one of P or Q<br>
+            ¬P(x) — x does not have property P<br>
+            P(x) → Q(x) — if x has P, then x has Q (still not a statement until x is specified)<br><br>
+            <span class="hl">Key distinction from propositional logic:</span><br>
+            p ∧ q — two specific propositions conjoined → always has a fixed truth value<br>
+            P(x) ∧ Q(x) — still a template → truth value depends on what x is
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p01-ph3">
+        <div class="inner-header" onclick="togI('p01-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">English → Predicate → Evaluate → English Check</div>
+            <p><strong>Given:</strong> "A lawyer who holds a valid practising certificate is authorised to appear in the High Court."</p>
+            <p><strong>Step 1 — Phase 1 check:</strong> "a lawyer" introduces a blank subject → this is a predicate statement, not a propositional one. It makes a claim about each lawyer individually, not about a single named person.</p>
+            <p><strong>Step 2 — Define predicates and domain:</strong></p>
+            <div class="notation">
+              Domain: all lawyers registered in Pakistan<br>
+              C(x) = "x holds a valid practising certificate"<br>
+              A(x) = "x is authorised to appear in the High Court"<br>
+              Formalisation: C(x) → A(x) &nbsp;&nbsp;[for each x in the domain]
+            </div>
+            <p><strong>Step 3 — Evaluate at a specific individual:</strong> Lawyer Ali holds a valid certificate. So C(Ali) = T. By the conditional: C(Ali) → A(Ali), since C(Ali) = T, we conclude A(Ali) = T. Ali is authorised.</p>
+            <p><strong>Step 4 — Check a second individual:</strong> Lawyer Raza has an expired certificate. C(Raza) = F. The conditional C(Raza) → A(Raza) has a false antecedent — it is vacuously true but tells us nothing about A(Raza). We cannot conclude Raza is authorised, but we also cannot conclude he is not authorised from this rule alone. A false antecedent leaves the consequent completely undetermined.</p>
+            <p><strong>Step 5 — English check:</strong> reading C(x) → A(x) back into English: "if x holds a valid certificate, then x is authorised" — this matches the original sentence, confirming the formalisation is correct in both directions.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p01-q">
+        <div class="inner-header" onclick="togI('p01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qp01a">
+            <div class="q-header" onclick="togQ('qp01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Classify each as propositional (p) or predicate (P(x)): (i) "The contract is void." (ii) "A contract signed under duress is voidable." (iii) "If x is a minor, x cannot form a binding contract." (iv) "This verdict was unanimous."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(i) <strong>Propositional</strong> — "the contract" is a specific named thing; the sentence is complete and has a fixed truth value.</p><p>(ii) <strong>Predicate</strong> — "a contract" introduces a blank; the sentence makes a claim about each contract individually: V(x) → D(x) where V(x)="x was signed under duress" and D(x)="x is voidable."</p><p>(iii) <strong>Predicate</strong> — explicitly has x as a placeholder; M(x) → ¬C(x) where M(x)="x is a minor" and C(x)="x can form a binding contract."</p><p>(iv) <strong>Propositional</strong> — "this verdict" refers to a specific verdict; the sentence is complete with a fixed truth value.</p><div class="what-tests">Phase 1 classification test · propositional vs predicate · identifying implicit blanks in natural language</div></div>
+          </div>
+
+          <div class="question-block" id="qp01b">
+            <div class="q-header" onclick="togQ('qp01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Define predicates for the domain "all employees of Company X" and formalise: "An employee who completes the compliance training and passes the assessment is certified." Then evaluate at Employee Sana (completed training, passed assessment) and Employee Tariq (completed training, did not pass).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>T(x) = "x completed compliance training" · A(x) = "x passed the assessment" · C(x) = "x is certified"</p><p>Formalisation: [T(x) ∧ A(x)] → C(x)</p><p><strong>Sana:</strong> T(Sana)=T, A(Sana)=T → T(Sana)∧A(Sana)=T → by modus ponens: C(Sana)=T. Sana is certified.</p><p><strong>Tariq:</strong> T(Tariq)=T, A(Tariq)=F → T(Tariq)∧A(Tariq)=F → antecedent is false → conditional is vacuously true but tells us nothing about C(Tariq). Tariq's certification status is undetermined from this rule alone — the rule says nothing about employees who completed training but failed the assessment.</p><div class="what-tests">Predicate definition · formalisation · evaluating a conjunction predicate · vacuously true conditional — the rule's silence on Tariq is a real, legally meaningful gap</div></div>
+          </div>
+
+          <div class="question-block" id="qp01c">
+            <div class="q-header" onclick="togQ('qp01c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Write the negation of P(x) ∧ Q(x) using De Morgan's law. Then interpret: P(x) = "x filed the required disclosure" and Q(x) = "x filed within the deadline." What does ¬[P(x) ∧ Q(x)] mean in plain English, and is it the same as ¬P(x) ∧ ¬Q(x)?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>By De Morgan: ¬[P(x) ∧ Q(x)] = ¬P(x) ∨ ¬Q(x)</p><p><strong>Plain English:</strong> "x did NOT (file the required disclosure AND file within the deadline)" = "x either failed to file the disclosure OR filed after the deadline (or both)." This is the correct negation.</p><p><strong>Is it the same as ¬P(x) ∧ ¬Q(x)?</strong> No. ¬P(x) ∧ ¬Q(x) means "x did not file the disclosure AND did not file within the deadline" — a person who filed late (¬Q but P is true) satisfies ¬[P∧Q] but not ¬P∧¬Q. The difference matters legally: a filing that arrived but was late violates the conjunction but is not the same as no filing at all.</p><div class="what-tests">De Morgan applied to predicates · predicate negation · distinguishing ¬(P∧Q) from ¬P∧¬Q with a legal consequences example</div></div>
+          </div>
+
+          <div class="question-block" id="qp01d">
+            <div class="q-header" onclick="togQ('qp01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Domain: all documents submitted to a tribunal. L(x) = "x is in the required language." A(x) = "x is authenticated." R(x) = "x will be received." Rule: R(x) ↔ [L(x) ∧ A(x)]. Evaluate R for: Document D1 (correct language, authenticated), Document D2 (correct language, not authenticated), Document D3 (wrong language, authenticated).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>The rule is a biconditional: R(x) if and only if both L(x) and A(x) hold.</p><p><strong>D1:</strong> L(D1)=T, A(D1)=T → L∧A=T → R(D1)=T. Document received.</p><p><strong>D2:</strong> L(D2)=T, A(D2)=F → L∧A=F → R(D2)=F. Not received — missing authentication.</p><p><strong>D3:</strong> L(D3)=F, A(D3)=T → L∧A=F → R(D3)=F. Not received — wrong language.</p><p>The biconditional is stricter than a one-way conditional: both conditions are simultaneously necessary and jointly sufficient. A document satisfying only one is not received, regardless of which one it satisfies.</p><div class="what-tests">Biconditional predicate · three-case evaluation · necessary and jointly sufficient conditions · tribunal admissibility as a logical structure</div></div>
+          </div>
+
+          <div class="question-block" id="qp01e">
+            <div class="q-header" onclick="togQ('qp01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A statutory clause reads: "A person is exempt from the surcharge if, and only if, they are a registered charity AND their annual income does not exceed the prescribed threshold." (a) Formalise this as a predicate logic statement. (b) The revenue authority argues that Organisation X is not exempt because it exceeded the income threshold last year, even though it is a registered charity. Is this argument structurally valid? (c) Organisation X argues that even if it exceeded the threshold, it should be exempt because it is a registered charity and charities serve the public good. Evaluate this counter-argument logically and legally.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Domain: all organisations. C(x)="x is a registered charity." I(x)="x's annual income does not exceed the prescribed threshold." E(x)="x is exempt from the surcharge." Formalisation: E(x) ↔ [C(x) ∧ I(x)]</p><p><strong>(b)</strong> The revenue authority's argument is structurally valid. If Organisation X exceeded the income threshold, then I(X)=F. By the biconditional, E(X) ↔ [C(X) ∧ I(X)] — since I(X)=F, the conjunction C(X)∧I(X)=F, and therefore E(X)=F. The exemption requires both conditions simultaneously; failing one is sufficient to deny the exemption regardless of whether the other holds. The argument correctly applies the biconditional.</p><p><strong>(c)</strong> Organisation X's counter-argument is logically invalid against the statute as written, and legally weak as a primary argument though potentially viable as a policy argument. Logically: the statute's exemption criterion is E(x) ↔ [C(x) ∧ I(x)]. The fact that charities serve the public good is a reason the legislature may have included charities in the exemption, but it is not an additional exemption criterion in the text. Adding "serves the public good" as a standalone exemption criterion requires amending the statute, not interpreting it. Legally: if Organisation X can argue the income threshold was exceeded due to one-time anomalous income that doesn't reflect ongoing financial capacity, it might seek a purposive interpretation — but that is a legal argument about legislative intent, not a logical argument that the biconditional doesn't apply. On the plain text, the revenue authority's position is correct.</p><div class="what-tests">Biconditional formalisation · evaluating a denial-of-exemption argument structurally · distinguishing a valid logical counter-argument from a policy counter-argument · the limits of purposive interpretation against a plain biconditional statutory text</div></div>
+          </div>
+
+          <div class="question-block" id="qp01f">
+            <div class="q-header" onclick="togQ('qp01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A regulation states: "A food business operator is required to maintain temperature logs if they store perishable goods, OR if they employ more than five food handlers." Let S(x) = "x stores perishable goods," H(x) = "x employs more than five food handlers," L(x) = "x is required to maintain temperature logs." (a) Formalise the regulation. (b) A business operator stores no perishable goods and employs three food handlers — are they required to maintain logs? (c) The regulator issues an enforcement notice to a business that stores no perishable goods but employs eight food handlers. The business argues "we don't need logs because we don't store perishables." Evaluate the argument. (d) Propose a stricter version of the regulation that would require logs only when both conditions hold, and explain the practical consequence of the change.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> [S(x) ∨ H(x)] → L(x)</p><p><strong>(b)</strong> S(x)=F, H(x)=F → S∨H=F → antecedent false → conditional vacuously true, but L(x) is not forced to be true. The business is NOT required to maintain logs.</p><p><strong>(c)</strong> S(x)=F, H(x)=T → S∨H=T (disjunction requires only one to hold) → antecedent true → L(x)=T. The business IS required to maintain logs. The business's argument incorrectly applies the rule: it treats the disjunction as if both conditions must hold (a conjunction), when in fact either condition alone suffices. This is a formal fallacy — the business denies the consequent by eliminating only one disjunct of the antecedent, but the other disjunct (H) remains true.</p><p><strong>(d)</strong> Stricter version: [S(x) ∧ H(x)] → L(x). Under this rule, logs are required only when a business both stores perishables AND employs more than five handlers. Practical consequence: the business in (c) — eight food handlers, no perishables — would no longer be required to maintain temperature logs under the stricter rule. The regulatory burden is reduced, but a food safety gap opens: large food-handler operations without perishable storage may still present temperature-related risks (e.g., prepared hot foods, equipment cleaning requirements) that fall outside the new, narrower trigger.</p><div class="what-tests">Disjunctive antecedent · vacuously true conditional · the disjunction-vs-conjunction confusion as a formal fallacy in regulatory interpretation · amending a regulation's logical structure and tracing its practical consequence</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="p01-bar">
+        <div class="inner-header" onclick="togI('p01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Statutory Drafting &amp; LSAT Logic Games</div>
+            <p>Multi-element statutory triggers are predicate logic in legislative form. The exemption/liability determination for any given party (the x) requires evaluating each predicate in the trigger condition, applying the connective (∧, ∨, ↔), and reading off the result. A lawyer who can do this systematically never makes the "I don't qualify for X because I lack element A" error when element B alone might suffice — and never concedes "my client is subject to rule R" without checking every element of R's trigger condition individually.</p>
+            <p>LSAT Logic Games are almost entirely predicate logic in disguise: "If a lawyer is admitted to the state bar AND has not been disciplined in the past three years, they may appear pro hac vice." Every game rule of this form is a conditional predicate. The formal evaluation procedure — plug in each player, check each predicate, apply the connective, read the result — is the exact mechanical skill Logic Games reward when applied quickly and without error.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-label">Topic 2 · Binary Predicates — Relationships Between Two Variables</div>
+
+  <div class="topic-card" id="p02" style="border-left-color:var(--pd)">
+    <div class="topic-header" onclick="tog('p02')">
+      <span class="lec-tag" style="background:var(--pd)">TOPIC 2</span>
+      <div class="topic-title">Binary Predicates — R(x, y) and Relationships Between Subjects</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="p02-ph1">
+        <div class="inner-header" onclick="togI('p02-ph1')"><span class="inner-label">Phase 1 — Translation (English Only)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>A unary predicate has one blank — one subject that needs filling. A binary predicate has <em>two</em> blanks — it describes a <strong>relationship between two things.</strong> "x employs y," "x is the supervisor of y," "x filed a claim against y" — all of these need two subjects to become a complete true/false statement.</p>
+          <div class="phase-block">
+            <div class="phase-label">Phase 1 Test — Spotting Two Blanks</div>
+            <p>Ask: how many things do I need to name before this sentence has a truth value?</p>
+            <p>"x is negligent." → one thing (x) → unary P(x).</p>
+            <p>"x supervises y." → two things (x and y) → binary R(x,y).</p>
+            <p>"x transferred funds to y on behalf of z." → three things → ternary predicate (rare in QR-II but good to recognise).</p>
+            <p>The order of the variables matters in binary predicates: R(x,y) = "x employs y" is NOT the same as R(y,x) = "y employs x." Always state which is x and which is y before evaluating.</p>
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Order Trap</div>
+            <p>In English, "Ali supervises Sara" and "Sara supervises Ali" are clearly different. In predicate notation, S(Ali, Sara) ≠ S(Sara, Ali). But when a word problem uses passive voice — "Sara is supervised by Ali" — students often reverse the order in the predicate without noticing. Always rewrite passive voice as active voice before formalising: "Sara is supervised by Ali" → "Ali supervises Sara" → S(Ali, Sara).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p02-ph2">
+        <div class="inner-header" onclick="togI('p02-ph2')"><span class="inner-label">Phase 2 — Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Binary predicate:</span> R(x, y) — two variables, a relationship between them<br>
+            Read as "x stands in relation R to y" or "R holds between x and y"<br><br>
+            <span class="hl">Domain:</span> now two domains — one for x, one for y (often the same set, sometimes different)<br>
+            e.g. E(x, y) = "x employs y" where x ∈ {companies} and y ∈ {persons}<br><br>
+            <span class="hl">Evaluating at specific individuals:</span><br>
+            E(TechCo, Ayesha) = T if TechCo employs Ayesha, F otherwise<br>
+            E(Ayesha, TechCo) = ? — a different statement (does Ayesha employ TechCo?), usually F<br><br>
+            <span class="hl">Compound binary predicates:</span><br>
+            E(x,y) ∧ P(y) — "x employs y AND y is a minor"<br>
+            R(x,y) → Q(x,y) — "if x supervises y then x is responsible for y's conduct"<br><br>
+            <span class="hl">Chaining predicates:</span><br>
+            E(x,y) ∧ E(y,z) → contract chain: x employs y, y employs z — does x have liability for z?<br>
+            This is the multi-party contract structure that makes binary predicates legally important
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p02-ph3">
+        <div class="inner-header" onclick="togI('p02-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">English → Binary Predicate → Chain Evaluation → English Check</div>
+            <p><strong>Given:</strong> "An employer is vicariously liable for any harm caused by an employee while acting within the scope of their employment."</p>
+            <p><strong>Step 1 — Phase 1:</strong> two blanks — the employer (x) and the employee (y) → binary predicate structure. A third element, the harm, is implied but treated as background.</p>
+            <p><strong>Step 2 — Define:</strong></p>
+            <div class="notation">
+              Domain: x ∈ {employers}, y ∈ {persons}<br>
+              E(x,y) = "x employs y"<br>
+              S(y) = "y was acting within the scope of employment"<br>
+              H(y) = "y caused harm"<br>
+              V(x) = "x is vicariously liable for the harm"<br><br>
+              Rule: [E(x,y) ∧ S(y) ∧ H(y)] → V(x)
+            </div>
+            <p><strong>Step 3 — Evaluate:</strong> Company C employs Driver D. D caused an accident while making a delivery (within scope). E(C,D)=T, S(D)=T, H(D)=T → conjunction=T → V(C)=T. Company C is vicariously liable.</p>
+            <p><strong>Step 4 — What if D was on a personal errand?</strong> S(D)=F → conjunction=F → V(C) is not forced to be T by this rule. Vicarious liability does not apply. The employer may still be liable on other grounds, but this specific rule doesn't establish it.</p>
+            <p><strong>Step 5 — English check:</strong> [E(x,y) ∧ S(y) ∧ H(y)] → V(x) reads back as "if x employs y, and y was acting within scope, and y caused harm, then x is vicariously liable" — exactly matching the original rule. Formalisation confirmed.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p02-q">
+        <div class="inner-header" onclick="togI('p02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qp02a">
+            <div class="q-header" onclick="togQ('qp02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Formalise using binary predicates: "A lawyer who represents a client in proceedings has a duty of confidentiality to that client." Define your predicates and domain, then evaluate for Lawyer L representing Client C in a tribunal, and for Lawyer L who once gave informal advice to Client D outside any proceedings.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Domain: x ∈ {lawyers}, y ∈ {persons/clients}. R(x,y)="x represents y in proceedings." D(x,y)="x has a duty of confidentiality to y." Rule: R(x,y) → D(x,y).</p><p><strong>Lawyer L, Client C (tribunal):</strong> R(L,C)=T → D(L,C)=T. Duty of confidentiality exists.</p><p><strong>Lawyer L, Client D (informal advice, no proceedings):</strong> R(L,D)=F (no representation in proceedings) → antecedent false → D(L,D) is not established by this rule. The duty under this specific rule does not apply. Whether a duty arises under other rules (e.g. general professional conduct standards for advice outside formal proceedings) is a separate analysis — this rule alone doesn't create it.</p><div class="what-tests">Binary predicate formalisation · representation as a relationship requiring two named parties · vacuously true conditional · limits of a specific rule vs other applicable rules</div></div>
+          </div>
+
+          <div class="question-block" id="qp02b">
+            <div class="q-header" onclick="togQ('qp02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Define C(x,y) = "x has a valid contract with y." Three parties: Alpha Corp, Beta Ltd, Gamma Ltd. C(Alpha, Beta)=T, C(Beta, Gamma)=T, C(Alpha, Gamma)=F. A subcontracting rule states: if x has a contract with y and y has a contract with z, then x is indirectly obligated to z's performance. Formalise and evaluate whether Alpha is indirectly obligated to Gamma's performance.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>O(x,z) = "x is indirectly obligated to z's performance." Rule: [C(x,y) ∧ C(y,z)] → O(x,z).</p><p>Evaluate for x=Alpha, y=Beta, z=Gamma: C(Alpha,Beta)=T ∧ C(Beta,Gamma)=T → conjunction=T → O(Alpha,Gamma)=T.</p><p>Alpha is indirectly obligated to Gamma's performance, even though C(Alpha,Gamma)=F (no direct contract). This is exactly how subcontractor liability chains work in construction and outsourcing contracts — the indirect obligation arises from the chain, not from a direct agreement.</p><div class="what-tests">Binary predicate chaining · indirect obligation through two-step relationship · evaluating a three-party structure · subcontracting as a logical predicate chain</div></div>
+          </div>
+
+          <div class="question-block" id="qp02c">
+            <div class="q-header" onclick="togQ('qp02c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Rewrite in predicate form and identify the order trap: "The payment was made to the creditor by the debtor." Then evaluate: T(Debtor, Creditor) = "the debtor made payment to the creditor" — is this the same statement as T(Creditor, Debtor)?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Passive voice:</strong> "the payment was made to the creditor by the debtor" — rewrite as active: "the debtor made payment to the creditor."</p><p>Predicate: T(x,y) = "x made payment to y." Correct formalisation: T(Debtor, Creditor).</p><p><strong>Is T(Debtor, Creditor) = T(Creditor, Debtor)?</strong> No. T(Creditor, Debtor) = "the creditor made payment to the debtor" — the exact reverse, a completely different and almost certainly false statement in this context. Reversing the argument order in a binary predicate produces a different (usually opposite) claim. A student who formalises a passive-voice sentence without rewriting it first frequently commits this reversal, producing a formally valid-looking but factually wrong statement.</p><div class="what-tests">Order trap · passive-to-active rewriting · T(x,y) ≠ T(y,x) with a concrete example · the legal consequence of argument-order reversal</div></div>
+          </div>
+
+          <div class="question-block" id="qp02d">
+            <div class="q-header" onclick="togQ('qp02d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">A conflict-of-interest rule: "A judge who has a financial interest in a party to the proceedings must recuse themselves." Let F(x,y) = "judge x has a financial interest in party y," P(y) = "y is a party to the proceedings," R(x) = "x must recuse." Formalise the rule. Then evaluate for Judge J who holds shares in Company A (a party) and for Judge K who once worked at Company B (not currently a party).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Rule: [F(x,y) ∧ P(y)] → R(x) — for any judge x and any party y.</p><p><strong>Judge J, Company A:</strong> F(J,A)=T (holds shares), P(A)=T (A is a party) → conjunction=T → R(J)=T. Judge J must recuse.</p><p><strong>Judge K, Company B:</strong> P(B)=F (B is not currently a party) → F(K,B)∧P(B)=F → antecedent false → R(K) not established by this rule. Prior employment at B is also not a "financial interest" in the predicate's defined sense. Judge K is not required to recuse under this specific rule. (Whether past employment creates an appearance problem under other judicial conduct rules is separate — this analysis is bounded by the stated rule.)</p><div class="what-tests">Binary predicate in a conflict-of-interest rule · two-condition conjunction trigger · correctly bounded analysis (this rule, not all possible rules) · why a past employment doesn't satisfy the financial interest predicate as defined</div></div>
+          </div>
+
+          <div class="question-block" id="qp02e">
+            <div class="q-header" onclick="togQ('qp02e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A company's data-sharing policy states: "Personal data may be shared with a third party if the data subject has consented AND the third party is a verified partner." Let: S(x,y) = "x shares data about z with y," C(z) = "z has consented," V(y) = "y is a verified partner," P(x,y,z) = "x may permissibly share data about z with y." (a) Formalise the permission rule. (b) The company shares data about User U with Organisation O (not a verified partner) but claims User U's general privacy policy acceptance counts as consent. Is this permissible under the rule? (c) The company then shares data about User U with Partner P (verified partner) without seeking U's specific consent, relying on U's general terms acceptance. Is this permissible? (d) Propose a formalisation of a stricter rule that would require both consent AND partnership AND purpose limitation, and name one additional predicate needed.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Rule: P(x,y,z) ↔ [C(z) ∧ V(y)] — data about z may be shared by x with y if and only if z has consented and y is a verified partner.</p><p><strong>(b) Organisation O, User U:</strong> V(O)=F (O is not a verified partner) → C(U)∧V(O)=F → P(company,O,U)=F. Not permissible, regardless of whether C(U) is true. The missing partnership status alone makes sharing impermissible under the biconditional rule.</p><p><strong>(c) Partner P, User U (no specific consent):</strong> V(P)=T (verified partner). Whether C(U)=T depends on whether general terms acceptance constitutes "consent" within the rule's meaning. If the rule requires specific, informed consent to sharing (as under GDPR), general terms acceptance does not satisfy C(U) → P(company,P,U)=F. If general acceptance is sufficient, C(U)=T → P(company,P,U)=T. The predicate logic here correctly identifies that the legal dispute is entirely about the definition of C(z) — a definitional dispute, not a logical one.</p><p><strong>(d) Stricter rule:</strong> add L(x,y,z) = "the purpose of sharing z's data with y matches the purpose for which z consented." New rule: P(x,y,z) ↔ [C(z) ∧ V(y) ∧ L(x,y,z)]. Now all three conditions must hold simultaneously. A company that shares data for a purpose beyond what the user consented to (e.g., using medical data for marketing when consent was only for treatment purposes) fails L even if C and V hold.</p><div class="what-tests">Ternary predicate · biconditional permission rule · the definitional boundary of a predicate as the legal dispute · adding a predicate to tighten a rule · data privacy as predicate logic</div></div>
+          </div>
+
+          <div class="question-block" id="qp02f">
+            <div class="q-header" onclick="togQ('qp02f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A fiduciary duty rule states: "Person x owes a fiduciary duty to person y if x manages assets on y's behalf AND y places trust and confidence in x." Let M(x,y)="x manages assets on y's behalf," T(y,x)="y places trust and confidence in x," F(x,y)="x owes fiduciary duty to y." (a) Formalise. (b) Investment Manager Ali manages a pension fund on behalf of Beneficiary Bano, who trusts Ali with investment decisions. Does Ali owe a fiduciary duty to Bano? (c) Lawyer Zara advises Client Khalid. Khalid trusts Zara's legal judgment. However, Zara does not manage any of Khalid's assets. Does Zara owe a fiduciary duty to Khalid under this rule? (d) This rule is widely criticised as too narrow for capturing the full scope of fiduciary relationships in law. Using predicate logic, propose an alternative rule using a disjunction that captures both asset management and non-asset professional trust relationships.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> [M(x,y) ∧ T(y,x)] → F(x,y)</p><p><strong>(b) Ali and Bano:</strong> M(Ali,Bano)=T, T(Bano,Ali)=T → conjunction=T → F(Ali,Bano)=T. Ali owes a fiduciary duty to Bano.</p><p><strong>(c) Zara and Khalid:</strong> M(Zara,Khalid)=F (Zara does not manage assets) → M∧T=F → F(Zara,Khalid) not established by this rule. Under this specific formulation, Zara does not owe a fiduciary duty to Khalid — the asset management predicate is not satisfied.</p><p><strong>(d) Proposed alternative:</strong> add P(x,y)="x exercises professional power or discretion over y's interests." New rule: [M(x,y) ∧ T(y,x)] ∨ [P(x,y) ∧ T(y,x)] → F(x,y), which simplifies to [M(x,y) ∨ P(x,y)] ∧ T(y,x) → F(x,y). Under this rule: M(Zara,Khalid)=F but P(Zara,Khalid)=T (Zara exercises professional legal discretion over Khalid's interests), T(Khalid,Zara)=T → [F∨T]∧T=T → F(Zara,Khalid)=T. Zara now owes a fiduciary duty. This disjunctive formulation captures the broader legal understanding of fiduciary relationships that extends beyond asset management to all relationships of professional power and trust.</p><div class="what-tests">Conjunction predicate trigger · evaluating a two-predicate rule at two pairs · identifying which predicate fails and why · proposing a disjunctive alternative to expand a rule's scope · fiduciary duty as a predicate logic structure</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="p02-bar">
+        <div class="inner-header" onclick="togI('p02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Vicarious Liability &amp; LSAT Logic Games</div>
+            <p>The binary predicate chain — E(x,y) ∧ E(y,z) creating obligations between x and z — is the formal structure of every respondeat superior, agency, and subcontractor liability analysis. The NY Bar's professional responsibility questions routinely test this structure: when does a supervising attorney's P(supervisor, associate) relationship create liability for the associate's actions? The answer is always a conjunction of predicates evaluated against specific facts.</p>
+            <p>LSAT Logic Games with "groups and members" or "assignment" setups are binary predicate evaluations: assigning person x to project y (A(x,y)=T), subject to constraints of the form "if A(x,y)=T then A(z,y) must also be T." Recognising these as R(x,y) structures and tracking the truth values of each pair systematically is the most reliable strategy for these game types — faster and less error-prone than intuitive methods.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-label">Topic 3 · Predicates Combined with Quantifiers — The Full Structure</div>
+
+  <div class="topic-card" id="p03" style="border-left-color:var(--pd)">
+    <div class="topic-header" onclick="tog('p03')">
+      <span class="lec-tag" style="background:var(--pd)">TOPIC 3</span>
+      <div class="topic-title">Predicates with Quantifiers — ∀x P(x) and ∃x P(x) in Full Context</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="p03-ph1">
+        <div class="inner-header" onclick="togI('p03-ph1')"><span class="inner-label">Phase 1 — Translation (English Only)</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Adding a quantifier to a predicate is what turns a template into a complete statement. ∀x P(x) says "P holds for every x in the domain." ∃x P(x) says "P holds for at least one x in the domain." Both are now full propositions with definite truth values — not templates anymore.</p>
+          <div class="phase-block">
+            <div class="phase-label">Phase 1 Test — Which Quantifier Is Hidden Here?</div>
+            <p>Two questions to ask of any English sentence with a predicate:</p>
+            <p><strong>Q1: Does this claim need to hold for EVERY member of the group, or only for AT LEAST ONE?</strong></p>
+            <p>"All lawyers must disclose conflicts." → Every lawyer → ∀</p>
+            <p>"Some witness statements were inconsistent." → At least one → ∃</p>
+            <p>"No contractor is exempt." → Every contractor is NOT exempt → ∀x ¬P(x)</p>
+            <p>"Not all claims were filed on time." → At least one was NOT on time → ∃x ¬P(x)</p>
+            <p><strong>Q2: What is the domain?</strong> The quantifier's scope is always limited to a stated or implied domain. "Every person" and "every registered contractor" are different ∀ statements even if the property P is identical.</p>
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The "No" and "None" Trap</div>
+            <p>"No contractor is licensed" looks like it might be an ∃ (existential negative), but it's actually a universal: ∀x ¬L(x) — "for every contractor x, x is not licensed." The word "no" in English almost always signals ∀ with negation, not ∃. Similarly, "none of the evidence supports this claim" = ∀x ¬S(x), not ∃x ¬S(x).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p03-ph2">
+        <div class="inner-header" onclick="togI('p03-ph2')"><span class="inner-label">Phase 2 — Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Universal quantifier:</span> ∀x P(x) — "for all x in the domain, P(x) holds"<br>
+            Proves true: must verify P holds for EVERY element<br>
+            Proves false: need only ONE counterexample<br><br>
+            <span class="hl">Existential quantifier:</span> ∃x P(x) — "there exists at least one x in the domain for which P(x) holds"<br>
+            Proves true: exhibit ONE example where P holds<br>
+            Proves false: must verify P fails for EVERY element<br><br>
+            <span class="hl">Quantified conditionals (the most common legal form):</span><br>
+            ∀x [P(x) → Q(x)] — "for all x, if x has P then x has Q"<br>
+            NOT the same as: ∀x P(x) → ∀x Q(x) (different logical structure)<br><br>
+            <span class="hl">Quantified binary predicates:</span><br>
+            ∀x ∃y R(x,y) — "every x is related to some y" (different y for each x)<br>
+            ∃y ∀x R(x,y) — "some single y is related to every x" (same y for all x)<br>
+            These two are NOT equivalent — order of quantifiers matters enormously<br><br>
+            <span class="hl">English signal words:</span><br>
+            ∀: all, every, any, each, no (with ¬), none (with ¬), whenever, whoever<br>
+            ∃: some, at least one, there exists, there is a, certain, several
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p03-ph3">
+        <div class="inner-header" onclick="togI('p03-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Full Pipeline — Legal Sentence → Quantified Predicate → Evaluate → English Check</div>
+            <p><strong>Given:</strong> "Every registered company that fails to file its annual return is subject to a penalty, and at least one registered company failed to file last year."</p>
+            <p><strong>Step 1 — Phase 1:</strong> Two separate claims. First: a claim about EVERY registered company with a condition → ∀ with a conditional predicate. Second: a claim about AT LEAST ONE registered company → ∃.</p>
+            <p><strong>Step 2 — Define:</strong></p>
+            <div class="notation">
+              Domain: all registered companies<br>
+              F(x) = "x failed to file its annual return"<br>
+              P(x) = "x is subject to a penalty"<br><br>
+              Claim 1: ∀x [F(x) → P(x)]<br>
+              Claim 2: ∃x F(x)
+            </div>
+            <p><strong>Step 3 — Derive a conclusion:</strong> From ∃x F(x), there is some specific company — call it Company A — where F(A)=T. From ∀x [F(x) → P(x)], apply to Company A: F(A)→P(A). Since F(A)=T, by modus ponens: P(A)=T. Company A is subject to a penalty.</p>
+            <p><strong>Step 4 — What does ∀x [F(x)→P(x)] say about a company that DID file?</strong> For Company B that filed: F(B)=F → F(B)→P(B) is vacuously true. The rule says nothing about whether B is subject to a penalty on other grounds. It only guarantees penalties for failures; it doesn't guarantee freedom from penalties for compliant companies (which might be penalised for other reasons).</p>
+            <p><strong>Step 5 — English check:</strong> ∀x [F(x)→P(x)] reads "for every company x, if x failed to file, then x is subject to a penalty." ∃x F(x) reads "there is at least one company that failed to file." Both match the original. Formalisation confirmed.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="p03-q">
+        <div class="inner-header" onclick="togI('p03-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qp03a">
+            <div class="q-header" onclick="togQ('qp03a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Identify the quantifier (∀ or ∃) in each sentence and write the formal predicate statement: (i) "All contracts require consideration." (ii) "Some witnesses recanted their testimony." (iii) "No employee was informed of the policy change." (iv) "Not every appeal was decided within the statutory period."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(i) ∀ — "all" signals universal. ∀x [C(x) → R(x)] where C(x)="x is a contract" and R(x)="x requires consideration."</p><p>(ii) ∃ — "some" signals existential. ∃x [W(x) ∧ T(x)] where W(x)="x is a witness" and T(x)="x recanted testimony."</p><p>(iii) ∀ with negation — "no" signals universal negation. ∀x [E(x) → ¬I(x)] where E(x)="x is an employee" and I(x)="x was informed of the policy change." Equivalently: ¬∃x [E(x) ∧ I(x)].</p><p>(iv) ∃ with negation — "not every" signals that at least one fails. ∃x [A(x) ∧ ¬D(x)] where A(x)="x is an appeal" and D(x)="x was decided within the statutory period."</p><div class="what-tests">Four quantifier identification cases · all, some, no (=∀¬), not every (=∃¬) · the "no" trap · formalising compound predicates</div></div>
+          </div>
+
+          <div class="question-block" id="qp03b">
+            <div class="q-header" onclick="togQ('qp03b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">From ∀x [L(x) → D(x)] (every licensed professional must disclose conflicts) and the facts: Ali is licensed (L(Ali)=T); Sara is not licensed (L(Sara)=F); Tariq is licensed and has a conflict. (a) Does Ali have a disclosure obligation? (b) Does Sara have a disclosure obligation under this rule? (c) Does Tariq have a disclosure obligation, and does this rule tell us what happens if he doesn't disclose?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a) Ali:</strong> L(Ali)=T → D(Ali)=T by the universal conditional. Ali has a disclosure obligation.</p><p><strong>(b) Sara:</strong> L(Sara)=F → L(Sara)→D(Sara) is vacuously true, but D(Sara) is not forced to be T. Sara has no disclosure obligation under this rule — but note the rule says nothing about whether Sara might have other obligations under other rules (e.g. as an unlicensed person acting in a professional capacity).</p><p><strong>(c) Tariq:</strong> L(Tariq)=T → D(Tariq)=T. Yes, Tariq has a disclosure obligation. However, ∀x [L(x)→D(x)] only establishes the obligation — it says nothing about consequences of non-disclosure. The rule tells us Tariq must disclose; a separate rule (penalty, liability, disqualification) would be needed to determine what happens if he doesn't. This file's rule is obligation-creating, not consequence-specifying.</p><div class="what-tests">Universal conditional applied to three cases · vacuously true for non-licensed · distinguishing obligation-creating from consequence-specifying rules · what a rule is silent about</div></div>
+          </div>
+
+          <div class="question-block" id="qp03c">
+            <div class="q-header" onclick="togQ('qp03c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Formalise and evaluate: "Every supplier who receives a purchase order must acknowledge receipt within 24 hours. Supplier S received three purchase orders. At least one was not acknowledged within 24 hours." What conclusion can be drawn, and does the rule tell you anything about the unacknowledged order specifically?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Domain: all purchase orders received by suppliers. R(x)="x received a purchase order." A(x)="x acknowledged within 24 hours." Rule: ∀x [R(x)→A(x)]. Fact 1: R(o₁)=T, R(o₂)=T, R(o₃)=T for Supplier S's three orders. Fact 2: ∃x ¬A(x) — at least one order was not acknowledged.</p><p><strong>Conclusion:</strong> since ∀x [R(x)→A(x)] requires acknowledgment for every received order, and ∃x ¬A(x) shows at least one order was not acknowledged despite being received, Supplier S has violated the rule. The existential fact (at least one unacknowledged) directly contradicts the universal obligation (all must be acknowledged).</p><p><strong>What the rule says about the specific unacknowledged order:</strong> the rule itself only establishes the obligation. A breach has occurred (the universal was violated), but whether this triggers a penalty, gives the buyer a right to cancel, or constitutes a contract breach requires additional rules. The predicate analysis correctly identifies that a violation occurred — it doesn't specify the consequence.</p><div class="what-tests">Universal obligation contradicted by an existential fact · identifying the breach · scope limitation of the obligation rule vs consequence rules</div></div>
+          </div>
+
+          <div class="question-block" id="qp03d">
+            <div class="q-header" onclick="togQ('qp03d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Explain the difference between ∀x ∃y R(x,y) and ∃y ∀x R(x,y). Give a legal example for each, and explain why a lawyer who confuses them makes a material error in a contract analysis context.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>∀x ∃y R(x,y):</strong> "For every x, there exists some y (possibly different for each x) such that R(x,y) holds." Every x has its own y.</p><p><strong>Legal example:</strong> "Every contractor has at least one supervisor." Each contractor has a supervisor, but different contractors can have different supervisors — there is no single supervisor for all.</p><p><strong>∃y ∀x R(x,y):</strong> "There exists a single y such that for every x, R(x,y) holds." One y works for all x simultaneously.</p><p><strong>Legal example:</strong> "There is a single compliance officer responsible for every contractor." One specific person supervises all contractors — a much stronger, centralised claim.</p><p><strong>Why confusing them is a material error:</strong> In a contract context, "every party has at least one point of contact" (∀x∃y) means each party may deal with different representatives — no single person is responsible for the whole relationship. "There is a single contract manager for all parties" (∃y∀x) means one person is accountable across the board. If a lawyer drafts a coordination clause using ∀x∃y language thinking it creates a single point of accountability, the clause actually permits different contacts for each party — the opposite of what was intended. The error creates a governance gap with real consequences in multi-party contracts.</p><div class="what-tests">Quantifier order · ∀∃ vs ∃∀ structural difference · legal examples for each · material drafting consequence of confusing the two</div></div>
+          </div>
+
+          <div class="question-block" id="qp03e">
+            <div class="q-header" onclick="togQ('qp03e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A constitutional provision states: "Every citizen is equal before the law, and no citizen shall be denied equal protection." A government regulation exempts a specific professional class from a licensing requirement that applies to all other citizens. (a) Formalise both the constitutional provision and the regulation using predicate logic. (b) Identify the logical tension between them. (c) The government argues the exemption is permitted because "equality before the law does not mean identical treatment." Evaluate this argument using your formalisations — is there a logical formulation of "equality" that is consistent with the regulation, and what would it require?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Domain: all citizens. C(x)="x is a citizen." E(x)="x is equal before the law." P(x)="x is denied equal protection." L(x)="x is subject to the licensing requirement." Prof(x)="x is in the exempt professional class." Constitutional provision: ∀x [C(x)→E(x)] ∧ ∀x [C(x)→¬P(x)]. Regulation: ∀x [C(x) ∧ ¬Prof(x) → L(x)] ∧ ∀x [C(x) ∧ Prof(x) → ¬L(x)].</p><p><strong>(b) Logical tension:</strong> ∀x [C(x)→E(x)] asserts every citizen has equal status before the law. The regulation creates a class of citizens (Prof(x)) who are treated differently with respect to L(x) — some citizens face the licensing requirement, others do not. If E(x) means "x is treated identically to all other citizens in all respects," this is a direct contradiction. Under that interpretation, the regulation violates ∀x [C(x)→E(x)].</p><p><strong>(c) The government's argument:</strong> the argument is logically coherent if "equality" is given a weaker, relational definition. Specifically, if E(x) means "x's treatment is determined by the same rational criteria applied uniformly to their category" rather than "x receives literally identical treatment as all others," then the regulation is consistent — provided that the categorisation into Prof(x) and ¬Prof(x) is itself based on a legitimate, consistently applied criterion (e.g., professional training requirements that make the licensing redundant). Formally, this requires adding a predicate J(x,c)="x's treatment under criterion c is justified by a legitimate distinction" and reformulating E(x) as "x's treatment satisfies J(x,c) for all applicable criteria c." Under this formulation, the regulation is consistent with equality if the professional class distinction satisfies J — i.e., if there is a rational basis for the exemption. This is structurally exactly the rational basis review standard in constitutional law: the logical question of consistency depends entirely on how the predicate E(x) is defined, which is the legal question courts resolve through constitutional interpretation.</p><div class="what-tests">Full constitutional provision formalisation · identifying logical contradiction between provisions · the role of predicate definition in resolving apparent contradictions · predicate logic as a tool for precision in constitutional analysis · rational basis review as a logical predicate</div></div>
+          </div>
+
+          <div class="question-block" id="qp03f">
+            <div class="q-header" onclick="togQ('qp03f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Two statutory rules: Rule 1: ∀x [A(x) ∧ B(x) → C(x)]. Rule 2: ∃x [A(x) ∧ ¬C(x)]. (a) Are these rules consistent or contradictory? Show your reasoning. (b) Applying to: A(x)="x is an accredited laboratory," B(x)="x tested the sample," C(x)="x's results are admissible as evidence." The prosecution argues: "Lab X is accredited and tested the sample, so results are admissible." The defence finds evidence that Lab X's results were excluded in a previous case. Does the defence's finding contradict Rule 1, and what must the defence actually prove to exclude the evidence in this case?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> The rules are consistent — no contradiction. Rule 1 says every x with both A and B has C. Rule 2 says some x has A without C. These are compatible: the ∃x in Rule 2 could be a laboratory that has accreditation (A) but did NOT test the sample (¬B) — so it satisfies A∧¬C without violating Rule 1, because Rule 1 only guarantees C when BOTH A and B hold. If Rule 2's x has A and ¬B, the antecedent of Rule 1 is false for that x, and Rule 1 is vacuously satisfied. The two rules would only be contradictory if Rule 2's x had both A and B and ¬C — that would directly contradict Rule 1.</p><p><strong>(b)</strong> The prosecution's argument: A(LabX)=T (accredited), B(LabX)=T (tested the sample) → by Rule 1, C(LabX)=T. The argument is structurally valid under Rule 1.</p><p>The defence finding — Lab X's results were excluded previously — does not contradict Rule 1. Past exclusion means C(LabX)=F in a previous case, but the exclusion may have been based on ¬B (they didn't properly test that sample) or ¬A (accreditation had lapsed at that time). If either antecedent condition was unmet previously, no contradiction with Rule 1 arises.</p><p>What the defence must prove: to exclude the evidence in this case, the defence must show either (i) A(LabX)=F — accreditation is currently invalid, or (ii) B(LabX)=F — proper testing procedures were not followed for this specific sample, so this x doesn't have both A and B, making Rule 1 inapplicable. Simply pointing to a prior exclusion is insufficient unless the defence can establish that it arose from ¬A or ¬B and that the same condition persists in this case.</p><div class="what-tests">Consistency of ∀ and ∃ rules · when two rules are compatible vs contradictory · applying quantified predicates to an evidentiary admissibility argument · what the defence must prove vs what a prior exclusion establishes</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="p03-bar">
+        <div class="inner-header" onclick="togI('p03-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Constitutional Law &amp; LSAT Logical Reasoning</div>
+            <p>The quantifier-order problem (∀x∃y vs ∃y∀x) appears in contract drafting, constitutional law, and international treaty interpretation — the difference between "every state has some remedy" and "there is a single universal remedy for every state" has produced real legal disputes at the highest levels. A lawyer with quantifier-order fluency reads a contractual provision and immediately sees which structure is actually there, regardless of how ambiguous the English phrasing is.</p>
+            <p>LSAT Logical Reasoning's "Most Strongly Supported" and "Must Be True" questions are almost always quantifier-scope questions in disguise: if the stimulus contains a ∀, what can you infer about specific individuals (quantifier instantiation)? If it contains ∃, can you conclude a ∀? (Never — one example never establishes a universal.) These inferential limits are the predicate logic rules that drive the correct answer in roughly 30% of Logical Reasoning questions.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part1-logic-foundations.html">← Part 1</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-quantifiers.html">Quantifiers →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Predicates — Deep Treatment · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>

@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Part 1 · Logic Foundations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #0E0E1A;
+    --ink-soft:  #3A3A4A;
+    --ink-faint: #6B6B7B;
+    --page:      #F9F8F5;
+    --rule:      #E2DDD6;
+    --tag-text:  #F9F8F5;
+    --bar-bg:    #F0EDE6;
+    --bar-border:#C9A84C;
+    --c1: #3A7FD4;
+    --c2: #2EAD6E;
+    --c3: #E05A28;
+    --t2: #1A5C3A;
+    --t3: #5C1A1A;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7; color: var(--ink); background: var(--page); padding-bottom: 80px; }
+
+  .site-header { background: var(--ink); color: var(--page); padding: 28px 20px 22px; position: sticky; top: 0; z-index: 100; }
+  .site-header .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bar-border); margin-bottom: 4px; }
+  .site-header h1 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; line-height: 1.2; }
+  .site-header .subtitle { font-size: 13px; color: #A0A8B0; margin-top: 4px; }
+
+  .progress-strip { background: #1A1A2A; padding: 10px 20px; display: flex; align-items: center; gap: 14px; }
+  .progress-strip .ps-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--bar-border); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+  .progress-bar-outer { flex: 1; height: 3px; background: #2A3A4A; border-radius: 2px; }
+  .progress-bar-inner { height: 3px; background: var(--bar-border); border-radius: 2px; }
+  .progress-strip .ps-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #A0A8B0; white-space: nowrap; }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 0 16px; }
+  .controls { padding: 16px 0 4px; display: flex; gap: 10px; }
+  .ctrl-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; background: none; border: 1px solid var(--rule); color: var(--ink-soft); padding: 6px 12px; cursor: pointer; border-radius: 1px; }
+  .ctrl-btn:hover { background: var(--rule); }
+
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-faint); padding: 28px 0 10px; border-bottom: 1px solid var(--rule); }
+
+  .topic-card { border: 1px solid var(--rule); background: #fff; margin-top: 12px; border-radius: 2px; border-left-width: 4px; border-left-style: solid; }
+  .topic-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; cursor: pointer; user-select: none; gap: 12px; }
+  .topic-header:hover { background: #FAFAF8; }
+  .topic-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.3; flex: 1; }
+  .lec-tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 1px; color: #fff; flex-shrink: 0; }
+  .chevron { width: 20px; height: 20px; flex-shrink: 0; color: var(--ink-faint); transition: transform 0.2s ease; }
+  .topic-card.open .chevron { transform: rotate(180deg); }
+  .topic-body { display: none; border-top: 1px solid var(--rule); }
+  .topic-card.open .topic-body { display: block; }
+
+  .inner-section { border-bottom: 1px solid var(--rule); }
+  .inner-section:last-child { border-bottom: none; }
+  .inner-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; cursor: pointer; user-select: none; gap: 10px; }
+  .inner-header:hover { background: #FAFAF8; }
+  .inner-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+  .inner-body { display: none; padding: 4px 18px 18px; }
+  .inner-section.open .inner-body { display: block; }
+  .inner-chevron { width: 16px; height: 16px; flex-shrink: 0; color: var(--ink-faint); transition: transform 0.2s ease; }
+  .inner-section.open .inner-chevron { transform: rotate(180deg); }
+
+  p { margin-top: 12px; color: var(--ink); font-size: 15px; }
+  p:first-child { margin-top: 0; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  .notation { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: #F0EDE6; border: 1px solid var(--rule); border-radius: 2px; padding: 12px 14px; margin-top: 12px; line-height: 1.9; color: var(--ink); }
+  .notation .hl { font-weight: 600; color: #1A3A5C; }
+
+  .logic-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; }
+  .logic-table th { background: var(--ink); color: var(--page); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; padding: 8px 10px; text-align: left; font-weight: 600; }
+  .logic-table td { padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.5; font-size: 13px; }
+  .logic-table tr:last-child td { border-bottom: none; }
+  .logic-table tr:nth-child(even) td { background: #FAFAF8; }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  .example-block { background: #F7F5F0; border-left: 3px solid #8B6914; padding: 14px 16px; margin-top: 12px; border-radius: 0 2px 2px 0; }
+  .example-block .ex-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #8B6914; margin-bottom: 8px; font-weight: 600; }
+  .example-block p { font-size: 14px; margin-top: 8px; }
+  .example-block p:first-of-type { margin-top: 0; }
+
+  .pattern-warn { background: #FFF8F0; border-left: 3px solid var(--bar-border); padding: 11px 14px; margin-top: 12px; border-radius: 0 2px 2px 0; }
+  .pattern-warn .pw-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #8B6914; font-weight: 600; margin-bottom: 6px; }
+  .pattern-warn p { font-size: 14px; margin-top: 6px; }
+
+  .question-block { margin-top: 10px; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+  .q-header { display: flex; align-items: flex-start; gap: 10px; padding: 13px 14px; cursor: pointer; user-select: none; }
+  .q-header:hover { background: #FAFAF8; }
+  .tier-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; padding: 3px 7px; border-radius: 1px; flex-shrink: 0; margin-top: 1px; }
+  .t2-badge { background: var(--t2); color: #fff; }
+  .t3-badge { background: var(--t3); color: #fff; }
+  .q-text { font-size: 14px; line-height: 1.6; color: var(--ink); flex: 1; }
+  .q-chevron { width: 15px; height: 15px; flex-shrink: 0; color: var(--ink-faint); margin-top: 3px; transition: transform 0.2s ease; }
+  .question-block.open .q-chevron { transform: rotate(180deg); }
+  .q-body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--rule); background: #FDFCFA; }
+  .question-block.open .q-body { display: block; }
+  .q-body p { font-size: 14px; margin-top: 10px; }
+  .q-body p:first-child { margin-top: 10px; }
+  .what-tests { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--rule); line-height: 1.6; }
+
+  .bar-lens { background: var(--bar-bg); border: 1px solid var(--bar-border); border-radius: 2px; padding: 14px 16px; margin-top: 12px; }
+  .bar-lens .bar-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #8B6914; font-weight: 600; margin-bottom: 8px; }
+  .bar-lens p { font-size: 14px; margin-top: 8px; }
+  .bar-lens p:first-of-type { margin-top: 0; }
+
+  .nav-strip { background: #1A1A2A; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--bar-border); letter-spacing: 0.08em; text-decoration: none; }
+  .nav-link:hover { color: #fff; }
+
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+
+
+  @media (max-width: 420px) { .site-header h1 { font-size: 19px; } .topic-title { font-size: 15px; } }
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Part 1 — Logic Foundations</h1>
+  <div class="subtitle">Lec. 1–10 · Dr. Tariq Ismaeel · 13 topics</div>
+</header>
+
+<div class="progress-strip">
+  <span class="ps-label">Part 1</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">13 / 13 topics</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <!-- ═══════════════════════════════
+       CLUSTER 1 · LEC 1-4
+  ════════════════════════════════ -->
+  <div class="section-label">Lec. 1–4 · Logic &amp; Reasoning Types</div>
+
+  <!-- TOPIC 1: What is Logic -->
+  <div class="topic-card" id="t01" style="border-left-color: var(--c1)">
+    <div class="topic-header" onclick="tog('t01')">
+      <span class="lec-tag" style="background:var(--c1)">LEC 1</span>
+      <div class="topic-title">Introduction to Logic &amp; Its Importance</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t01-lang">
+        <div class="inner-header" onclick="togI('t01-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>Logic is the study of <strong>correct reasoning</strong> — the rules that separate valid arguments from invalid ones. It is not about whether a conclusion is true in the world. It is about whether the conclusion <em>follows</em> from the premises given.</p>
+          <p>A doctor diagnosing from symptoms, a judge evaluating evidence, a lawyer constructing an argument — all are applying logic, whether or not they label it that way. Logic makes the structure of that reasoning visible and testable.</p>
+          <p><strong>Why it matters for law specifically:</strong> Every legal rule is a conditional statement. Every case involves premises (facts) and a conclusion (verdict or liability). A lawyer who cannot identify flawed reasoning cannot challenge it. Logic is the grammar of legal argument.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">PU Exam Pattern</div>
+            <p>Punjab University tests logic understanding through application, not definition. Expect a scenario where you must identify whether an argument is logically sound — not recite what logic is. Always ask: do the premises actually support the conclusion, or are they just related to it?</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t01-m">
+        <div class="inner-header" onclick="togI('t01-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>Every argument, however it's dressed up in prose, reduces to the same skeleton: one or more <strong>premises</strong> offered as support, and a <strong>conclusion</strong> they're meant to establish.</p>
+          <div class="notation">
+            <span class="hl">Standard form:</span><br>
+            P1: [premise]<br>
+            P2: [premise]<br>
+            ∴ C: [conclusion]<br><br>
+            <span class="hl">Premise indicators:</span> since, because, given that, as, for<br>
+            <span class="hl">Conclusion indicators:</span> therefore, thus, hence, so, it follows that, consequently
+          </div>
+          <p>Spotting these indicator words is the first mechanical skill in logic, and the one most word problems lean on to hide their structure — a sentence with no "therefore" in it can still be an argument; the conclusion just has to be located by meaning rather than by signal word.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t01-ex">
+        <div class="inner-header" onclick="togI('t01-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Extracting Standard Form</div>
+            <p>"Since the contract was signed under duress, and contracts signed under duress are voidable, this contract is voidable."</p>
+            <div class="notation">
+              P1: The contract was signed under duress.<br>
+              P2: Contracts signed under duress are voidable.<br>
+              ∴ C: This contract is voidable.
+            </div>
+            <p>Notice "since" flags the premises, and the conclusion is stated last but isn't marked with a conclusion-indicator word at all — it has to be identified as the claim the rest of the sentence is built to support, not located by a keyword.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t01-q">
+        <div class="inner-header" onclick="togI('t01-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q01a">
+            <div class="q-header" onclick="togQ('q01a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">"The notice was not served within the statutory period, and notices not served within the statutory period are invalid, so this notice is invalid." Identify the premises and conclusion, and write the argument in standard form.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p>P1: The notice was not served within the statutory period.<br>P2: Notices not served within the statutory period are invalid.<br>∴ C: This notice is invalid.</p>
+              <div class="what-tests">Extracting standard form from a continuous sentence with no explicit premise/conclusion indicator words</div>
+            </div>
+          </div>
+          <div class="question-block" id="q01b">
+            <div class="q-header" onclick="togQ('q01b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A witness statement reads: "I saw the defendant leave the building at 9 PM. The crime occurred at 9:15 PM, three streets away. He cannot have committed it." Is this presented as an argument? If so, identify its structure.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Yes, this is an argument</strong> even though it has no premise/conclusion indicator words at all — "since," "therefore," and similar markers are entirely absent.</p>
+              <p>P1: The defendant left the building at 9 PM.<br>P2: The crime occurred at 9:15 PM, three streets away.<br>∴ C: He cannot have committed it.</p>
+              <p>The conclusion has to be located by meaning — it's the claim the other two sentences are clearly offered to support — not by a signal word, which is exactly the skill this topic exists to build.</p>
+              <div class="what-tests">Identifying an unmarked argument · standard form extraction without indicator words</div>
+            </div>
+          </div>
+          <div class="question-block" id="q01c">
+            <div class="q-header" onclick="togQ('q01c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A regulator's press release states: "Inspections increased 40% this year. Compliance complaints fell 25%. Our enforcement program is working." Restate this as a formal argument in standard form, and then evaluate — using only the structure, not outside knowledge — whether the conclusion actually follows from the premises as given.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p>P1: Inspections increased 40% this year.<br>P2: Compliance complaints fell 25%.<br>∴ C: The enforcement program is working.</p>
+              <p><strong>Does the conclusion follow?</strong> Not from these premises alone. The two premises are both true claims about what happened, but neither one, nor both together, logically establishes that the enforcement program <em>caused</em> the improvement — an unstated assumption (that the two trends are causally linked, and that no other factor explains the drop in complaints) is doing all the actual work. The argument as stated commits exactly the gap this entire subject is built to catch: premises that are merely <em>related</em> to the conclusion being treated as premises that <em>establish</em> it.</p>
+              <div class="what-tests">Standard form extraction · distinguishing a valid logical structure from a merely plausible-sounding one · the premise-relevance gap that recurs across every later fallacy and causation topic</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t01-bar">
+        <div class="inner-header" onclick="togI('t01-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>The LSAT's entire Logical Reasoning section is applied logic. Every question type — Strengthen, Weaken, Assumption, Flaw — requires identifying the logical structure of an argument before evaluating it. The skills built here are directly transferable, with no additional theory required.</p>
+            <p>On the Bar, legal reasoning memos and MPT tasks require you to construct arguments where premises (law + facts) lead to a conclusion (liability/no liability). The cleaner your logical structure, the more persuasive the document.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 2: Three Reasoning Types -->
+  <div class="topic-card" id="t02" style="border-left-color: var(--c1)">
+    <div class="topic-header" onclick="tog('t02')">
+      <span class="lec-tag" style="background:var(--c1)">LEC 2</span>
+      <div class="topic-title">Inductive, Deductive &amp; Abductive Reasoning</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t02-lang">
+        <div class="inner-header" onclick="togI('t02-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p><strong>Deductive:</strong> General rule → specific conclusion. The conclusion is guaranteed if the premises are true. "All humans are mortal. Socrates is human. Therefore Socrates is mortal." The conclusion cannot be false if both premises are true. This is certainty.</p>
+          <p><strong>Inductive:</strong> Specific observations → general conclusion. The conclusion is probable, not guaranteed. "Every swan I have ever seen is white. Therefore all swans are white." One black swan in Australia destroyed this conclusion. This is probability, not certainty.</p>
+          <p><strong>Abductive:</strong> Observation → best available explanation. "The grass is wet. The most likely explanation is that it rained." It could have been a sprinkler — but rain is the simplest hypothesis. This is the reasoning of diagnosis, investigation, and circumstantial evidence.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">The Disguise to Watch For</div>
+            <p>PU will present an argument and ask which type of reasoning it uses — without labelling it. The tell: if the conclusion is <em>guaranteed</em> by the premises, it is deductive. If it is <em>probable</em> from accumulated evidence, it is inductive. If it is the <em>best explanation</em> for a single observation, it is abductive.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t02-mech">
+        <div class="inner-header" onclick="togI('t02-mech')">
+          <span class="inner-label">Comparison Table</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <table class="logic-table">
+            <thead><tr><th>Type</th><th>Direction</th><th>Certainty</th><th>Legal Use</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Deductive</strong></td><td>General → Specific</td><td>Guaranteed</td><td>Applying a statute to facts</td></tr>
+              <tr><td><strong>Inductive</strong></td><td>Specific → General</td><td>Probable</td><td>Building a pattern from precedents</td></tr>
+              <tr><td><strong>Abductive</strong></td><td>Observation → Explanation</td><td>Best guess</td><td>Circumstantial evidence arguments</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="inner-section" id="t02-ex">
+        <div class="inner-header" onclick="togI('t02-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Classifying Three Arguments</div>
+            <p><strong>(a)</strong> "Every contract requires offer, acceptance, and consideration. This agreement has all three. Therefore it is a valid contract." — <strong>Deductive.</strong> The conclusion is guaranteed if both premises are true; nothing about contract law is left to probability here.</p>
+            <p><strong>(b)</strong> "The last six judgments from this bench have favoured the plaintiff in negligence claims. The seventh case is likely to favour the plaintiff too." — <strong>Inductive.</strong> A pattern from six specific cases is used to predict a seventh; the conclusion is probable, not certain — a sufficiently different seventh case could break the pattern.</p>
+            <p><strong>(c)</strong> "The safe was found open, the cash missing, and only the manager had the combination. The manager is the most likely suspect." — <strong>Abductive.</strong> This is the simplest explanation for the observations, not the only logically possible one — someone else could have obtained the combination, but absent further evidence, the manager is the best available explanation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t02-q">
+        <div class="inner-header" onclick="togI('t02-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q02a">
+            <div class="q-header" onclick="togQ('q02a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A judge reasons: "In the past 20 cases of this type, courts awarded damages. Therefore damages should be awarded here." Identify the reasoning type and its weakness.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Reasoning type:</strong> Inductive. The judge moves from specific past cases to a general conclusion about this case.</p>
+              <p><strong>Weakness:</strong> Inductive conclusions are never guaranteed. The 21st case may have a distinguishing fact that breaks the pattern. In law, this is why precedent requires careful case distinction — a prior pattern does not automatically govern a new case.</p>
+              <div class="what-tests">Inductive reasoning · identifying the gap between probability and certainty · legal application to precedent</div>
+            </div>
+          </div>
+          <div class="question-block" id="q02b">
+            <div class="q-header" onclick="togQ('q02b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">Person A's fingerprints are on the weapon. Person A was seen near the scene. The detective concludes Person A is the most likely suspect. What type of reasoning is this, and what would make it deductive instead?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Reasoning type:</strong> Abductive. The detective selects the simplest explanation for the observations — not the only possible explanation.</p>
+              <p><strong>To make it deductive:</strong> A deductive argument would require a premise that guarantees the conclusion — for example, "Only the person whose fingerprints are on the weapon and who was near the scene committed the crime." Then the conclusion follows necessarily. But such a premise would rarely be true in reality, which is why criminal cases rely on the standard of proof (beyond reasonable doubt) rather than logical certainty.</p>
+              <div class="what-tests">Abductive vs. deductive distinction · the gap between circumstantial evidence and proof · standard of proof as a logical concept</div>
+            </div>
+          </div>
+          <div class="question-block" id="q02c">
+            <div class="q-header" onclick="togQ('q02c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A lawyer argues: "Environmental regulations always reduce economic growth. This country introduced environmental regulations last year. Economic growth has declined. Therefore the regulations caused the decline." Identify every reasoning type used and every logical flaw present.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Reasoning types present:</strong> The first premise ("always reduce") is itself an inductive generalisation stated as if it were a universal rule. The argument then applies it deductively to this country. The link between regulations and the observed decline is abductive — it assumes the simplest explanation without ruling out alternatives.</p>
+              <p><strong>Logical flaws:</strong></p>
+              <p>1. The inductive premise is overstated as universal ("always"). One counterexample destroys it.</p>
+              <p>2. Correlation is mistaken for causation — growth declined, regulations were introduced, but no causal mechanism is established. A global recession, political instability, or currency devaluation could explain the decline equally well.</p>
+              <p>3. Post hoc ergo propter hoc fallacy — "after this, therefore because of this." Temporal sequence is not causal proof.</p>
+              <p><strong>Bar relevance:</strong> Expert witnesses in economic regulation cases make exactly this argument. Cross-examination turns on identifying the causal claim and demanding evidence for it beyond temporal correlation.</p>
+              <div class="what-tests">Mixed reasoning types in a single argument · overgeneralisation · correlation vs. causation · post hoc fallacy · Tier 3 because it requires simultaneously identifying the structure and multiple flaws</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t02-bar">
+        <div class="inner-header" onclick="togI('t02-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>IRAC is deductive reasoning in legal dress. The Rule is the general premise. Application checks whether the facts satisfy it. Conclusion follows necessarily if they do. Understanding this makes IRAC mechanical rather than mysterious.</p>
+            <p>Inductive reasoning underlies common law development — courts observe patterns across cases and extract general rules. Abductive reasoning is the engine of investigation and diagnosis. All three appear on the LSAT under different question labels.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 3: Propositions -->
+  <div class="topic-card" id="t03" style="border-left-color: var(--c1)">
+    <div class="topic-header" onclick="tog('t03')">
+      <span class="lec-tag" style="background:var(--c1)">LEC 3</span>
+      <div class="topic-title">Propositions, Arguments &amp; Logical Connectives</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t03-lang">
+        <div class="inner-header" onclick="togI('t03-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>A <strong>proposition</strong> is any statement that is either true or false — never both, never neither. "The court is in session" is a proposition. "Is the court in session?" is not — questions have no truth value.</p>
+          <p>An <strong>argument</strong> is a set of propositions where some (the premises) are offered as reasons to believe another (the conclusion). A valid argument is one where if the premises are true, the conclusion cannot be false.</p>
+          <p><strong>Logical connectives</strong> join propositions to build compound statements:</p>
+          <div class="notation">
+            <span class="hl">¬p</span>  Negation — "not p" — flips the truth value<br>
+            <span class="hl">p ∧ q</span>  Conjunction — "p and q" — true only when BOTH are true<br>
+            <span class="hl">p ∨ q</span>  Disjunction — "p or q" — false only when BOTH are false<br>
+            <span class="hl">p → q</span>  Conditional — "if p then q" — false ONLY when p is true and q is false<br>
+            <span class="hl">p ↔ q</span>  Biconditional — "p if and only if q" — true when both have the SAME truth value
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Conditional Trap — Most Tested</div>
+            <p>p → q is false in exactly ONE situation: p is true and q is false. Students instinctively apply real-world logic and say "if p is false, the conditional is violated." Wrong. If p is false, the conditional makes no claim at all — it is vacuously true. PU exploits this constantly.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t03-mech">
+        <div class="inner-header" onclick="togI('t03-mech')">
+          <span class="inner-label">Truth Table Reference</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <table class="logic-table">
+            <thead><tr><th>p</th><th>q</th><th>¬p</th><th>p∧q</th><th>p∨q</th><th>p→q</th><th>p↔q</th></tr></thead>
+            <tbody>
+              <tr><td>T</td><td>T</td><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>T</td><td>F</td><td>F</td><td>F</td><td>T</td><td><strong>F</strong></td><td>F</td></tr>
+              <tr><td>F</td><td>T</td><td>T</td><td>F</td><td>T</td><td>T</td><td>F</td></tr>
+              <tr><td>F</td><td>F</td><td>T</td><td>F</td><td>F</td><td>T</td><td>T</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">The bold F on row 2 is the only row where p→q fails. Memorise this row.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t03-ex">
+        <div class="inner-header" onclick="togI('t03-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Translating Compound Statements</div>
+            <p>"The defendant is liable if and only if both negligence is proven and the harm was foreseeable."</p>
+            <p>Let p = negligence is proven, q = harm was foreseeable, r = defendant is liable.</p>
+            <div class="notation">r ↔ (p ∧ q)</div>
+            <p>Reading it back into English to check the translation: "r if and only if (p and q)" — liability holds exactly when both negligence and foreseeability hold together, and fails if either is missing. This matches the original sentence, confirming the translation is correct in both directions, which is the actual test of a correct symbolisation — not just going English-to-symbols, but symbols-to-English landing back on the same meaning.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t03-q">
+        <div class="inner-header" onclick="togI('t03-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q03a">
+            <div class="q-header" onclick="togQ('q03a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A contract clause states: "If payment is received by Friday, the goods will be delivered Monday." Payment was not received by Friday. Was the clause violated?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>No, the clause was not violated.</strong> The clause is a conditional p → q where p = "payment received by Friday" and q = "goods delivered Monday." When p is false (payment not received), the conditional is vacuously true regardless of what happens to q. The clause makes no promise about what happens when payment is not received — it only promises delivery when payment is made. Not delivering when payment was not received is entirely consistent with the clause.</p>
+              <div class="what-tests">Vacuous truth of the conditional · the conditional makes no claim when the antecedent is false · contract interpretation as formal logic</div>
+            </div>
+          </div>
+          <div class="question-block" id="q03b">
+            <div class="q-header" onclick="togQ('q03b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A patient is diagnosed if they have both a fever AND a sore throat. Person A has a fever but no sore throat. Construct the truth table for the diagnosis condition and determine whether Person A is diagnosed.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p>The diagnosis condition is p ∧ q where p = has fever, q = has sore throat.</p>
+              <div class="notation">
+                p = T (Person A has fever)<br>
+                q = F (Person A has no sore throat)<br>
+                p ∧ q = T ∧ F = <span class="hl">F</span><br><br>
+                Person A is NOT diagnosed.
+              </div>
+              <p>Conjunction requires both conditions simultaneously. One condition being true is insufficient.</p>
+              <div class="what-tests">Conjunction truth table · applying connectives to real data · direct QR-II past paper question type (Q1-xi)</div>
+            </div>
+          </div>
+          <div class="question-block" id="q03c">
+            <div class="q-header" onclick="togQ('q03c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A statute reads: "A person is liable if and only if they caused harm AND acted negligently." Person A caused harm but did not act negligently. Person B acted negligently but caused no harm. Person C caused harm and acted negligently. Determine the liability of each person and explain what the biconditional adds beyond a simple conditional.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p>Let L = liable, H = caused harm, N = acted negligently. The statute: L ↔ (H ∧ N)</p>
+              <p><strong>Person A:</strong> H = T, N = F → H ∧ N = F → L = F. Not liable.</p>
+              <p><strong>Person B:</strong> H = F, N = T → H ∧ N = F → L = F. Not liable.</p>
+              <p><strong>Person C:</strong> H = T, N = T → H ∧ N = T → L = T. Liable.</p>
+              <p><strong>What the biconditional adds:</strong> A simple conditional (H ∧ N) → L would only say: if both conditions met, then liable. It would leave open whether a person could be liable some other way. The biconditional L ↔ (H ∧ N) closes that door entirely — liability exists <em>if and only if</em> both conditions are met. It is both a sufficient and necessary condition. This precision matters for statutory drafting: it prevents courts from finding liability through alternative routes not specified in the statute.</p>
+              <div class="what-tests">Biconditional applied to three cases · necessary vs. sufficient conditions · the legal significance of "if and only if" in statutory language · Tier 3 because it requires evaluating three scenarios and explaining the structural difference between → and ↔</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q03d">
+            <div class="q-header" onclick="togQ('q03d')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Build a truth table for (p ∨ q) → r. Identify all rows where the compound statement is false. Then interpret: p = "the accused was present at the scene," q = "the accused's fingerprints were found," r = "the accused is charged." Under what combination of facts does the charging decision violate this logical rule?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>The compound statement (p∨q)→r is false only when the antecedent (p∨q) is true and the consequent r is false.</p>
+              <table class="logic-table"><thead><tr><th>p</th><th>q</th><th>r</th><th>p∨q</th><th>(p∨q)→r</th></tr></thead><tbody>
+              <tr><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>T</td><td>T</td><td>F</td><td>T</td><td><strong>F</strong></td></tr>
+              <tr><td>T</td><td>F</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>T</td><td>F</td><td>F</td><td>T</td><td><strong>F</strong></td></tr>
+              <tr><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>F</td><td>T</td><td>F</td><td>T</td><td><strong>F</strong></td></tr>
+              <tr><td>F</td><td>F</td><td>T</td><td>F</td><td>T</td></tr>
+              <tr><td>F</td><td>F</td><td>F</td><td>F</td><td>T</td></tr>
+              </tbody></table>
+              <p><strong>False rows:</strong> rows 2, 4, and 6 — all cases where p∨q=T (at least one piece of evidence exists) but r=F (no charge). The last row (p=F, q=F, r=F) is vacuously true — when there's no evidence at all, the rule doesn't require charging, so no violation.</p>
+              <p><strong>Legal interpretation:</strong> the charging rule is violated whenever the accused was present OR fingerprints were found, but charges were not filed. The rule does NOT require charging when neither evidence type exists (row 8 — vacuously compliant), and it does NOT prohibit charging when evidence exists (rows 1, 3, 5 — rule satisfied). A discretionary decision not to charge despite evidence (rows 2, 4, 6) is where the violation occurs under this logical rule.</p>
+              <div class="what-tests">Full 8-row truth table for a 3-variable compound · identifying false rows · vacuous truth when antecedent is false · legal interpretation of which scenarios violate the rule</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q03e">
+            <div class="q-header" onclick="togQ('q03e')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Determine whether p ↔ q is logically equivalent to (p→q) ∧ (q→p) by constructing the truth tables for both and comparing their final columns.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <table class="logic-table"><thead><tr><th>p</th><th>q</th><th>p→q</th><th>q→p</th><th>(p→q)∧(q→p)</th><th>p↔q</th></tr></thead><tbody>
+              <tr><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>T</td><td>F</td><td>F</td><td>T</td><td>F</td><td>F</td></tr>
+              <tr><td>F</td><td>T</td><td>T</td><td>F</td><td>F</td><td>F</td></tr>
+              <tr><td>F</td><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              </tbody></table>
+              <p>The final two columns are identical in every row — T, F, F, T. <strong>Logically equivalent.</strong> p↔q means exactly the same as (p→q)∧(q→p): the biconditional holds precisely when both one-way conditionals hold simultaneously. This equivalence is useful in legal drafting: "A if and only if B" can always be unpacked as "if A then B, AND if B then A" — two separate obligations that together constitute the biconditional.</p>
+              <div class="what-tests">Logical equivalence via column comparison · biconditional as conjunction of two conditionals · practical drafting implication of the equivalence</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q03f">
+            <div class="q-header" onclick="togQ('q03f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A three-condition liability rule states: "A person is liable if and only if they had a duty of care (d), they breached that duty (b), and the breach caused harm (c)." (a) Formalise as a biconditional with compound antecedent and build the truth table for all 8 combinations of d, b, c and the liability outcome L. (b) Identify all rows where L=T. (c) A claimant argues "I was harmed (c=T) and there was a breach (b=T), so the defendant is liable." Evaluate this argument using the truth table. (d) Explain why courts require all three elements rather than any two.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> L ↔ (d ∧ b ∧ c). Since L↔X is true when L and X have the same value, L=T only when d∧b∧c=T (all three true), and L=F otherwise.</p>
+              <table class="logic-table"><thead><tr><th>d</th><th>b</th><th>c</th><th>d∧b∧c</th><th>L</th></tr></thead><tbody>
+              <tr><td>T</td><td>T</td><td>T</td><td>T</td><td><strong>T</strong></td></tr>
+              <tr><td>T</td><td>T</td><td>F</td><td>F</td><td>F</td></tr>
+              <tr><td>T</td><td>F</td><td>T</td><td>F</td><td>F</td></tr>
+              <tr><td>T</td><td>F</td><td>F</td><td>F</td><td>F</td></tr>
+              <tr><td>F</td><td>T</td><td>T</td><td>F</td><td>F</td></tr>
+              <tr><td>F</td><td>T</td><td>F</td><td>F</td><td>F</td></tr>
+              <tr><td>F</td><td>F</td><td>T</td><td>F</td><td>F</td></tr>
+              <tr><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td></tr>
+              </tbody></table>
+              <p><strong>(b) L=T in row 1 only</strong> — when d=T, b=T, and c=T simultaneously.</p>
+              <p><strong>(c) Claimant's argument:</strong> b=T and c=T, but d is unspecified. Rows 1 and 5 have b=T, c=T. In row 1 (d=T): L=T. In row 5 (d=F): L=F. The claimant's argument is incomplete — two elements are not sufficient to determine L=T. Without establishing d=T (duty of care), the argument fails for row 5. The truth table reveals the claimant has not made a valid inference.</p>
+              <p><strong>(d) Why all three elements:</strong> each element independently captures a distinct legal requirement. Duty without breach means no fault occurred. Breach without duty means there was no legal standard violated. Harm without breach means the harm was not the defendant's fault. Harm without duty means the defendant owed nothing to begin with. Any two elements together still leave the third's absence as a complete defence — the conjunction structure means removing any one element exits the single L=T row entirely, landing in one of seven L=F rows.</p>
+              <div class="what-tests">Three-variable truth table for biconditional · single-row L=T · evaluating an incomplete argument against the table · why conjunction requires all elements · negligence as a truth-table structure</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="inner-section" id="t03-bar">
+        <div class="inner-header" onclick="togI('t03-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>LSAT Sufficient Assumption and Necessary Assumption questions are entirely about the conditional and its requirements. The difference between p → q (p sufficient for q) and q → p (q sufficient for p) is the most tested logical relationship on the LSAT.</p>
+            <p>In statutory interpretation, "if and only if" (biconditional) drafting creates closed liability schemes. "If" alone (conditional) creates open ones. A lawyer who cannot identify this distinction cannot argue whether a statute creates exclusive or inclusive liability conditions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 4: Truth Tables & Equivalences -->
+  <div class="topic-card" id="t04" style="border-left-color: var(--c1)">
+    <div class="topic-header" onclick="tog('t04')">
+      <span class="lec-tag" style="background:var(--c1)">LEC 3</span>
+      <div class="topic-title">Truth Tables &amp; Propositional Equivalences</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t04-lang">
+        <div class="inner-header" onclick="togI('t04-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>Two compound statements are <strong>logically equivalent</strong> if they have identical truth values in every possible situation — every row of their truth tables matches.</p>
+          <p>The three equivalences you must know cold:</p>
+          <div class="notation">
+            <span class="hl">De Morgan 1:</span>  ¬(p ∧ q)  ≡  ¬p ∨ ¬q<br>
+            "Not (both p and q)" = "either not p, or not q"<br><br>
+            <span class="hl">De Morgan 2:</span>  ¬(p ∨ q)  ≡  ¬p ∧ ¬q<br>
+            "Not (p or q)" = "neither p nor q"<br><br>
+            <span class="hl">Contrapositive:</span>  p → q  ≡  ¬q → ¬p<br>
+            "If p then q" = "If not q, then not p"
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">Contrapositive vs. Converse — Critical Distinction</div>
+            <p>The contrapositive (¬q → ¬p) is logically equivalent to the original (p → q). The converse (q → p) is NOT equivalent — it is a completely different claim. Confusing these two is the single most exploited error on the LSAT and in legal argument analysis.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t04-m">
+        <div class="inner-header" onclick="togI('t04-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>To prove two statements equivalent, build a truth table for each and compare column-by-column across all rows — equivalence means every row matches, with no exceptions.</p>
+          <div class="notation">
+            <span class="hl">Procedure:</span><br>
+            1. List all variables, build all 2ⁿ truth-value combinations<br>
+            2. Evaluate each statement's truth value row by row<br>
+            3. Compare the final columns — identical in every row = equivalent (≡); differ in even one row = not equivalent
+          </div>
+          <p>For two variables (p, q), that's 4 rows. For three variables, 8 rows. The number of rows is always 2ⁿ, where n is the number of distinct propositional variables — this is itself a fact PU has tested directly ("how many rows in the truth table for a statement with 4 variables?").</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t04-ex">
+        <div class="inner-header" onclick="togI('t04-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Proving De Morgan 1 by Truth Table</div>
+            <table class="logic-table">
+              <thead><tr><th>p</th><th>q</th><th>p∧q</th><th>¬(p∧q)</th><th>¬p</th><th>¬q</th><th>¬p∨¬q</th></tr></thead>
+              <tbody>
+                <tr><td>T</td><td>T</td><td>T</td><td>F</td><td>F</td><td>F</td><td>F</td></tr>
+                <tr><td>T</td><td>F</td><td>F</td><td>T</td><td>F</td><td>T</td><td>T</td></tr>
+                <tr><td>F</td><td>T</td><td>F</td><td>T</td><td>T</td><td>F</td><td>T</td></tr>
+                <tr><td>F</td><td>F</td><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              </tbody>
+            </table>
+            <p>Compare the ¬(p∧q) column against the ¬p∨¬q column: F,T,T,T in both, every single row. The two statements are equivalent — this table <em>is</em> the proof, not just an illustration of it.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t04-q">
+        <div class="inner-header" onclick="togI('t04-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q04a">
+            <div class="q-header" onclick="togQ('q04a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A rule states: "If a witness is credible, their testimony is admissible." Person A's testimony was not admissible. What can you conclude about Person A's credibility? Write the logical form used.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Conclusion:</strong> Person A is not credible.</p>
+              <p>The original rule: p → q (credible → admissible). Its contrapositive: ¬q → ¬p (not admissible → not credible). Since testimony was not admissible (¬q is true), the contrapositive gives us ¬p — Person A is not credible.</p>
+              <div class="notation">
+                Rule:          p → q  (credible → admissible)<br>
+                Contrapositive: ¬q → ¬p  (¬admissible → ¬credible)<br>
+                Given: ¬q = T → Therefore ¬p = T → Person A is not credible
+              </div>
+              <div class="what-tests">Contrapositive applied to legal facts · modus tollens inference pattern · distinguishing what can be concluded from what cannot</div>
+            </div>
+          </div>
+          <div class="question-block" id="q04b">
+            <div class="q-header" onclick="togQ('q04b')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A defence counsel argues: "The statute says if a person is negligent, they are liable. My client is not negligent. Therefore my client is not liable." The prosecution responds: "That reasoning is flawed." Who is right, and why? Identify the exact logical error if one exists.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>The prosecution is right. The defence has committed the Fallacy of Denying the Antecedent.</strong></p>
+              <div class="notation">
+                Valid pattern (Modus Tollens):  p → q, ¬q ∴ ¬p  ✓<br>
+                Invalid pattern (Defence):       p → q, ¬p ∴ ¬q  ✗
+              </div>
+              <p>The statute says negligence is <em>sufficient</em> for liability — not that it is the <em>only</em> path to liability. The defendant might be liable through a different legal theory (strict liability, intentional tort, vicarious liability) even without negligence. The conditional p → q does not say ¬p → ¬q. That would be the inverse, which is not logically equivalent to the original.</p>
+              <p><strong>What the defence needed to argue:</strong> That the statute uses "if and only if" (biconditional) — making negligence both necessary and sufficient for liability. If that were the case, ¬p would indeed give ¬q. But that is a statutory interpretation argument, not a logical deduction from the stated conditional.</p>
+              <div class="what-tests">Fallacy of Denying the Antecedent · sufficient vs. necessary conditions · the inverse is not equivalent to the original · statutory interpretation as logical structure · highest difficulty — requires identifying the fallacy, naming it, explaining why it fails, and identifying what argument would have worked</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q04c">
+            <div class="q-header" onclick="togQ('q04c')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">State the contrapositive of each statement and verify it is logically equivalent: (i) "If a company is insolvent, it cannot pay dividends." (ii) "If a witness recants, the prosecution's case weakens." (iii) "If the notice was served, the defendant had knowledge of the proceedings."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(i) Original: I → ¬D (insolvent → cannot pay dividends). Contrapositive: D → ¬I (can pay dividends → not insolvent). Equivalent — if a company is paying dividends, it cannot be insolvent.</p>
+              <p>(ii) Original: R → W (recants → prosecution weakens). Contrapositive: ¬W → ¬R (prosecution does not weaken → witness did not recant). Equivalent — if the case stayed strong, the witness must not have recanted.</p>
+              <p>(iii) Original: S → K (served → had knowledge). Contrapositive: ¬K → ¬S (no knowledge → not served). Equivalent — if the defendant had no knowledge of the proceedings, service cannot have occurred. This is exactly the structure of a service challenge in civil procedure.</p>
+              <div class="what-tests">Contrapositive formation for three different conditionals · verifying logical equivalence · legal applications of contrapositive reasoning</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q04d">
+            <div class="q-header" onclick="togQ('q04d')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A student claims: "If the evidence was illegally obtained, it is inadmissible. The evidence was found to be admissible. Therefore it was not illegally obtained." Identify the argument form, determine if it is valid, and explain the reasoning in terms of the contrapositive.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>P1: I → ¬A (illegally obtained → inadmissible, equivalently: illegal → ¬admissible)</p>
+              <p>P2: A (the evidence was admissible)</p>
+              <p>∴ C: ¬I (it was not illegally obtained)</p>
+              <p><strong>Argument form:</strong> Modus Tollens applied via contrapositive. P1's contrapositive: A → ¬I (admissible → not illegal). P2 gives A=T. By modus ponens on the contrapositive: ¬I=T. <strong>Valid.</strong></p>
+              <p>Equivalently, from P1 (I→¬A) and P2 (A=T): if I were true, ¬A would be true, contradicting P2. So I must be false. Same conclusion, valid by modus tollens directly on P1 with ¬(¬A) = A as the premise.</p>
+              <div class="what-tests">Modus tollens · using contrapositive to verify validity · two equivalent reasoning paths to the same conclusion · admissibility as a logical structure</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q04e">
+            <div class="q-header" onclick="togQ('q04e')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Explain the difference between the converse and the contrapositive of p→q. For the statement "If a contract is void, it has no legal effect," write both the converse and the contrapositive. Which, if either, must be true given the original? Which is the most dangerous mistake to make in legal practice?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Contrapositive of p→q:</strong> ¬q→¬p. Logically equivalent to the original — if the original is true, the contrapositive is necessarily true. No additional information needed.</p>
+              <p><strong>Converse of p→q:</strong> q→p. Logically independent of the original — the original can be true while the converse is false, and vice versa. They make different claims.</p>
+              <p>Original: V→¬L (void → no legal effect).</p>
+              <p><strong>Contrapositive:</strong> L→¬V (has legal effect → not void). Must be true. If a contract has legal effect, it cannot be void.</p>
+              <p><strong>Converse:</strong> ¬L→V (no legal effect → void). Does NOT have to be true. A contract might have no legal effect for reasons other than voidness — it might be unenforceable, or its performance might be complete, or it might be voidable but not yet avoided. "No effect" does not automatically mean "void."</p>
+              <p><strong>Most dangerous mistake:</strong> treating the converse as if it were the contrapositive — assuming "the contract has no legal effect, therefore it must be void" when in fact voidness is only one of several reasons a contract might lack legal effect. In practice, this error can cause lawyers to advise clients incorrectly about whether a contract needs to be formally voided rather than simply treated as unenforceable.</p>
+              <div class="what-tests">Contrapositive vs converse distinction · equivalence of contrapositive · independence of converse · practical consequence of converse error in contract law</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q04f">
+            <div class="q-header" onclick="togQ('q04f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A tax rule: "If a person has foreign income above Rs. 1,000,000 AND maintains a foreign account, they must file a foreign asset declaration." (a) Formalise as (p∧q)→r. (b) Which of the four named patterns are valid? (c) Taxpayer X has high income but no account — authority issues a notice. Evaluate. (d) Taxpayer Y has an account but low income. Same question.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> p="income &gt; Rs.1,000,000," q="has foreign account," r="must file declaration." Rule: (p∧q)→r.</p>
+              <p><strong>(b)</strong> Modus Ponens: (p∧q)=T ∴ r=T. Valid. Modus Tollens: ¬r ∴ ¬(p∧q). Valid. Affirming Consequent: r ∴ (p∧q). Invalid. Denying Antecedent: ¬(p∧q) ∴ ¬r. Invalid — filing might still be required under a different rule.</p>
+              <p><strong>(c) Taxpayer X:</strong> p=T, q=F → p∧q=F → antecedent false → rule does not require X to file. The authority's notice is not supported by this rule. X should challenge by demonstrating q=F.</p>
+              <p><strong>(d) Taxpayer Y:</strong> p=F, q=T → p∧q=F → same. The conjunction requires both simultaneously. Y is not subject to the filing obligation under this rule.</p>
+              <div class="what-tests">Compound antecedent · all four patterns evaluated · vacuously true when one conjunct fails · two taxpayers demonstrating the same logical gap from different directions</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="inner-section" id="t04-bar">
+        <div class="inner-header" onclick="togI('t04-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>The contrapositive/converse confusion is, by a wide margin, the single most exploited structural error on the LSAT's Logical Reasoning and Logic Games sections — entire "Necessary Assumption" and "Flaw" question types are built around an answer choice that swaps a conditional for its converse and hopes you won't notice.</p>
+            <p>In statutory interpretation specifically, this distinction has real teeth: a statute reading "if negligence, then liability" does not logically yield "if no negligence, then no liability" — that's the inverse, not the contrapositive, and arguing otherwise without an explicit biconditional in the statutory text is a drafting argument, not a logical entailment. A lawyer who conflates these can lose an argument that was never actually supported by the statute's plain conditional structure.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 5: Logical Fallacies -->
+  <div class="topic-card" id="t05" style="border-left-color: var(--c1)">
+    <div class="topic-header" onclick="tog('t05')">
+      <span class="lec-tag" style="background:var(--c1)">LEC 4</span>
+      <div class="topic-title">Logical Fallacies</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t05-lang">
+        <div class="inner-header" onclick="togI('t05-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>A <strong>logical fallacy</strong> is an argument that appears valid but contains a flaw in its reasoning. The conclusion may even be true — but it does not follow from the premises in the way claimed. Fallacies are the tools of persuasion that logic exposes.</p>
+          <div class="notation">
+            <span class="hl">Ad Hominem:</span> Attacking the person, not the argument.<br>
+            "Person A is corrupt, so their evidence is false."<br><br>
+            <span class="hl">Straw Man:</span> Misrepresenting the opponent's position to attack an easier target.<br><br>
+            <span class="hl">False Dichotomy:</span> Presenting two options as if they are the only ones.<br>
+            "Either you support this policy or you support crime."<br><br>
+            <span class="hl">Post Hoc:</span> Assuming causation from temporal sequence.<br>
+            "Crime rose after the law changed, so the law caused crime."<br><br>
+            <span class="hl">Circular Reasoning:</span> The conclusion is hidden in the premises.<br>
+            "This law is just because just laws are those passed by Parliament."<br><br>
+            <span class="hl">Denying the Antecedent:</span> p→q, ¬p, ∴ ¬q  (invalid — see Topic 4)<br><br>
+            <span class="hl">Affirming the Consequent:</span> p→q, q, ∴ p  (invalid — converse error)
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">PU Pattern — Name AND Explain</div>
+            <p>PU will not just ask you to name a fallacy. It will present an argument and ask you to identify the flaw AND explain why it is a flaw. Naming alone scores partial marks. The explanation is where full marks live.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t05-m">
+        <div class="inner-header" onclick="togI('t05-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>Fallacies split into two structurally different categories, and naming which category you're in is itself half the answer on a PU question.</p>
+          <div class="notation">
+            <span class="hl">Formal fallacies:</span> the structure itself is broken — affirming the consequent, denying the antecedent. These can be shown invalid with a truth table alone, with no need to know what p and q actually mean.<br><br>
+            <span class="hl">Informal fallacies:</span> the structure is fine — ad hominem, straw man, post hoc, circular reasoning all have a valid-looking shape — but the content is flawed: an irrelevant premise, a misrepresented claim, an unjustified causal leap.
+          </div>
+          <p>In formal fallacies, the logical plumbing itself is broken. In informal fallacies, the plumbing works fine, but what's flowing through it is the problem. That distinction tells you where to locate the flaw: in the symbolic structure, or in the real-world content the structure carries.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t05-ex">
+        <div class="inner-header" onclick="togI('t05-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Diagnosing a Fallacy, Fully</div>
+            <p>"Counsel's argument on environmental liability can't be trusted — their firm has previously represented oil companies."</p>
+            <p><strong>Step 1 — name it:</strong> Ad Hominem.</p>
+            <p><strong>Step 2 — locate the category:</strong> Informal. The sentence has a perfectly normal argument shape ("X is unreliable because of Y"); nothing about its symbolic structure is broken.</p>
+            <p><strong>Step 3 — explain the flaw (where full marks live):</strong> the firm's past clients are irrelevant to whether the legal argument itself is structurally sound. The objection attacks who is speaking instead of engaging with the statutory analysis presented — even a lawyer with a conflicted client history can construct a logically valid argument, and even a lawyer with a spotless history can construct a flawed one. Past representation says nothing about present argument quality.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t05-q">
+        <div class="inner-header" onclick="togI('t05-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q05a">
+            <div class="q-header" onclick="togQ('q05a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A prosecutor says: "Defence counsel has previously been sanctioned for misconduct. Therefore his arguments in this case should be disregarded." Identify the fallacy and explain its effect on the argument.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Fallacy: Ad Hominem.</strong> The prosecutor attacks the person making the argument rather than the argument itself. Even if defence counsel has been sanctioned, that fact has no logical bearing on whether the arguments in this case are sound. A flawed person can make a valid argument. A reputable person can make a fallacious one. The merit of an argument is independent of the character of its maker.</p>
+              <p><strong>Effect:</strong> It invites the jury to substitute a judgment about the person for a judgment about the evidence — which is precisely the cognitive shortcut that cross-examination rules and character evidence rules in procedure are designed to prevent.</p>
+              <div class="what-tests">Ad hominem · the independence of argument merit from arguer character · procedural rules as logical safeguards</div>
+            </div>
+          </div>
+          <div class="question-block" id="q05b">
+            <div class="q-header" onclick="togQ('q05b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A politician argues: "Those who oppose the new anti-terrorism bill must want terrorists to succeed." Identify the fallacy, explain the error, and reconstruct what a valid argument against the bill might look like.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Fallacy: False Dichotomy</strong> (also contains a Straw Man element). The argument presents only two options — support the bill or want terrorism — when in reality opposition may be based on concerns about civil liberties, constitutional rights, proportionality, or effectiveness.</p>
+              <p><strong>The error:</strong> It eliminates the middle ground entirely and misrepresents the opponent's actual position (Straw Man) by attributing a motive (wanting terrorism) that was never claimed.</p>
+              <p><strong>Valid argument against the bill:</strong> "The bill's detention-without-trial provision violates Article X of the Constitution. Courts have consistently held that such provisions require judicial oversight. Therefore the bill as drafted is unconstitutional, irrespective of its anti-terrorism objectives."</p>
+              <div class="what-tests">False dichotomy · straw man · reconstructing a valid argument from an invalid one · civil liberties vs. security as a logical framing problem</div>
+            </div>
+          </div>
+          <div class="question-block" id="q05c">
+            <div class="q-header" onclick="togQ('q05c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A judge's written opinion states: "This court finds the defendant's conduct unlawful because unlawful conduct is precisely what this court was established to identify and condemn." Identify all logical flaws, explain why the reasoning cannot support the judgment, and state what the judgment would require to be logically sound.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Primary fallacy: Circular Reasoning (Begging the Question).</strong> The conclusion (conduct is unlawful) is embedded in the premise (this court condemns unlawful conduct). The argument moves from "the court condemns this" to "this is unlawful" using a premise that assumes the very thing it is trying to prove.</p>
+              <p><strong>Secondary issue:</strong> The premise about the court's purpose — even if true — only establishes jurisdiction, not the merits. A court established to identify unlawful conduct has the authority to make findings, but that authority does not itself constitute a finding.</p>
+              <p><strong>Why this cannot support the judgment:</strong> A sound judicial finding requires (1) identifying the applicable legal rule, (2) finding the relevant facts, and (3) applying the rule to the facts to reach a conclusion. The opinion skips steps 1 and 2 entirely and attempts to derive the conclusion from institutional authority alone.</p>
+              <p><strong>What sound reasoning would require:</strong> "The defendant's conduct satisfies the elements of [specific statutory provision / common law rule]. The court finds each element established on the evidence. Therefore the conduct is unlawful." This is deductive: rule (major premise) + facts (minor premise) → conclusion.</p>
+              <div class="what-tests">Circular reasoning · jurisdictional authority vs. substantive finding · the three-step structure of sound judicial reasoning · Tier 3 because it requires identifying the fallacy, explaining why it specifically fails in a judicial context, and reconstructing what valid reasoning would look like</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t05-bar">
+        <div class="inner-header" onclick="togI('t05-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>LSAT "Flaw in the Reasoning" questions are entirely about identifying fallacies by their structural description — not by name. The answer choices say things like "the argument mistakes a condition that is sufficient for an outcome for one that is necessary." That is Affirming the Consequent in plain language. Knowing the names matters less than recognising the pattern.</p>
+            <p>In appellate practice, identifying circular reasoning and false dichotomy in lower court opinions is a standard ground of appeal. Grounds of appeal are often logical fallacies dressed in legal language.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       CLUSTER 2 · LEC 5-7
+  ════════════════════════════════ -->
+  <div class="section-label">Lec. 5–7 · Venn Diagrams, Predicates &amp; Quantifiers</div>
+
+  <!-- TOPIC 6: Venn Diagrams -->
+  <div class="topic-card" id="t06" style="border-left-color: var(--c2)">
+    <div class="topic-header" onclick="tog('t06')">
+      <span class="lec-tag" style="background:var(--c2)">LEC 5</span>
+      <div class="topic-title">Venn Diagrams &amp; Categorical Reasoning</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t06-lang">
+        <div class="inner-header" onclick="togI('t06-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>A Venn diagram makes the relationship between sets visible. The four categorical relationships you need:</p>
+          <div class="notation">
+            <span class="hl">All A are B:</span>     Circle A is entirely inside Circle B<br>
+            <span class="hl">No A are B:</span>      Circles A and B do not overlap at all<br>
+            <span class="hl">Some A are B:</span>    Circles A and B partially overlap<br>
+            <span class="hl">Some A are not B:</span> Circle A exists partly outside Circle B
+          </div>
+          <p>The key use of Venn diagrams is testing <strong>argument validity</strong>. Draw the premises. If the conclusion is already visible in the diagram, the argument is valid. If the conclusion could be false given the diagram, the argument is invalid.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">PU Exam Pattern — QR-II Past Paper Q1-xii</div>
+            <p>The past paper asked: "All apples are fruits. All fruits are healthy. Draw inferences using a Venn diagram." This is a two-premise syllogism. Draw the three circles — Apples inside Fruits, Fruits inside Healthy — and the inference (all apples are healthy) is immediately visible as a transitive relationship.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t06-m">
+        <div class="inner-header" onclick="togI('t06-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">A ⊂ B:</span> A is a subset of B — "All A are B" — every member of A is also in B<br>
+            <span class="hl">A ∩ B = ∅:</span> A and B are disjoint — "No A are B" — zero overlap<br>
+            <span class="hl">A ∩ B ≠ ∅:</span> A and B overlap — "Some A are B" — at least one shared member<br>
+            <span class="hl">Transitivity:</span> if A ⊂ B and B ⊂ C, then A ⊂ C — chains of "all" statements combine
+          </div>
+          <p><strong>Validity test procedure:</strong> draw every premise as accurately as the diagram allows — if a premise uses "some," draw only a partial, ambiguous overlap, not a full circle relationship, since "some" never licenses you to draw more certainty than the premise actually states. Then check: is the conclusion <em>forced</em> by every way the diagram could legally be drawn, or only true in <em>one possible</em> drawing? If only one possible drawing makes it true, the argument is invalid — a valid conclusion must hold in every diagram consistent with the premises, not just the first one you happen to draw.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t06-ex">
+        <div class="inner-header" onclick="togI('t06-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Testing a Three-Circle Syllogism</div>
+            <p>Premise 1: All witnesses are required to take an oath. Premise 2: Some witnesses are minors. Conclusion offered: Some minors are required to take an oath.</p>
+            <p><strong>Drawing it:</strong> Witnesses ⊂ Required-to-Oath (P1, full containment). Minors overlaps Witnesses partially (P2, "some").</p>
+            <p><strong>Checking the conclusion:</strong> the overlap region between Minors and Witnesses sits entirely inside Required-to-Oath, because all of Witnesses does. So that overlap region — which represents witnesses who are minors — is necessarily inside Required-to-Oath too.</p>
+            <p><strong>Valid.</strong> Every way you could legally draw this diagram consistent with both premises forces some minors into the Required-to-Oath circle — there's no valid drawing that avoids it.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t06-q">
+        <div class="inner-header" onclick="togI('t06-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q06a">
+            <div class="q-header" onclick="togQ('q06a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">Premise 1: All contracts are legally binding documents. Premise 2: All legally binding documents require a signature. Using a Venn diagram description, determine whether "All contracts require a signature" is a valid inference.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Valid inference.</strong></p>
+              <p>Venn diagram: Draw three circles — Contracts, Legally Binding Documents, Require Signature. Premise 1 places Contracts entirely inside Legally Binding Documents. Premise 2 places Legally Binding Documents entirely inside Require Signature. Therefore Contracts is entirely inside Require Signature — the inference is already drawn by the diagram.</p>
+              <div class="notation">
+                Contracts ⊂ Legally Binding Documents ⊂ Require Signature<br>
+                Therefore: Contracts ⊂ Require Signature ✓
+              </div>
+              <div class="what-tests">Transitive Venn diagram inference · syllogistic validity · directly maps to QR-II past paper format</div>
+            </div>
+          </div>
+          <div class="question-block" id="q06b">
+            <div class="q-header" onclick="togQ('q06b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">Premise 1: Some lawyers are politicians. Premise 2: All politicians are public figures. Can you conclude that all lawyers are public figures? Use a Venn diagram to support your answer.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>No — invalid inference.</strong></p>
+              <p>Venn diagram: Politicians is entirely inside Public Figures (Premise 2). Lawyers partially overlaps Politicians (Premise 1 — "some"). The overlap region of Lawyers and Politicians sits inside Public Figures, but the rest of the Lawyers circle may sit entirely outside Public Figures.</p>
+              <p>The diagram shows that <em>some</em> lawyers are public figures (those who are also politicians), but does not place all of Lawyers inside Public Figures. The conclusion "all lawyers are public figures" would require Lawyers to be entirely inside Public Figures, which the diagram does not show.</p>
+              <div class="what-tests">Partial overlap · invalid syllogism · the difference between "some A are B" and "all A are B" in diagram terms</div>
+            </div>
+          </div>
+          <div class="question-block" id="q06c">
+            <div class="q-header" onclick="togQ('q06c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">Premise 1: No acquitted person is guilty. Premise 2: Some guilty persons are dangerous. Conclusion offered: Some dangerous persons are not acquitted. Is this valid? Use Venn diagram reasoning and explain the limits of what can be inferred from these premises.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>The conclusion is valid, but requires careful unpacking.</strong></p>
+              <p>From Premise 1: Acquitted and Guilty are disjoint — the circles do not overlap. From Premise 2: Guilty and Dangerous partially overlap — some guilty persons are in the Dangerous circle.</p>
+              <p>Since Guilty and Acquitted are entirely separate, anything in the Guilty circle (including the part that overlaps with Dangerous) is outside the Acquitted circle. Therefore the guilty-and-dangerous persons are not acquitted — making "some dangerous persons are not acquitted" valid.</p>
+              <p><strong>Limits of inference:</strong> We cannot conclude that ALL dangerous persons are not acquitted — the Dangerous circle may extend into regions with no Guilty overlap, and some of those persons could theoretically be acquitted. We also cannot conclude anything about whether acquitted persons are dangerous — the Acquitted circle is entirely separate from Guilty but may or may not overlap with Dangerous independently.</p>
+              <p><strong>Legal implication:</strong> This diagram captures the structural tension between legal innocence (acquittal) and factual guilt — they are logically separable categories, which is why the criminal standard of proof ("beyond reasonable doubt") acknowledges that acquittal does not prove actual innocence.</p>
+              <div class="what-tests">Disjoint sets · partial overlap · valid inference from combined premises · identifying the limits of what can and cannot be inferred · legal meaning of acquittal as a logical category</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t06-bar">
+        <div class="inner-header" onclick="togI('t06-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>LSAT Logic Games are, structurally, Venn-diagram validity testing wearing a different costume — grouping games in particular ask exactly the question this topic trains: given these constraints, what must be true in every possible arrangement, versus what's only true in one arrangement you happened to draw first?</p>
+            <p>In statutory drafting and interpretation, categorical relationships (every contractor is liable / no exempted entity is liable / some employees are contractors) are exactly what Venn reasoning formalises — a lawyer who can quickly diagram a statute's defined categories can spot gaps and overlaps a plain reading misses, particularly in multi-definition regulatory schemes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 7: Predicates -->
+  <div class="topic-card" id="t07" style="border-left-color: var(--c2)">
+    <div class="topic-header" onclick="tog('t07')">
+      <span class="lec-tag" style="background:var(--c2)">LEC 6</span>
+      <div class="topic-title">Predicates &amp; Predicate Logic</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t07-lang">
+        <div class="inner-header" onclick="togI('t07-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>A <strong>predicate</strong> is a property or relationship — something that can be true or false of an individual. "is honest" is a predicate. "is taller than" is a predicate. On their own, predicates are not propositions — they become propositions when applied to a specific subject.</p>
+          <p>P(x) means "x has property P." It is true for some values of x and false for others.</p>
+          <div class="notation">
+            <span class="hl">P(x)</span>  =  "x is a licensed lawyer"<br>
+            P(Person A) = true if Person A is licensed, false otherwise<br><br>
+            <span class="hl">R(x, y)</span> = "x is the employer of y"<br>
+            R(Company, Employee) = true or false depending on the specific pair
+          </div>
+          <p>Predicate logic is more powerful than propositional logic because it can express <em>who</em> or <em>what</em> a claim applies to — not just whether a compound statement is true or false.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-m">
+        <div class="inner-header" onclick="togI('t07-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Unary predicate:</span> P(x) — one subject, one property: "x is licensed"<br>
+            <span class="hl">Binary predicate:</span> R(x, y) — a relationship between two subjects: "x employs y"<br>
+            <span class="hl">Compound predicates:</span> built from connectives, e.g. H(x) ∧ ¬G(x) — "x was harmed and x did not consent"<br>
+            <span class="hl">Domain:</span> the set of things x is allowed to range over — always state it, since a predicate's truth depends on which domain you're evaluating it against
+          </div>
+          <p>The mechanical skill here is plugging a specific individual into a predicate and evaluating true/false, then carrying that result through whatever propositional logic (∧, →, etc.) wraps around it — exactly the same truth-table machinery from Topic 3 and 4, just applied to predicates that have first been evaluated for a named subject.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-ex">
+        <div class="inner-header" onclick="togI('t07-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Evaluating a Binary Predicate</div>
+            <p>Let R(x, y) = "x is the employer of y." A workplace policy states: "If x is the employer of y, x must provide y with a written contract." Formally: ∀x∀y, R(x,y) → C(x,y), where C(x,y) = "x provides y a written contract."</p>
+            <p>Company Z employs Person D. Apply the rule: R(Z, D) = T (given). By modus ponens on the universal rule, C(Z, D) must be T — Company Z is required to provide Person D a written contract.</p>
+            <p>Notice the rule says nothing about Company Z's obligations to anyone it does <em>not</em> employ — R(Z, anyone-else) = F leaves the conditional vacuously true, with no obligation triggered, exactly the same "false antecedent" pattern from Topic 3's conditional, just now carrying two subjects instead of one proposition.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-q">
+        <div class="inner-header" onclick="togI('t07-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q07a">
+            <div class="q-header" onclick="togQ('q07a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">Let L(x) = "x holds a valid law licence" and P(x) = "x may appear before the Supreme Court." The rule is: for all x, if L(x) then P(x). Person A does not hold a valid licence. Person B holds a valid licence. What can you conclude about each person's right to appear?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Rule: ∀x, L(x) → P(x)<br><br>
+                Person A: L(A) = F → conditional vacuously true, but no conclusion about P(A)<br>
+                Person B: L(B) = T → by modus ponens, P(B) = T ✓
+              </div>
+              <p><strong>Person B</strong> may appear — the rule guarantees it.</p>
+              <p><strong>Person A:</strong> We cannot conclude either way. The rule only says a licence is sufficient for the right to appear — it does not say a licence is the only way to obtain that right. Person A might appear through a different provision (pro hac vice, in-person exception, etc.).</p>
+              <div class="what-tests">Predicate logic applied to a rule · modus ponens · the conditional makes no claim when the antecedent is false</div>
+            </div>
+          </div>
+          <div class="question-block" id="q07b">
+            <div class="q-header" onclick="togQ('q07b')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">Let G(x) = "x gave consent", H(x) = "x was harmed", L(x) = "x has a legal claim." A statute provides: ∀x, H(x) ∧ ¬G(x) → L(x). Person A was harmed and did not consent. Person B was not harmed but did not consent. Person C consented and was harmed. Evaluate each person's claim. Then explain what additional premise would be required for Person C to have a claim.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Statute: ∀x, H(x) ∧ ¬G(x) → L(x)<br><br>
+                Person A: H(A)=T, G(A)=F → H∧¬G = T → L(A) = T  ✓  Has a claim<br>
+                Person B: H(B)=F, G(B)=F → H∧¬G = F → no conclusion about L(B)<br>
+                Person C: H(C)=T, G(C)=T → ¬G(C)=F → H∧¬G = F → no conclusion about L(C)
+              </div>
+              <p><strong>Person A</strong> has a legal claim — both conditions of the statute are satisfied.</p>
+              <p><strong>Person B</strong> has no claim under this statute — harm is required and was not present. The absence of consent alone is insufficient.</p>
+              <p><strong>Person C</strong> has no claim under this statute. Consent was given, which breaks the required conjunction. The statute is specifically designed to protect those who did not consent.</p>
+              <p><strong>For Person C to have a claim, an additional premise is needed:</strong> A separate rule such as "∀x, H(x) ∧ G(x) ∧ N(x) → L(x)" where N(x) represents a vitiating factor (e.g., consent was obtained by fraud or duress). Alternatively: evidence that Person C's consent was invalid, converting G(C) to effectively ¬G(C) under the statute's meaning of genuine consent.</p>
+              <div class="what-tests">Multi-predicate statute evaluation · three-case analysis · identifying when the antecedent fails · reasoning about what additional premise changes the conclusion · directly maps to how courts interpret multi-element statutory claims</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t07-bar">
+        <div class="inner-header" onclick="togI('t07-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Statutory Drafting Connection</div>
+            <p>Multi-element statutes are predicate logic in legislative disguise — most causes of action are literally a conjunction of predicates (duty, breach, causation, damages all required together), and a lawyer's entire job in pleading or defending a claim is checking whether each predicate is satisfied for a specific named party, exactly the mechanical evaluation drilled here.</p>
+            <p>This is also the precise skill MBE and MPT fact patterns test under time pressure: a multi-element rule plus a fact pattern naming several people, where the task is running each person through every element and reporting which conjunction holds.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 8: Quantifiers -->
+  <div class="topic-card" id="t08" style="border-left-color: var(--c2)">
+    <div class="topic-header" onclick="tog('t08')">
+      <span class="lec-tag" style="background:var(--c2)">LEC 7</span>
+      <div class="topic-title">Quantifiers — Universal &amp; Existential</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t08-lang">
+        <div class="inner-header" onclick="togI('t08-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>Quantifiers tell you <strong>how much of a domain</strong> a predicate applies to.</p>
+          <div class="notation">
+            <span class="hl">∀x P(x)</span>  — Universal: P is true for EVERY x in the domain<br>
+            "All lawyers are officers of the court"<br><br>
+            <span class="hl">∃x P(x)</span>  — Existential: P is true for AT LEAST ONE x in the domain<br>
+            "Some lawyers are also politicians"
+          </div>
+          <p>The domain matters enormously. ∀x P(x) over the domain "licensed lawyers in Pakistan" is a very different claim from ∀x P(x) over "all persons."</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t08-m">
+        <div class="inner-header" onclick="togI('t08-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Proving ∀x P(x):</span> requires showing P holds for every single element of the domain — one missing case disproves it<br>
+            <span class="hl">Proving ∃x P(x):</span> requires exhibiting just one element where P holds — a single example suffices<br>
+            <span class="hl">Disproving ∀x P(x):</span> requires only one counterexample — find one x where P(x) is false<br>
+            <span class="hl">Disproving ∃x P(x):</span> requires showing P fails for every element — the same heavy burden as proving a ∀
+          </div>
+          <p>This is the single most exploitable structural fact in the whole topic: ∀ and ∃ have <em>opposite</em> burdens depending on whether you're proving or disproving them. A universal claim is hard to prove, easy to disprove. An existential claim is easy to prove, hard to disprove. Whoever frames the question as ∀ versus ∃ is quietly setting how much work the other side has to do.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t08-ex">
+        <div class="inner-header" onclick="togI('t08-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Choosing the Right Quantifier Strategically</div>
+            <p>A regulator wants to claim "every factory in the district complies with the emissions standard" (∀x C(x)). The factory owners' association wants to claim "some factory inspections were conducted unfairly" (∃x U(x)).</p>
+            <p><strong>Regulator's burden:</strong> must demonstrate compliance for every single factory — a complete domain sweep. Missing even one unchecked factory leaves the ∀ claim unproven.</p>
+            <p><strong>Association's burden:</strong> only needs one documented case of an unfair inspection — a single ∃ instantiation closes their argument.</p>
+            <p>Notice the regulator chose the harder claim to make (∀) because it's the stronger, more useful one if true; the association chose the easier claim to make (∃) because it's all they need to create doubt. Recognising which side is making which type of claim — before evaluating whether they've actually met their burden — is the entire skill this topic trains.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t08-q">
+        <div class="inner-header" onclick="togI('t08-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q08a">
+            <div class="q-header" onclick="togQ('q08a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">Translate the following into formal notation and identify the domain: (a) "Every judge in this court has read the brief." (b) "At least one defendant in this case is a minor." (c) "No witness testified voluntarily."</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                (a) Domain: judges in this court<br>
+                    ∀x, R(x)  where R(x) = "x has read the brief"<br><br>
+                (b) Domain: defendants in this case<br>
+                    ∃x, M(x)  where M(x) = "x is a minor"<br><br>
+                (c) Domain: witnesses in this proceeding<br>
+                    ∀x, ¬V(x)  where V(x) = "x testified voluntarily"<br>
+                    Equivalent: ¬∃x, V(x)  — no witness testified voluntarily
+              </div>
+              <div class="what-tests">English-to-formal translation · domain identification · universal negation expressed two ways</div>
+            </div>
+          </div>
+          <div class="question-block" id="q08b">
+            <div class="q-header" onclick="togQ('q08b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A rights organisation claims: "Some detained persons were denied access to counsel." The government responds: "All detained persons in our facilities received access to counsel." Are these statements contradictory? What would each side need to prove?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>The statements are contradictory only if they refer to the same domain.</strong></p>
+              <div class="notation">
+                Organisation: ∃x, D(x) ∧ ¬A(x)  — some detained persons denied access<br>
+                Government:   ∀x, D(x) → A(x)   — all detained persons had access
+              </div>
+              <p>These are direct negations of each other when the domain is identical. If the government is referring only to "our facilities" while the organisation's claim covers additional detention sites, the domains differ and both can be simultaneously true.</p>
+              <p><strong>Organisation needs:</strong> One documented case of a detained person denied access — a single ∃x instantiation.</p>
+              <p><strong>Government needs:</strong> Evidence covering every detained person — a ∀x claim requires universal coverage, not a sample.</p>
+              <div class="what-tests">Domain specification as a legal argument tool · existential vs. universal burden of proof · asymmetry between proving ∃ (one case) and proving ∀ (complete coverage)</div>
+            </div>
+          </div>
+          <div class="question-block" id="q08c">
+            <div class="q-header" onclick="togQ('q08c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A whistleblower claims: "There exists a contract in which the company knowingly misrepresented material facts." The company's legal team argues: "Our compliance review covered all contracts and found no misrepresentation." A journalist adds: "The compliance review was conducted by the company's own lawyers." Analyse all three statements using quantifier logic and explain what the journalist's observation does to the evidential weight of the company's universal claim.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Whistleblower: ∃x, C(x) ∧ M(x)  — some contract x contains knowing misrepresentation<br>
+                Company:       ∀x, C(x) → ¬M(x) — all contracts reviewed, none misrepresented<br>
+                These are direct logical contradictions if the domain is identical
+              </div>
+              <p><strong>The company's claim is a ∀ statement:</strong> it asserts that the review covered the entire domain of contracts and found ¬M(x) for every element. To be credible, this requires both (a) complete domain coverage and (b) reliable detection methodology.</p>
+              <p><strong>The journalist's observation attacks condition (b).</strong> It does not change the logical form of the company's statement, but it challenges the <em>epistemic reliability</em> of the evidence supporting the ∀ claim. A review conducted by interested parties may have systematically failed to detect what it was looking for — not through logical error, but through motivated reasoning or selective attention.</p>
+              <p><strong>Formal implication:</strong> The company's ∀ claim, even if logically structured correctly, is weakened because the process generating it had a known bias. In evidentiary terms, the weight given to the ∀ assertion should be reduced — it remains possible that ∃x C(x)∧M(x) is true despite the review's conclusion.</p>
+              <p><strong>Bar connection:</strong> Self-audits and internal compliance reviews face exactly this challenge in securities litigation and corporate fraud cases. Courts frequently require independent review precisely because a ∀ claim ("we checked everything") produced by a conflicted reviewer carries diminished weight.</p>
+              <div class="what-tests">Quantifier contradiction · epistemic reliability of a universal claim · the difference between logical validity and evidential weight · how bias affects ∀ assertions · Tier 3 because it requires applying quantifier logic to evaluate not just the logical structure but the credibility of the evidence supporting it</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t08-bar">
+        <div class="inner-header" onclick="togI('t08-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>The asymmetry between ∃ and ∀ is a core LSAT concept. Proving a universal claim (∀) requires covering the entire domain. Disproving it requires only one counterexample (∃¬). This asymmetry explains why the burden of proof in civil cases (balance of probabilities) and criminal cases (beyond reasonable doubt) differ — they are setting different thresholds for how confident we must be before treating a ∀ claim as established.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 9 & 10: Negation of Quantified Statements (PILOT TOPICS - ALREADY BUILT) -->
+  <div class="topic-card" id="t09" style="border-left-color: var(--c2)">
+    <div class="topic-header" onclick="tog('t09')">
+      <span class="lec-tag" style="background:var(--c2)">LEC 7</span>
+      <div class="topic-title">Negation of Quantified Statements</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t09-lang">
+        <div class="inner-header" onclick="togI('t09-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>The negation of "all" is "at least one is not." The negation of "some" is "none." One exception destroys a universal claim. Defeating an existential claim requires showing zero exceptions exist.</p>
+          <div class="notation">
+            <span class="hl">¬(∀x P(x))</span>  ≡  ∃x ¬P(x)  — at least one fails<br>
+            <span class="hl">¬(∃x P(x))</span>  ≡  ∀x ¬P(x)  — all fail<br><br>
+            Pattern: quantifier flips · condition negates · both simultaneously
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">Exam Disguise</div>
+            <p>PU presents a sentence — "All witnesses testified truthfully" — and asks what the defence must establish. Recognise the ∀ structure before applying the negation rule. The hidden step is the translation, not the mechanics.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-m">
+        <div class="inner-header" onclick="togI('t09-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Negation procedure, step by step:</span><br>
+            1. Identify the quantifier (∀ or ∃) and the predicate it governs<br>
+            2. Flip the quantifier (∀↔∃)<br>
+            3. Negate the predicate (P becomes ¬P)<br>
+            4. Nothing else changes — the domain stays the same
+          </div>
+          <p>The two rules are mirror images of each other, which is exactly why they're easy to mix up under time pressure: ¬∀ becomes ∃¬, and ¬∃ becomes ∀¬. Say the rule out loud as "the quantifier flips, the predicate negates" rather than memorising the symbols in isolation — that phrasing survives translation back into English, which is where PU actually tests this.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-ex">
+        <div class="inner-header" onclick="togI('t09-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Negating in Both Directions</div>
+            <p>"At least one clause in this agreement is unenforceable." Formally: ∃x, C(x) ∧ U(x), where C(x) = "x is a clause in this agreement," U(x) = "x is unenforceable."</p>
+            <p><strong>Applying the procedure:</strong> flip ∃ to ∀, negate the predicate (U becomes ¬U).</p>
+            <div class="notation">Negation: ∀x, C(x) → ¬U(x) — every clause in this agreement is enforceable</div>
+            <p><strong>Reading it back into English</strong> to verify: "for every clause in this agreement, that clause is enforceable" — which is exactly the opposite claim of "at least one is unenforceable," confirming the negation is correct in both directions, not just symbolically derived.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-q">
+        <div class="inner-header" onclick="togI('t09-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q09a">
+            <div class="q-header" onclick="togQ('q09a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A legal researcher claims: "Some eyewitness testimonies are unreliable." The defence wants to argue the opposite. Write the statement the defence must prove and explain why proving most testimonies are reliable is insufficient.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Original:  ∃x, testimony(x) ∧ unreliable(x)<br>
+                Negation:  ∀x, testimony(x) → reliable(x)
+              </div>
+              <p><strong>Defence must prove:</strong> Not a single testimony is unreliable — all are reliable. "Most are reliable" leaves room for one unreliable testimony, which is all the original ∃ claim required.</p>
+              <div class="what-tests">∃ negation · absolute nature of universal negation · why majority claims do not defeat existential claims</div>
+            </div>
+          </div>
+          <div class="question-block" id="q09b">
+            <div class="q-header" onclick="togQ('q09b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A prosecutor argues: "Every witness who testified told the truth." Defence counsel responds: "That is false." What is the minimum defence counsel must establish? What would it mean if counsel proved most witnesses lied?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Prosecutor: ∀x, testified(x) → truthful(x)<br>
+                Negation:   ∃x, testified(x) ∧ ¬truthful(x)
+              </div>
+              <p><strong>Minimum:</strong> One witness who testified and did not tell the truth. That single instance makes the universal false.</p>
+              <p><strong>Proving most lied:</strong> Stronger than required, but a different claim — it introduces a narrative of systemic dishonesty. Logically, one liar is sufficient. Strategically, more may be more persuasive, but the logical threshold is met at one.</p>
+              <div class="what-tests">∀ negation · logical minimum vs. strategic sufficiency · the asymmetric vulnerability of universal claims</div>
+            </div>
+          </div>
+          <div class="question-block" id="q09c">
+            <div class="q-header" onclick="togQ('q09c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A whistleblower claims some contracts contain misrepresentations. The company says all contracts were reviewed and found clean. A journalist notes the review was internal. Analyse using quantifier negation and evaluate what the journalist's observation does to the company's universal claim.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Whistleblower: ∃x, contract(x) ∧ misrepresentation(x)<br>
+                Company:       ∀x, contract(x) → ¬misrepresentation(x)<br>
+                These are logical contradictions over the same domain
+              </div>
+              <p>The journalist's observation does not change the logical form of the company's ∀ claim but challenges its <strong>epistemic reliability</strong> — the process generating the claim had a known conflict of interest. A ∀ claim produced by a biased reviewer carries reduced evidential weight, even if structurally valid. Courts require independent audits precisely because self-review of universal claims is inherently suspect.</p>
+              <div class="what-tests">Quantifier contradiction · epistemic reliability vs. logical validity · conflict of interest as an attack on ∀ evidence</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t09-bar">
+        <div class="inner-header" onclick="togI('t09-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>The flip-and-negate rule is precisely what the LSAT calls a "Necessary Assumption" or "Weaken" question is built on when the stimulus contains a quantified claim — the correct attack almost always negates the quantifier and the predicate together, not just one of the two, and answer choices that negate only the predicate (a common trap) leave the original quantifier's structure intact and therefore don't actually refute the claim.</p>
+            <p>In drafting, this matters directly: a clause negotiator who is asked to weaken "all disclosures must be made within 30 days" into something more favourable needs to know precisely what the negation is — "at least one disclosure need not be made within 30 days" — rather than overcorrecting into "no disclosures are required," which concedes far more than necessary.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 10: Negation of Universal Conditional -->
+  <div class="topic-card" id="t10" style="border-left-color: var(--c2)">
+    <div class="topic-header" onclick="tog('t10')">
+      <span class="lec-tag" style="background:var(--c2)">LEC 7</span>
+      <div class="topic-title">Negation of Universal Conditional Statements</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t10-lang">
+        <div class="inner-header" onclick="togI('t10-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>A universal conditional says: for every x, <em>if</em> condition P holds, <em>then</em> consequence Q follows. To break it, you need one case where P was satisfied and Q did not follow.</p>
+          <div class="notation">
+            <span class="hl">Original:</span>   ∀x, P(x) → Q(x)<br>
+            <span class="hl">Negation:</span>   ∃x, P(x) ∧ ¬Q(x)<br><br>
+            Three changes: ∀→∃ · arrow becomes ∧ · Q becomes ¬Q<br>
+            All three simultaneously. Missing any one is wrong.
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Most Common Error</div>
+            <p>Students negate Q but forget to flip the quantifier and replace the arrow. Three things change. Every time.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t10-m">
+        <div class="inner-header" onclick="togI('t10-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Checklist for negating ∀x, P(x) → Q(x):</span><br>
+            ☐ Quantifier changed from ∀ to ∃<br>
+            ☐ Arrow (→) changed to conjunction (∧)<br>
+            ☐ Consequent changed from Q to ¬Q<br>
+            ☐ Antecedent P stays unchanged, unnegated
+          </div>
+          <p>Notice the antecedent P does <em>not</em> get negated — only the consequent does. This is the easiest piece to get backwards, because the instinct is to negate "everything," but the correct negation keeps P exactly as it was and asserts it actually held while Q failed to follow. That's what makes it a genuine counterexample to the original rule rather than a different rule entirely.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t10-ex">
+        <div class="inner-header" onclick="togI('t10-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Running the Checklist</div>
+            <p>"Whenever an employee works overtime, they are entitled to additional pay." Formally: ∀x, O(x) → E(x).</p>
+            <div class="notation">
+              ∀ → ∃ ✓<br>
+              → becomes ∧ ✓<br>
+              E(x) becomes ¬E(x) ✓<br>
+              O(x) stays O(x), unnegated ✓<br><br>
+              Negation: ∃x, O(x) ∧ ¬E(x)
+            </div>
+            <p>In plain English: "there exists at least one employee who worked overtime and was not entitled to additional pay." To disprove the original rule, you need exactly one such employee — someone who genuinely worked overtime (the antecedent held) but received no additional pay (the consequent failed). An employee who simply wasn't entitled to overtime pay because they never worked overtime at all doesn't count — that's a case where the antecedent never triggered, which says nothing about whether the rule itself is true.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t10-q">
+        <div class="inner-header" onclick="togI('t10-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q10a">
+            <div class="q-header" onclick="togQ('q10a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A statute states: "Any person who causes harm through negligence is liable for damages." The defendant argues the statute does not apply. Write what the defendant must establish in plain English and formal notation. What is the defendant NOT required to prove?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Statute:  ∀x, negligent(x) ∧ harm(x) → liable(x)<br>
+                Negation: ∃x, negligent(x) ∧ harm(x) ∧ ¬liable(x)<br>
+                OR: show ¬negligent(x) — the antecedent was never satisfied
+              </div>
+              <p><strong>Defendant must establish:</strong> Either that they were not negligent (breaking the antecedent), or that despite negligence and harm, liability should not follow (a more aggressive challenge to the statute itself).</p>
+              <p><strong>Not required to prove:</strong> That no one is ever liable for harm. That harm did not occur. The challenge is specific to this instance, not universal.</p>
+              <div class="what-tests">Universal conditional negation · two routes to defeating the antecedent · precision of legal argumentation</div>
+            </div>
+          </div>
+          <div class="question-block" id="q10b">
+            <div class="q-header" onclick="togQ('q10b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">A study concludes: "Every patient who received Treatment X showed improvement." Person B wants to challenge this in court. Person C (opposing statistician) says: "You would need to prove no patients improved." Is Person C correct? Write the precise negation and identify Person C's error.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Person C is wrong.</strong></p>
+              <div class="notation">
+                Study:    ∀x, received(x) → improved(x)<br>
+                Negation: ∃x, received(x) ∧ ¬improved(x)<br><br>
+                Person C described: ∀x, received(x) → ¬improved(x)  ← wrong statement
+              </div>
+              <p>Person C confused the negation of ∀x Q(x) with the negation of ∀x P→Q. The negation of the study's claim requires one patient who received treatment and did not improve — not proof that no patient improved. Person B needs one counterexample, not a comprehensive refutation.</p>
+              <div class="what-tests">Universal conditional negation · identifying a plausible but logically wrong account of negation · expert witness cross-examination logic</div>
+            </div>
+          </div>
+          <div class="question-block" id="q10c">
+            <div class="q-header" onclick="togQ('q10c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">Person A argues: "Whenever a contract is signed under duress, it is voidable." Person B responds: "Courts have upheld some contracts signed under duress." Person C intervenes: "The real question is whether duress was properly established in those cases." Analyse all three positions using the universal conditional and its negation. Who is making the most logically precise point?</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                Person A: ∀x, duress(x) → voidable(x)<br>
+                Person B: ∃x, duress(x) ∧ ¬voidable(x)  — claims a counterexample exists<br>
+                Person C: challenges whether duress(x) = T in Person B's cases
+              </div>
+              <p><strong>Person A</strong> states the rule as a universal conditional — coherent and legally grounded.</p>
+              <p><strong>Person B</strong> attempts to negate it with a counterexample — logically the correct move, but the counterexample's validity depends on whether the antecedent (duress) was genuinely satisfied.</p>
+              <p><strong>Person C</strong> makes the most precise point: if the courts upheld those contracts because duress was not properly established, then Person B's cases do not satisfy P(x) — they are not genuine instances of ∃x P∧¬Q. They are cases where P was absent. The rule is untouched.</p>
+              <p>This is the distinction between case distinction (C's move) and rule exception (B's move). C operates at a higher level of analytical precision — questioning antecedent satisfaction rather than accepting the framing.</p>
+              <div class="what-tests">Universal conditional · negation · antecedent satisfaction · the distinction between rule exception and case distinction · the most analytically rigorous intervention in a three-way argument</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t10-bar">
+        <div class="inner-header" onclick="togI('t10-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>Case distinction in common law is the judicial version of questioning antecedent satisfaction. When a court says "this precedent does not apply because the facts are distinguishable," it is arguing that P(x) was not satisfied in the current case — the antecedent of the rule was never triggered.</p>
+            <p>LSAT "Weaken" questions frequently involve finding the ∃x that negates a universal conditional claim in the argument. The question presents a rule and asks what single piece of evidence undermines it — that evidence is always a specific instance where P held but Q did not follow.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       CLUSTER 3 · LEC 8-10
+  ════════════════════════════════ -->
+  <div class="section-label">Lec. 8–10 · Quantitative Reasoning Exercises</div>
+
+  <!-- TOPIC 11: Argument Structure -->
+  <div class="topic-card" id="t11" style="border-left-color: var(--c3)">
+    <div class="topic-header" onclick="tog('t11')">
+      <span class="lec-tag" style="background:var(--c3)">LEC 8</span>
+      <div class="topic-title">Argument Structure &amp; Validity Testing</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t11-lang">
+        <div class="inner-header" onclick="togI('t11-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>An argument is <strong>valid</strong> if the conclusion cannot be false when all premises are true — regardless of whether the premises are actually true. An argument is <strong>sound</strong> if it is valid AND all its premises are actually true.</p>
+          <p>The standard inference patterns:</p>
+          <div class="notation">
+            <span class="hl">Modus Ponens:</span>      p → q,  p  ∴ q          ✓ Valid<br>
+            <span class="hl">Modus Tollens:</span>      p → q, ¬q  ∴ ¬p         ✓ Valid<br>
+            <span class="hl">Hypothetical Syllogism:</span> p→q, q→r ∴ p→r     ✓ Valid<br>
+            <span class="hl">Disjunctive Syllogism:</span>  p∨q, ¬p  ∴ q         ✓ Valid<br><br>
+            <span class="hl">Affirming Consequent:</span> p→q, q  ∴ p           ✗ Invalid<br>
+            <span class="hl">Denying Antecedent:</span>   p→q, ¬p ∴ ¬q          ✗ Invalid
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t11-m">
+        <div class="inner-header" onclick="togI('t11-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p><strong>Validity-testing procedure, when an argument doesn't obviously match one of the six named patterns:</strong></p>
+          <div class="notation">
+            1. Symbolise every premise and the conclusion<br>
+            2. Build a truth table covering all variables<br>
+            3. Find every row where ALL premises are true<br>
+            4. Check the conclusion in those rows — if it's true in every one, the argument is valid; if false in even one, invalid
+          </div>
+          <p>The six named patterns are shortcuts that skip this full procedure because their validity (or invalidity) has already been proven once and for all by exactly this method — recognising the pattern lets you skip straight to the answer. When an argument doesn't match a named pattern, the truth-table procedure is the fallback that always works, just slower.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t11-ex">
+        <div class="inner-header" onclick="togI('t11-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Validity Testing an Unnamed Pattern</div>
+            <p>"If the application is complete (p), it will be processed (q). The application was not processed (¬q). The application was incomplete (¬p)." — does ¬q, p→q ∴ ¬p hold?</p>
+            <p>This is Modus Tollens (p→q, ¬q ∴ ¬p) — recognise the named pattern first, which confirms validity instantly. But to verify by table for practice:</p>
+            <table class="logic-table">
+              <thead><tr><th>p</th><th>q</th><th>p→q</th><th>¬q</th><th>¬p</th></tr></thead>
+              <tbody>
+                <tr><td>T</td><td>T</td><td>T</td><td>F</td><td>F</td></tr>
+                <tr><td>T</td><td>F</td><td>F</td><td>T</td><td>F</td></tr>
+                <tr><td>F</td><td>T</td><td>T</td><td>F</td><td>T</td></tr>
+                <tr><td>F</td><td>F</td><td>T</td><td>T</td><td>T</td></tr>
+              </tbody>
+            </table>
+            <p>Premises true (p→q = T AND ¬q = T) only in row 4. In that row, ¬p = T. The conclusion is true in every row where both premises hold — only one such row exists here, and it confirms the conclusion. Valid.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t11-q">
+        <div class="inner-header" onclick="togI('t11-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q11a">
+            <div class="q-header" onclick="togQ('q11a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">Argument: "If the contract is valid, both parties are bound. The contract is valid. Therefore both parties are bound." Identify the inference pattern and assess validity.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Pattern: Modus Ponens. Valid.</strong></p>
+              <div class="notation">
+                p → q  (valid contract → both bound)<br>
+                p      (contract is valid)<br>
+                ∴ q    (both parties are bound)  ✓
+              </div>
+              <p>If the premises are true, the conclusion cannot be false. This is a sound argument if the contract is indeed valid.</p>
+              <div class="what-tests">Modus Ponens recognition · validity vs. soundness distinction</div>
+            </div>
+          </div>
+          <div class="question-block" id="q11b">
+            <div class="q-header" onclick="togQ('q11b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">Argument: "If evidence is obtained illegally, it is inadmissible. This evidence is inadmissible. Therefore it was obtained illegally." Identify the pattern, assess validity, and explain the practical danger of this reasoning.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Pattern: Affirming the Consequent. Invalid.</strong></p>
+              <div class="notation">
+                p → q  (illegal → inadmissible)<br>
+                q      (inadmissible)<br>
+                ∴ p    (therefore illegal)  ✗ Invalid
+              </div>
+              <p>Evidence may be inadmissible for many reasons other than illegal collection — hearsay, relevance, privilege, procedural defects. Assuming inadmissibility proves illegal collection conflates one sufficient cause with the only cause.</p>
+              <p><strong>Practical danger:</strong> A police officer who assumes inadmissibility implies illegal collection might wrongly conclude their colleagues acted unlawfully, or a prosecutor might improperly argue that challenging admissibility is equivalent to claiming the police acted illegally — chilling legitimate procedural challenges.</p>
+              <div class="what-tests">Affirming the Consequent · multiple sufficient causes · the practical consequences of confusing sufficient with necessary conditions</div>
+            </div>
+          </div>
+          <div class="question-block" id="q11c">
+            <div class="q-header" onclick="togQ('q11c')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A court reasons: "If a corporation is found liable for fraud, it must pay punitive damages. If it pays punitive damages, its directors face personal liability review. This corporation was found liable for fraud. What follows necessarily? What follows if punitive damages were not awarded despite the fraud finding?"</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                p → q  (fraud → punitive damages)<br>
+                q → r  (punitive damages → directors' review)<br>
+                p      (fraud finding confirmed)<br><br>
+                By Hypothetical Syllogism: p → r<br>
+                By Modus Ponens:          p is true ∴ r follows<br>
+                ∴ Directors face personal liability review  ✓
+              </div>
+              <p><strong>If punitive damages were not awarded despite fraud finding:</strong> This means p is true but q is false — which makes p→q false. The first premise is violated. This would represent either a legal error (the court failed to apply the mandatory rule) or a challenge to the rule itself. The chain p→q→r breaks at the first link, so r does not follow. Directors' review would not be triggered.</p>
+              <p><strong>Note:</strong> This situation — p true, q false — is precisely the scenario that would justify an appeal on the punitive damages ruling, because the first conditional is stated as mandatory ("must").</p>
+              <div class="what-tests">Hypothetical syllogism · modus ponens chain · what happens when an intermediate link breaks · appellate reasoning as logical chain repair</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q11d">
+            <div class="q-header" onclick="togQ('q11d')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Use a truth table to test validity: P1: p→q, P2: q→r, P3: p. Conclusion: r. Identify all rows where all three premises are true, and check whether r holds in every such row.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <table class="logic-table"><thead><tr><th>p</th><th>q</th><th>r</th><th>p→q</th><th>q→r</th><th>All P true?</th><th>r</th></tr></thead><tbody>
+              <tr><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td><td><strong>YES</strong></td><td>T ✓</td></tr>
+              <tr><td>T</td><td>T</td><td>F</td><td>T</td><td>F</td><td>No (P2 false)</td><td>—</td></tr>
+              <tr><td>T</td><td>F</td><td>T</td><td>F</td><td>T</td><td>No (P1 false)</td><td>—</td></tr>
+              <tr><td>T</td><td>F</td><td>F</td><td>F</td><td>T</td><td>No (P1 false)</td><td>—</td></tr>
+              <tr><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td><td>No (P3 false)</td><td>—</td></tr>
+              <tr><td>F</td><td>T</td><td>F</td><td>T</td><td>F</td><td>No</td><td>—</td></tr>
+              <tr><td>F</td><td>F</td><td>T</td><td>T</td><td>T</td><td>No (P3 false)</td><td>—</td></tr>
+              <tr><td>F</td><td>F</td><td>F</td><td>T</td><td>T</td><td>No (P3 false)</td><td>—</td></tr>
+              </tbody></table>
+              <p>Only row 1 has all three premises true. In that row, r=T. <strong>Valid.</strong> This is the named pattern "Hypothetical Syllogism + Modus Ponens" — the truth table confirms what the named pattern already tells us, but the table method works for any argument, named or not.</p>
+              <div class="what-tests">Full 8-row validity test · identifying all-premises-true rows · confirming the named pattern by table · the table method as fallback for unnamed patterns</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q11e">
+            <div class="q-header" onclick="togQ('q11e')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Identify the named fallacy and explain why the argument is invalid: "If the agreement was signed under duress, it is voidable. This agreement is voidable. Therefore it was signed under duress." What does this argument incorrectly assume about the relationship between the premises?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Pattern: p→q, q ∴ p. <strong>Affirming the Consequent — Invalid.</strong></p>
+              <p>The fallacy: the argument correctly states p→q (duress → voidable) and correctly observes q (the agreement is voidable). But it concludes p (duress) from these two premises — which is the converse of the given conditional, not the conditional itself. Voidability has multiple causes: misrepresentation, undue influence, incapacity, mistake. The fact that the agreement is voidable tells us it might have been signed under duress, but it is consistent with many other explanations.</p>
+              <p>What the argument incorrectly assumes: that duress is the only way an agreement becomes voidable — i.e., that q→p holds. This would require a biconditional (duress ↔ voidable), not just a one-way conditional. Without that, observing q leaves the cause of voidability entirely open.</p>
+              <div class="what-tests">Affirming the Consequent · the converse confusion · why voidability from q doesn't establish the specific cause p · the biconditional requirement to make the inference valid</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q11f">
+            <div class="q-header" onclick="togQ('q11f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Evaluate the validity of this argument using a truth table AND by identifying the named pattern: P1: "If the defendant had access to the system and had a financial motive, then they are a suspect." P2: "The defendant is not a suspect." P3: "The defendant had a financial motive." Conclusion: "The defendant did not have access to the system." (a) Formalise. (b) Run the validity test. (c) Identify the named pattern. (d) A prosecutor argues P3 (motive) is sufficient alone to establish suspicion. Evaluate this claim against P1's structure.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> A="had access," M="had financial motive," S="is a suspect." P1: (A∧M)→S. P2: ¬S. P3: M. Conclusion: ¬A.</p>
+              <p><strong>(b) Validity test:</strong> from P1 and P2 by modus tollens: ¬S → ¬(A∧M) = ¬A∨¬M. So either the defendant lacked access OR lacked motive (or both). From P3: M=T. Since ¬A∨¬M must hold and ¬M is false (M=T), we need ¬A=T. Therefore ¬A follows. <strong>Valid.</strong></p>
+              <p><strong>(c) Named pattern:</strong> Modus Tollens on the compound antecedent, combined with De Morgan's law and elimination of ¬M via P3. This is a two-step chain — not a single named pattern applied once, but a valid multi-step derivation.</p>
+              <p><strong>(d) Prosecutor's claim — "motive alone establishes suspicion":</strong> P1 is (A∧M)→S. This requires both access AND motive. Motive alone (M=T, A unknown) leaves the antecedent A∧M with an unresolved A component. If A=F, then A∧M=F → S is not established. The prosecutor's claim treats M as sufficient, but P1 makes it only necessary-in-conjunction — M is required but not sufficient on its own. This is exactly the "conjunction as sufficient" fallacy applied to P1's antecedent. P1 would need to read M→S (motive alone triggers suspicion) for the prosecutor's claim to be valid, which is a different and weaker trigger than the original rule.</p>
+              <div class="what-tests">Compound antecedent modus tollens · De Morgan on ¬(A∧M) · multi-step derivation · prosecutorial misreading of conjunction as sufficient-condition claim</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="inner-section" id="t11-bar">
+        <div class="inner-header" onclick="togI('t11-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>The six named inference patterns are the entire grammar of LSAT Logical Reasoning's "Flaw" question type — every wrong answer choice in a Flaw question is one of Affirming the Consequent or Denying the Antecedent dressed in different content, and recognising the pattern instantly is faster than re-deriving validity from a truth table under exam time pressure.</p>
+            <p>Multi-step statutory chains (p→q, q→r) are exactly how appellate arguments are built — a successful appeal often targets one broken link in a chain of conditionals rather than disputing the whole rule, which is precisely the "where does the chain break" analysis this topic trains.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 12: Mixed Application Problems -->
+  <div class="topic-card" id="t12" style="border-left-color: var(--c3)">
+    <div class="topic-header" onclick="tog('t12')">
+      <span class="lec-tag" style="background:var(--c3)">LEC 9</span>
+      <div class="topic-title">Tautologies, Contradictions &amp; Contingencies</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t12-lang">
+        <div class="inner-header" onclick="togI('t12-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>A <strong>tautology</strong> is a compound statement that is true in every possible situation — it cannot be made false. A <strong>contradiction</strong> is false in every situation — it cannot be made true. A <strong>contingency</strong> is sometimes true, sometimes false — it depends on the facts.</p>
+          <div class="notation">
+            <span class="hl">Tautology:</span>     p ∨ ¬p         — always true ("either raining or not")<br>
+            <span class="hl">Contradiction:</span>  p ∧ ¬p         — always false ("raining and not raining")<br>
+            <span class="hl">Contingency:</span>    p → q          — depends on p and q
+          </div>
+          <p>The practical importance: legal rules stated as tautologies are empty — they carry no information. Rules stated as contradictions are impossible to satisfy. Well-drafted rules are contingencies — they create real conditions that may or may not be satisfied.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t12-m">
+        <div class="inner-header" onclick="togI('t12-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Classification procedure:</span><br>
+            1. Build the full truth table for the compound statement<br>
+            2. Read the final column<br>
+            All T → tautology &nbsp;·&nbsp; All F → contradiction &nbsp;·&nbsp; Mix of T and F → contingency
+          </div>
+          <p>This is the same truth-table machinery from Topic 4, applied with a different goal — there you compared two columns for equivalence, here you're checking whether a single column is uniform or mixed. Any compound statement, however complex, reduces to one of exactly three categories once its full table is built; there's no fourth option.</p>
+        </div>
+      </div>
+      <div class="inner-section" id="t12-ex">
+        <div class="inner-header" onclick="togI('t12-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Classifying a Compound Statement by Table</div>
+            <p>Classify: (p → q) ∨ (q → p)</p>
+            <table class="logic-table">
+              <thead><tr><th>p</th><th>q</th><th>p→q</th><th>q→p</th><th>(p→q)∨(q→p)</th></tr></thead>
+              <tbody>
+                <tr><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+                <tr><td>T</td><td>F</td><td>F</td><td>T</td><td>T</td></tr>
+                <tr><td>F</td><td>T</td><td>T</td><td>F</td><td>T</td></tr>
+                <tr><td>F</td><td>F</td><td>T</td><td>T</td><td>T</td></tr>
+              </tbody>
+            </table>
+            <p>The final column is T in every row. <strong>Tautology.</strong> Notice this isn't obvious from looking at the statement alone — "p implies q, or q implies p" sounds like a substantive claim, but at least one direction of implication holds between any two propositions no matter what truth values they take, which is exactly why the table, not intuition, is the reliable test.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t12-q">
+        <div class="inner-header" onclick="togI('t12-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q12a">
+            <div class="q-header" onclick="togQ('q12a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">Classify each statement as tautology, contradiction, or contingency: (a) "Either the defendant is guilty or the defendant is not guilty." (b) "The defendant is guilty and the defendant is not guilty." (c) "If the defendant confessed, the defendant is guilty."</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                (a) p ∨ ¬p  →  Tautology — always true regardless of guilt<br>
+                (b) p ∧ ¬p  →  Contradiction — impossible, cannot be simultaneously guilty and not guilty<br>
+                (c) p → q   →  Contingency — true unless confession occurred without guilt (e.g. false confession)
+              </div>
+              <p><strong>Legal note on (c):</strong> A confession is strong evidence but not logically sufficient proof of guilt — false confessions occur. The statement is a contingency, not a tautology, because a world where someone confessed but was genuinely not guilty is logically possible.</p>
+              <div class="what-tests">Classification of compound statements · legal application of tautology and contradiction · why confession is not logically equivalent to guilt</div>
+            </div>
+          </div>
+          <div class="question-block" id="q12b">
+            <div class="q-header" onclick="togQ('q12b')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A legislative drafting error produces this clause: "A person is liable if they caused harm or they did not cause harm." A second clause reads: "A person is not liable if they both complied with regulations and did not comply with regulations." Identify the logical type of each clause, explain the practical legal consequence, and propose corrected drafting for each.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Clause 1:</strong> "Liable if H ∨ ¬H" — the condition is p ∨ ¬p, a tautology. It is always true, meaning the liability condition is always satisfied. Everyone is always liable under this clause. <strong>Practical consequence:</strong> Universal liability with no limiting condition — the clause is legally meaningless as a standard because it applies to everyone unconditionally.</p>
+              <p><strong>Clause 2:</strong> "Not liable if C ∧ ¬C" — the condition is p ∧ ¬p, a contradiction. It is never true, meaning the exemption condition can never be satisfied. No one can ever qualify for this exemption. <strong>Practical consequence:</strong> A dead letter exemption — it exists in the statute but cannot benefit anyone.</p>
+              <p><strong>Corrected drafting:</strong></p>
+              <div class="notation">
+                Clause 1: "A person is liable if they caused harm."<br>
+                          H → Liable  (contingency — applies only when harm occurred)<br><br>
+                Clause 2: "A person is not liable if they complied with regulations."<br>
+                          C → ¬Liable  (contingency — exemption available when compliance is shown)
+              </div>
+              <div class="what-tests">Tautology and contradiction in statutory drafting · practical legal consequences of each · corrective drafting as application of contingency · Tier 3 because it requires identifying the error, explaining the consequence, and producing corrected language</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t12-bar">
+        <div class="inner-header" onclick="togI('t12-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Drafting Connection</div>
+            <p>Tautological and contradictory clauses are a real, recurring drafting defect, not just a textbook curiosity — boilerplate language assembled from multiple templates without careful review regularly produces accidental tautologies (conditions that are always satisfied, making a supposed limitation meaningless) and accidental contradictions (exemptions that can never be triggered). Spotting these on a contract or statute review is a direct, billable application of this exact classification skill.</p>
+            <p>On the LSAT, a stimulus that contains a hidden tautology dressed as a substantive premise is a common "Flaw" pattern — the argument seems to rest on real information, but the premise is true no matter what, contributing nothing to the argument's actual support.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 13: Integrated Reasoning -->
+  <div class="topic-card" id="t13" style="border-left-color: var(--c3)">
+    <div class="topic-header" onclick="tog('t13')">
+      <span class="lec-tag" style="background:var(--c3)">LEC 10</span>
+      <div class="topic-title">Integrated Logic — Full Argument Analysis</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="t13-lang">
+        <div class="inner-header" onclick="togI('t13-lang')">
+          <span class="inner-label">Language First</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>This topic integrates everything from Lec. 1–9 into full argument analysis. The skill is: read a complex argument, identify its logical skeleton, test its validity, identify any fallacies, and evaluate what evidence would strengthen or weaken it.</p>
+          <p>The process in four steps:</p>
+          <div class="notation">
+            1. Identify the conclusion — what is the argument trying to establish?<br>
+            2. Identify the premises — what reasons are given?<br>
+            3. Identify the logical form — what inference pattern connects them?<br>
+            4. Test validity — if premises true, must conclusion follow?<br>
+               If not: name the flaw.
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t13-m">
+        <div class="inner-header" onclick="togI('t13-m')">
+          <span class="inner-label">Mechanics &amp; Notation</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <p>Integrated arguments are rarely a single named pattern — they're usually a <strong>chain</strong> of two or three patterns stacked together, sometimes with an unstated premise holding the chain together.</p>
+          <div class="notation">
+            <span class="hl">Finding an implicit premise:</span> if the stated premises don't logically reach the conclusion on their own, ask what additional statement, if assumed true, would close the gap. That missing statement is the implicit premise — and in legal argument, it's usually the most contestable part of the whole structure, precisely because it was never said out loud.<br><br>
+            <span class="hl">Finding the weakest link:</span> in a multi-premise chain, the argument is only as strong as its least defensible premise — locate the one premise that, if false, breaks the entire conclusion, and that's where a challenge should be aimed, not at premises that are already secure.
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t13-ex">
+        <div class="inner-header" onclick="togI('t13-ex')">
+          <span class="inner-label">Worked Example</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Full Four-Step Analysis</div>
+            <p>"Every licensed pharmacist must complete continuing education. Person D has not completed continuing education this year. Continuing education requirements only apply to active licence holders. Therefore Person D's licence must be inactive."</p>
+            <p><strong>Step 1 — conclusion:</strong> Person D's licence is inactive.</p>
+            <p><strong>Step 2 — premises:</strong> P1: ∀x, active(x) → must_CE(x). P2: ¬CE(D). P3 (restates P1's scope): CE requirement applies only to active licence holders.</p>
+            <p><strong>Step 3 — form:</strong> P1 + P2 looks like it should give Modus Tollens (¬must_CE(D) → ¬active(D))but P2 actually says ¬CE(D), not ¬must_CE(D) — not completing CE is not the same as not being required to.</p>
+            <p><strong>Step 4 — validity:</strong> <strong>Invalid as stated.</strong> The argument conflates "did not complete CE" with "was not required to complete CE." A licensed, active pharmacist who simply failed to comply with the requirement is indistinguishable, on this evidence alone, from one whose licence was never active in the first place. The conclusion needs an additional premise — evidence that Person D's non-compliance was due to inapplicability of the rule, not violation of it — which the argument as given does not supply.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t13-q">
+        <div class="inner-header" onclick="togI('t13-q')">
+          <span class="inner-label">Practice Questions</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="question-block" id="q13a">
+            <div class="q-header" onclick="togQ('q13a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">Analyse this argument: "All regulated industries must file annual compliance reports. This company is in a regulated industry. Yet it has not filed a compliance report. Therefore this company is in violation." Identify the form, assess validity, and identify what additional premise, if any, is needed.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                P1: ∀x, regulated(x) → must_file(x)<br>
+                P2: regulated(Company) = T<br>
+                P3: ¬filed(Company) = T<br>
+                C:  violation(Company) = T
+              </div>
+              <p>From P1 + P2 by Modus Ponens: must_file(Company) = T. Combined with P3 (¬filed): the company was required to file and did not. The conclusion follows — but requires one implicit premise: <strong>failing to do what is required constitutes a violation.</strong> This is reasonable and likely definitional, but should be stated explicitly for the argument to be fully sound.</p>
+              <div class="what-tests">Multi-premise argument · modus ponens chain · identifying implicit premises · full argument reconstruction</div>
+            </div>
+          </div>
+          <div class="question-block" id="q13b">
+            <div class="q-header" onclick="togQ('q13b')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A senior advocate argues: "No person should be punished twice for the same offence. This accused has already served a sentence for this act. Some argue a new statute creates a separate offence from the same act. But an offence that arises from the same act is the same offence. Therefore the new prosecution is barred." Reconstruct the full logical form, identify all premises (stated and implicit), assess validity, and identify the weakest link an opposing counsel should target.</span>
+              <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <div class="notation">
+                P1: ∀x, ∀o, punished(x,o) → ¬should_punish_again(x,o)  [double jeopardy rule]<br>
+                P2: punished(Accused, act_A) = T  [served sentence]<br>
+                P3: new_offence arises_from act_A  [prosecution's basis]<br>
+                P4 (implicit): ∀o, arises_from(o, act) → same_offence(o, act)  [advocate's key claim]<br>
+                C:  ¬should_prosecute(Accused) = T
+              </div>
+              <p><strong>Validity:</strong> If all premises including P4 are true, the conclusion follows by a chain of universal instantiation and modus ponens. The argument is logically valid given P4.</p>
+              <p><strong>The weakest link — P4.</strong> The advocate's implicit premise that "an offence arising from the same act is the same offence" is the entire weight-bearing beam of the argument. Opposing counsel should target it directly: different statutes may create distinct offences from the same act if they protect different legal interests, require different elements, or address different harms. This is the standard double jeopardy analysis in most jurisdictions — the Blockburger test (US) asks whether each offence requires proof of a fact the other does not, not merely whether they arise from the same act.</p>
+              <p><strong>Strategic implication:</strong> The prosecution should argue that P4 misstates the legal test, replacing "same act" with "same elements" as the correct criterion. This defeats the argument without challenging any of the other premises.</p>
+              <div class="what-tests">Full argument reconstruction · identifying implicit premises · locating the weakest logical link · double jeopardy as a logical structure · the difference between same act and same elements as a definitional precision problem · highest difficulty in Part 1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="t13-bar">
+        <div class="inner-header" onclick="togI('t13-bar')">
+          <span class="inner-label">Bar &amp; LSAT Lens</span>
+          <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>The four-step argument analysis process above is the LSAT Logical Reasoning method in full. Every question type — Strengthen, Weaken, Assumption, Flaw, Method of Reasoning — is a variant of steps 3 and 4. Mastering this on legal arguments builds the same skill the LSAT tests, in a richer context.</p>
+            <p>On the NY Bar, the MPT (Multistate Performance Test) requires you to analyse a legal argument from provided materials and produce a document responding to it. The quality of that response depends entirely on your ability to identify the argument's logical structure and its weakest link — then target it precisely.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="index.html">⌂ Home</a>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A0A8B0;">Part 1 of 4</span>
+  <a class="nav-link" href="qr2-part2-logic-in-action.html">Part 2 →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Part 1 · Logic Foundations · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id) { document.getElementById(id).classList.toggle('open'); }
+  function togI(id) { document.getElementById(id).classList.toggle('open'); }
+  function togQ(id) { document.getElementById(id).classList.toggle('open'); }
+  function expandAll() {
+    document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e => e.classList.add('open'));
+  }
+  function collapseAll() {
+    document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e => e.classList.remove('open'));
+  }
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>

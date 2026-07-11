@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Correlation &amp; Regression — Deep Treatment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--cr:#1A7A5E;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .data-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px;font-family:'JetBrains Mono',monospace;}
+  .data-table th{background:var(--ink);color:var(--page);font-size:11px;letter-spacing:0.04em;padding:8px 10px;text-align:center;font-weight:600;}
+  .data-table td{padding:8px 10px;border-bottom:1px solid var(--rule);text-align:center;}
+  .data-table tr:nth-child(even) td{background:#FAFAF8;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens p{font-size:14px;margin-top:8px;}
+  .bar-lens p:first-of-type{margin-top:0;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Correlation &amp; Regression — Deep Treatment</h1>
+  <div class="subtitle">4 topics · Pearson r · Simple &amp; Multiple Regression · Finals &amp; NY Bar scope</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Correlation &amp; Regression</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">4 topics · complete</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <div class="section-label">Pearson Correlation — Deep Treatment</div>
+
+  <!-- TOPIC 1: PEARSON CORRELATION -->
+  <div class="topic-card open" id="cr01" style="border-left-color:var(--cr)">
+    <div class="topic-header" onclick="tog('cr01')">
+      <span class="lec-tag" style="background:var(--cr)">TOPIC 1</span>
+      <div class="topic-title">Pearson Correlation — r, r², and What They Actually Mean</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="cr01-l">
+        <div class="inner-header" onclick="togI('cr01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Pearson's r answers one question: <strong>how tightly do two variables move together in a straight-line pattern?</strong> It compresses that answer into a single number between −1 and +1. Direction comes from the sign; strength comes from how close to 1 the absolute value is.</p>
+          <p>Three things r does <em>not</em> tell you, which exams routinely test by seeing if you'll claim otherwise:</p>
+          <div class="notation">
+            <span class="hl">r does NOT establish causation.</span> Association and causation are different claims requiring different evidence. r = 0.95 between two variables means they move together tightly — it says nothing about which causes which, or whether a third variable drives both.<br><br>
+            <span class="hl">r = 0 does NOT mean no relationship.</span> r measures linear association only. Two variables can have a perfect non-linear relationship (U-shaped, exponential) and produce r ≈ 0. Always plot the data before concluding "no relationship."<br><br>
+            <span class="hl">r is unit-free.</span> If X is in hours and Y is in rupees, r is still between −1 and +1 — the units cancel out entirely in the formula. A strong r in one unit system is the same strength in any other.
+          </div>
+          <p><strong>r²</strong> is the coefficient of determination — arguably more practically useful than r itself. It answers: <em>what fraction of the variation in Y is accounted for by the linear relationship with X?</em> If r = 0.90, then r² = 0.81, meaning 81% of Y's spread is explained by X. The remaining 19% comes from other factors the model doesn't capture.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">The Most Tested Interpretation Error</div>
+            <p>"r² = 0.81 means the model explains 81% of the data." Wrong on two counts. First, r² explains variation in Y, not "the data" as a whole. Second, the unexplained 19% is not error — it's simply variation in Y that other variables (not X) explain. Saying "81% explained" without naming what's unexplained is the half-truth every expert report uses and every competent opposing lawyer should catch.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr01-m">
+        <div class="inner-header" onclick="togI('cr01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Pearson r formula:</span><br>
+            r = [n·Σxy − Σx·Σy] / √{[n·Σx² − (Σx)²] · [n·Σy² − (Σy)²]}<br><br>
+            <span class="hl">Computation table — build these 5 columns first:</span><br>
+            x &nbsp;|&nbsp; y &nbsp;|&nbsp; xy &nbsp;|&nbsp; x² &nbsp;|&nbsp; y²<br>
+            Then sum each column: Σx, Σy, Σxy, Σx², Σy²<br><br>
+            <span class="hl">Strength thresholds (general guidance, not universal law):</span><br>
+            |r| ≥ 0.90 → very strong &nbsp;·&nbsp; 0.70–0.89 → strong<br>
+            0.50–0.69 → moderate &nbsp;·&nbsp; 0.30–0.49 → weak<br>
+            |r| &lt; 0.30 → very weak or negligible<br><br>
+            <span class="hl">r² = r × r</span> — coefficient of determination<br>
+            Interpreted as: proportion of variation in Y explained by X<br><br>
+            <span class="hl">Sign rules:</span><br>
+            Positive r → as X increases, Y tends to increase<br>
+            Negative r → as X increases, Y tends to decrease<br>
+            r = +1 or −1 → all points lie exactly on a straight line (perfect linear)
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr01-ex">
+        <div class="inner-header" onclick="togI('cr01-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Full r Computation — Legal Aid Hours vs Client Outcome Score</div>
+            <table class="data-table">
+              <tr><th>Hours (X)</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+              <tr><th>Score (Y)</th><td>40</td><td>55</td><td>58</td><td>68</td><td>72</td><td>80</td></tr>
+            </table>
+            <div class="notation">
+              Step 1 — Build the computation table:<br>
+              Σx = 21 &nbsp;·&nbsp; Σy = 373 &nbsp;·&nbsp; Σxy = 1436 &nbsp;·&nbsp; Σx² = 91 &nbsp;·&nbsp; Σy² = 24197 &nbsp;·&nbsp; n = 6<br><br>
+              Step 2 — Compute numerator:<br>
+              n·Σxy − Σx·Σy = 6(1436) − 21(373) = 8616 − 7833 = <strong>783</strong><br><br>
+              Step 3 — Compute denominator terms:<br>
+              n·Σx² − (Σx)² = 6(91) − 441 = 546 − 441 = 105<br>
+              n·Σy² − (Σy)² = 6(24197) − 139129 = 145182 − 139129 = 6053<br>
+              √(105 × 6053) = √635565 ≈ 797.2<br><br>
+              Step 4 — r = 783 / 797.2 ≈ <strong>0.9822</strong><br>
+              Step 5 — r² = 0.9822² ≈ <strong>0.9647</strong>
+            </div>
+            <p><strong>Interpretation:</strong> r = 0.98 — very strong positive linear association. As legal aid hours increase, client outcome scores rise almost in lockstep.</p>
+            <p><strong>r² = 0.9647:</strong> 96.5% of the variation in client outcome scores is accounted for by hours of legal aid. The remaining 3.5% reflects factors the model doesn't capture — lawyer quality, case complexity, client cooperation.</p>
+            <p><strong>What r does NOT say here:</strong> it doesn't prove more hours cause better outcomes. More capable lawyers might handle more complex cases that need more hours and also produce better outcomes regardless of hours. The causal claim needs additional evidence — r alone never provides it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr01-q">
+        <div class="inner-header" onclick="togI('cr01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qcr01a">
+            <div class="q-header" onclick="togQ('qcr01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">An expert report states: "r = 0.87 between a defendant's pollution discharges and local respiratory illness rates. This proves the discharges caused the illness." Identify every error in this conclusion.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Error 1 — Causation from correlation:</strong> r = 0.87 establishes strong positive linear association, not causation. A third variable (industrial activity in general, population density near both the plant and healthcare facilities) could drive both discharges and illness rates simultaneously.</p><p><strong>Error 2 — Reverse causation not excluded:</strong> while biologically implausible here, the statistical evidence alone doesn't structurally rule it out — a complete causal argument requires a plausible mechanism and controlled comparison, neither of which r provides.</p><p><strong>Error 3 — Linear-only scope:</strong> r = 0.87 means the linear component of the relationship is strong, but it doesn't characterise the full relationship. If the true dose-response curve is non-linear (as many toxicological relationships are), r understates or overstates the true association depending on the curvature.</p><div class="what-tests">Three distinct r-misuse errors · causation/association distinction · lurking variable · linear-only scope of r</div></div>
+          </div>
+
+          <div class="question-block" id="qcr01b">
+            <div class="q-header" onclick="togQ('qcr01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A study of 50 employees finds r = 0.12 between years of experience and performance rating. A manager argues this means "experience has no effect on performance." What does r = 0.12 actually establish, and what does it not establish?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>What r = 0.12 establishes:</strong> a very weak positive linear association between experience and performance in this sample — knowing an employee's years of experience provides almost no predictive value for their performance rating along a straight-line model.</p><p><strong>What it does not establish:</strong> (1) that experience has no effect — the relationship might be non-linear (e.g., performance improves steeply in early years, then plateaus — a curved shape that produces near-zero r even while the real effect is substantial). (2) That the finding holds beyond this sample. (3) That other types of relationship (threshold effects, interaction with job type) don't exist. The manager's "no effect" claim goes beyond what r = 0.12 can support.</p><div class="what-tests">Near-zero r ≠ no relationship · non-linear alternatives · scope limits of r as evidence</div></div>
+          </div>
+
+          <div class="question-block" id="qcr01c">
+            <div class="q-header" onclick="togQ('qcr01c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Two datasets both produce r = 0.75. Dataset A has n = 8 pairs; Dataset B has n = 80 pairs. Should you treat these two correlations with equal confidence? Explain the relevant principle without computing any significance test.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>No — equal r does not mean equal reliability.</strong> The same r value from a small sample is far more likely to be a chance occurrence than the same r from a large sample. With n=8, a single unusual data point can substantially inflate r; with n=80, the influence of any single point is diluted across 79 others. Dataset B's r=0.75 is backed by far more evidence and is correspondingly more trustworthy as a description of the underlying population relationship.</p><p>This is why statistical significance testing for r (not examinable here computationally, but conceptually important) always incorporates n — the same r can be statistically significant at n=80 and not significant at n=8. In evidentiary terms: a correlation based on 8 observations should be held to a higher burden of corroboration than one based on 80.</p><div class="what-tests">Sample size and reliability of r · why equal r values carry different evidential weight · conceptual foundation of significance without computation</div></div>
+          </div>
+
+          <div class="question-block" id="qcr01d">
+            <div class="q-header" onclick="togQ('qcr01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Compute r for the following data on inspection frequency (X) and compliance rate (Y): X = 2, 4, 6, 8, 10 and Y = 60, 70, 75, 85, 90. Interpret r and r² fully.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>n=5, Σx=30, Σy=380, Σxy=2420, Σx²=220, Σy²=29350</p><p>Numerator: 5(2420) − 30(380) = 12100 − 11400 = 700</p><p>Denominator: √[(5×220 − 900)(5×29350 − 144400)] = √[(200)(2350)] = √470000 ≈ 685.6</p><p>r = 700/685.6 ≈ <strong>0.9790</strong> · r² ≈ <strong>0.9584</strong></p><p><strong>Interpretation:</strong> Very strong positive linear association — compliance rates rise consistently with inspection frequency. r² = 0.9584 means 95.8% of the variation in compliance rates is accounted for by inspection frequency in this dataset. The remaining 4.2% reflects other factors: industry type, penalty severity, firm size, internal compliance culture.</p><div class="what-tests">Full r computation from raw data · r and r² interpretation · identifying what the unexplained variance means</div></div>
+          </div>
+
+          <div class="question-block" id="qcr01e">
+            <div class="q-header" onclick="togQ('qcr01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A plaintiff's expert reports r = 0.91 between a pharmaceutical firm's promotional spending and opioid prescription rates across 40 counties, claiming this demonstrates the marketing campaign caused the opioid crisis in those counties. As defence counsel: (a) identify the statistical limitations of using r as causal evidence; (b) propose two alternative explanations consistent with r = 0.91; (c) explain what additional evidence would be needed to support a causal claim at the standard required in civil litigation.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a) Statistical limitations:</strong> r = 0.91 establishes a very strong positive linear association but cannot establish causation for three reasons. First, r provides no directional evidence — it is symmetric (r(X,Y) = r(Y,X)), so the association is equally consistent with the inverse claim. Second, r doesn't control for confounders — counties with high promotional spending may systematically differ from low-spending counties in ways that independently predict prescription rates (physician density, poverty rates, pre-existing chronic pain prevalence). Third, r is an aggregate statistic across 40 counties — it describes a county-level pattern, which cannot automatically be attributed to individual-level causal mechanisms without committing the ecological fallacy.</p><p><strong>(b) Two alternative explanations consistent with r = 0.91:</strong> (i) Common cause — pharmaceutical firms deliberately targeted high-prescription counties with more marketing spend, meaning high prescription rates preceded and caused higher spending, not the reverse; the direction of causation is opposite to the plaintiff's claim. (ii) Lurking variable — counties with older populations have both higher chronic pain rates (driving prescriptions) and larger medical markets (attracting promotional spending), so age structure drives both variables simultaneously.</p><p><strong>(c) Evidence needed for civil causal standard ("more likely than not"):</strong> a controlled study or quasi-experimental design isolating the marketing effect after holding confounders constant; a plausible biological/behavioural mechanism linking exposure to promotional material to prescribing decisions (not just a correlation between county aggregates); temporal ordering evidence showing promotional spending preceded prescription rate increases in the same counties; and ideally a dose-response relationship — counties with more spending showing proportionally higher prescription increases — which would be consistent with causation in a way a single cross-sectional r cannot demonstrate.</p><div class="what-tests">Ecological fallacy · reverse causation · confounders in aggregate correlations · what a civil causal standard requires beyond statistical association · cross-examination of pharmaceutical expert testimony</div></div>
+          </div>
+
+          <div class="question-block" id="qcr01f">
+            <div class="q-header" onclick="togQ('qcr01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Dataset A: r = 0.95 between study hours and test scores for 30 students. Dataset B: r = −0.05 between shoe size and test scores for the same 30 students. An education researcher claims Dataset A proves tutoring programmes cause score improvements, and Dataset B proves shoe size is irrelevant to academic performance. Evaluate both claims precisely using only what r can and cannot establish.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Dataset A claim — "proves causation":</strong> Wrong. r = 0.95 establishes a very strong positive linear association, not causation. Students who study more might simply be more motivated, and motivation independently drives both study hours and scores — a classic lurking variable. Alternatively, more capable students may find studying easier and also perform better, reversing the implied causal direction. A tutoring programme's causal effectiveness would require a randomised controlled trial, not an observational correlation however strong.</p><p><strong>Dataset B claim — "shoe size is irrelevant":</strong> This claim is actually better supported than Dataset A's, but still overstated. r = −0.05 establishes that there is essentially no linear association between shoe size and test scores in this sample. This is consistent with shoe size being irrelevant — but r cannot rule out a non-linear association (no plausible mechanism exists for one, but r wouldn't detect it if it did). More precisely: r = −0.05 means shoe size provides essentially zero linear predictive value for test scores in this dataset, which is strong evidence of irrelevance but not logical proof of it.</p><p><strong>The asymmetry worth noting:</strong> r close to ±1 is necessary but not sufficient for a causal claim (strong association is required for causation but doesn't prove it). r close to 0 is strong evidence against a strong linear causal relationship but doesn't logically preclude all possible relationships. This asymmetry — r can weakly support irrelevance but cannot strongly support causation — is exactly what makes r a useful screening tool but an inadequate final evidentiary argument.</p><div class="what-tests">Causation vs association revisited · near-zero r as evidence of irrelevance · the asymmetry between what strong r and weak r actually establish · evaluating two claims with different inferential standards</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr01-bar">
+        <div class="inner-header" onclick="togI('cr01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Expert Evidence &amp; Daubert Standard</div>
+            <p>Under Daubert and its progeny, courts act as gatekeepers for scientific expert testimony. Correlation evidence alone — however strong — routinely fails Daubert's reliability prong when offered to establish causation, because the methodological leap from r to causation is not scientifically accepted without controlling for confounders. A lawyer who can articulate precisely why r ≠ causation, and name the specific confounders the expert failed to control, constructs the most effective Daubert challenge available against a correlation-based expert report.</p>
+            <p>r² appears on the NY Bar in the context of regression-based damages testimony — understanding that r² = 0.80 means 20% of harm variation is unexplained by the model is the foundation for challenging any damages figure that treats the model's prediction as if it were exact.</p>
+            <p>On the LSAT, the causation/correlation distinction drives an entire recurring question family: stimulus presents a correlation study, conclusion claims causation, correct answer either names the alternative explanation or identifies the missing controlled experiment. Recognising the pattern in one read is a direct, high-yield payoff of this topic.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-label">Simple Linear Regression — Full Treatment</div>
+
+  <!-- TOPIC 2: SIMPLE LINEAR REGRESSION -->
+  <div class="topic-card" id="cr02" style="border-left-color:var(--cr)">
+    <div class="topic-header" onclick="tog('cr02')">
+      <span class="lec-tag" style="background:var(--cr)">TOPIC 2</span>
+      <div class="topic-title">Simple Linear Regression — Computation, Residuals &amp; Prediction</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="cr02-l">
+        <div class="inner-header" onclick="togI('cr02-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Correlation tells you <em>whether</em> two variables are linearly related and how strongly. Regression goes further: it gives you the <strong>specific line</strong> that best summarises that relationship, so you can use X to predict Y for values you haven't observed.</p>
+          <p>"Best" has a precise meaning: the regression line minimises the sum of squared vertical distances between each data point and the line. These distances are called <strong>residuals</strong> — the gap between what actually happened (Y) and what the line predicted (Ŷ). A large residual means the line got that point badly wrong; a small residual means it got it nearly right.</p>
+          <div class="notation">
+            <span class="hl">The regression equation:</span> Ŷ = b₀ + b₁X<br>
+            b₁ = slope — how much Y changes per unit increase in X<br>
+            b₀ = intercept — predicted Y when X = 0<br><br>
+            <span class="hl">Residual for observation i:</span> eᵢ = Yᵢ − Ŷᵢ<br>
+            Positive residual → actual Y is above the line (line underestimated)<br>
+            Negative residual → actual Y is below the line (line overestimated)<br>
+            Sum of all residuals = 0 (always, by construction of least squares)
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">Interpolation vs Extrapolation — The Line You Must Draw</div>
+            <p>Interpolation: predicting Y for an X value within the range of your data — generally reliable, line is supported by nearby observations. Extrapolation: predicting Y for an X value outside the data range — the line has no support there, the relationship may change shape, and predictions can be wildly wrong or physically impossible. A regression model fitted on data from X=5 to X=50 has no business predicting at X=200 — but it will compute a number anyway, which is how expert reports produce absurd figures that look precise.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr02-m">
+        <div class="inner-header" onclick="togI('cr02-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Slope formula:</span><br>
+            b₁ = [n·Σxy − Σx·Σy] / [n·Σx² − (Σx)²]<br><br>
+            <span class="hl">Intercept formula:</span><br>
+            b₀ = ȳ − b₁x̄<br><br>
+            <span class="hl">Prediction:</span> substitute any X value into Ŷ = b₀ + b₁X<br><br>
+            <span class="hl">Residual for each data point:</span> eᵢ = Yᵢ − (b₀ + b₁Xᵢ)<br><br>
+            <span class="hl">Full computation procedure:</span><br>
+            1. Build the 5-column table: x, y, xy, x², y²<br>
+            2. Sum all five columns<br>
+            3. Compute b₁ using the slope formula<br>
+            4. Compute x̄ and ȳ, then b₀ = ȳ − b₁x̄<br>
+            5. Write the equation: Ŷ = b₀ + b₁X<br>
+            6. Check: compute Ŷ for each X, subtract from Y — residuals should sum to ≈ 0<br><br>
+            <span class="hl">Note on b₁ and r:</span> b₁ shares its numerator with r. Both measure the same underlying relationship — b₁ tells you the slope in original units, r tells you the standardised strength. A steep b₁ does not mean strong r (scatter around a steep line can be huge); a small b₁ does not mean weak r (tight scatter around a near-flat line is still a strong correlation).
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr02-ex">
+        <div class="inner-header" onclick="togI('cr02-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Full Regression — Monthly Ad Spend vs Revenue (8 Months)</div>
+            <table class="data-table">
+              <tr><th>Spend Rs'000 (X)</th><td>5</td><td>10</td><td>15</td><td>20</td><td>25</td><td>30</td><td>35</td><td>40</td></tr>
+              <tr><th>Revenue Rs'000 (Y)</th><td>120</td><td>145</td><td>170</td><td>200</td><td>220</td><td>255</td><td>280</td><td>310</td></tr>
+            </table>
+            <div class="notation">
+              n=8 · Σx=180 · Σy=1700 · Σxy=43950 · Σx²=5100 · Σy²=392250<br>
+              x̄=22.5 · ȳ=212.5<br><br>
+              b₁ = [8(43950)−180(1700)] / [8(5100)−180²]<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;= [351600−306000] / [40800−32400]<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;= 45600 / 8400 ≈ <strong>5.4286</strong><br><br>
+              b₀ = 212.5 − 5.4286(22.5) ≈ 212.5 − 122.14 ≈ <strong>90.36</strong><br><br>
+              Regression equation: <strong>Ŷ = 90.36 + 5.4286X</strong>
+            </div>
+            <p><strong>Interpreting b₁ = 5.4286:</strong> each additional Rs. 1,000 in monthly advertising spend is associated with approximately Rs. 5,429 in additional revenue, on average, within this data range.</p>
+            <p><strong>Interpreting b₀ = 90.36:</strong> the model predicts Rs. 90,360 in revenue at zero advertising spend — this is the y-intercept, not necessarily a reliable real-world prediction for X=0 since the data starts at X=5, not X=0. Extrapolating back to X=0 assumes the linear relationship holds all the way there, which is unverified.</p>
+            <p><strong>Residual check (first two points):</strong> At X=5: Ŷ = 90.36+5.4286(5) = 117.5, actual Y=120, residual = +2.5 (line underestimated). At X=10: Ŷ = 90.36+5.4286(10) = 144.6, actual Y=145, residual = +0.4 (very close). Small residuals confirm a good fit.</p>
+            <p><strong>Prediction at X=45 (extrapolation):</strong> Ŷ = 90.36+5.4286(45) ≈ 334.6. This is outside the fitted range (5–40) — treat as a rough extrapolation, not a reliable forecast.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr02-q">
+        <div class="inner-header" onclick="togI('cr02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qcr02a">
+            <div class="q-header" onclick="togQ('qcr02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A regression of case preparation time (X, hours) on settlement value (Y, Rs. lakhs) gives Ŷ = 12.5 + 3.2X. Interpret b₀ and b₁, predict the settlement value at 20 hours preparation, and flag any concern about this prediction.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>b₀ = 12.5:</strong> the model predicts Rs. 12.5 lakh in settlement value at zero preparation time — a baseline before any preparation-related effect. Whether this is meaningful depends on whether zero preparation is within the observed data range.</p><p><strong>b₁ = 3.2:</strong> each additional hour of preparation is associated with Rs. 3.2 lakh more in settlement value, on average, within the range the model was fitted on.</p><p><strong>Prediction at X=20:</strong> Ŷ = 12.5 + 3.2(20) = 12.5 + 64 = <strong>Rs. 76.5 lakh.</strong></p><p><strong>Concern:</strong> without knowing the original data's X range, this prediction could be interpolation (reliable) or extrapolation (unreliable). If case preparation in the dataset only ranged from 2–15 hours, X=20 is extrapolation and the Rs. 76.5 lakh figure should be held with appropriate scepticism.</p><div class="what-tests">Slope and intercept interpretation · prediction computation · extrapolation risk identification</div></div>
+          </div>
+
+          <div class="question-block" id="qcr02b">
+            <div class="q-header" onclick="togQ('qcr02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">From the data: X = 1, 3, 5, 7, 9 and Y = 10, 22, 30, 40, 50. Compute b₁ and b₀, write the regression equation, and compute the residual for the point (5, 30).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>n=5, Σx=25, Σy=152, Σxy=892, Σx²=165, x̄=5, ȳ=30.4</p><p>b₁ = [5(892)−25(152)] / [5(165)−625] = [4460−3800]/[825−625] = 660/200 = <strong>3.3</strong></p><p>b₀ = 30.4 − 3.3(5) = 30.4 − 16.5 = <strong>13.9</strong></p><p>Equation: <strong>Ŷ = 13.9 + 3.3X</strong></p><p>Residual at (5,30): Ŷ = 13.9+3.3(5) = 30.4 · e = 30−30.4 = <strong>−0.4</strong> (actual slightly below the line).</p><div class="what-tests">Full b₁ and b₀ computation · writing the equation · computing and interpreting a residual</div></div>
+          </div>
+
+          <div class="question-block" id="qcr02c">
+            <div class="q-header" onclick="togQ('qcr02c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A regression model of monthly income (X, Rs. thousands) on monthly savings (Y, Rs. thousands) is fitted on a sample of households earning Rs. 30,000–Rs. 80,000/month. A policymaker uses it to predict savings for a household earning Rs. 5,000/month. What is wrong with this, and how should the limitation be communicated in a policy brief?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>What is wrong:</strong> Rs. 5,000 is far outside the model's fitted range (30–80 thousand). This is extrapolation — the model was built from data on middle-to-upper-income households, and the linear relationship between income and savings observed in that range may not hold at very low incomes. At Rs. 5,000, households might have negative savings (dis-saving), a floor effect, or a fundamentally different savings-income relationship driven by survival spending rather than discretionary choice.</p><p><strong>How to communicate in a policy brief:</strong> "The model was estimated on households earning Rs. 30,000–80,000/month. The predicted savings figure of Rs. X for a Rs. 5,000/month household is an extrapolation outside this range and should not be treated as a reliable estimate. Low-income savings behaviour may follow different patterns requiring a separate model fitted on data from that income segment."</p><div class="what-tests">Extrapolation risk · communicating model limitations to non-technical decision-makers · why the same linear relationship may not hold across the full income distribution</div></div>
+          </div>
+
+          <div class="question-block" id="qcr02d">
+            <div class="q-header" onclick="togQ('qcr02d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">A regression gives Ŷ = 5 + 2X with r² = 0.92. For the observation (X=10, Y=28), compute the residual, state whether the line overestimated or underestimated, and explain what r² = 0.92 tells you about this model's overall fit.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Ŷ at X=10: Ŷ = 5+2(10) = 25</p><p>Residual: e = 28−25 = <strong>+3</strong></p><p><strong>Interpretation:</strong> the line underestimated — actual Y (28) was 3 units above the predicted value (25). A positive residual always means underestimation.</p><p><strong>r² = 0.92:</strong> 92% of the variation in Y across the dataset is accounted for by the linear relationship with X. The remaining 8% is variation in Y that this model doesn't explain — attributable to variables not included in the model, measurement error, or genuine randomness. Despite the positive residual at this particular point, the overall model fits the data well (92% explained variation is high).</p><div class="what-tests">Residual computation · over/underestimation interpretation · r² as overall fit measure · reconciling a local miss (one positive residual) with global fit (high r²)</div></div>
+          </div>
+
+          <div class="question-block" id="qcr02e">
+            <div class="q-header" onclick="togQ('qcr02e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A damages expert regresses lost profits (Y, in Rs. crore) on defendant's market share (X, in %) for 12 quarters, obtaining Ŷ = −8.2 + 1.4X with r² = 0.88. The defendant's market share ranged from 15%–35% in the data period. The expert predicts lost profits at the defendant's current market share of 45%, claiming the plaintiff lost Rs. 54.8 crore. (a) Compute this prediction. (b) Identify the methodological problem. (c) Explain how you would challenge the Rs. 54.8 crore figure in a damages hearing, using specific statistical grounds.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Ŷ = −8.2 + 1.4(45) = −8.2 + 63 = <strong>Rs. 54.8 crore</strong> — confirming the expert's arithmetic.</p><p><strong>(b) Methodological problem:</strong> 45% market share is outside the fitted data range of 15%–35%. This is extrapolation — the regression line has no observational support at X=45. The linear relationship observed between 15% and 35% market share may not continue linearly to 45%. In fact, at high market shares, competitive dynamics often change qualitatively (saturation effects, regulatory scrutiny, different competitive responses), making a simple extrapolation of a lower-share linear trend particularly unreliable.</p><p><strong>(c) Challenge at damages hearing:</strong> First, the expert's model was fitted on data from X=15 to X=35 — the prediction at X=45 is an extrapolation 10 percentage points beyond the most extreme observation, a 29% overshoot of the data boundary. Second, r²=0.88 describes the model's fit within the observed range — it provides no information about predictive accuracy outside that range. Third, the linear relationship may not persist: at market shares above 35%, the defendant's incremental market gains may have come from segments where the plaintiff was not competing, reducing the actual loss-per-share-point below the model's b₁=1.4. The plaintiff must provide independent evidence — not just the extrapolated line — that the relationship holds at 45%.</p><div class="what-tests">Computing a prediction · identifying extrapolation precisely (how far outside the range) · why r² says nothing about extrapolation reliability · constructing a specific three-point statistical challenge at a damages hearing</div></div>
+          </div>
+
+          <div class="question-block" id="qcr02f">
+            <div class="q-header" onclick="togQ('qcr02f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">In an employment discrimination case, a regression of salary (Y) on years of experience (X) for 60 employees gives Ŷ = 45 + 2.5X, r² = 0.65. A female employee with 12 years of experience earns Rs. 62,000. (a) What does the model predict she should earn? (b) Compute her residual. (c) The plaintiff's lawyer argues the negative residual proves discrimination. The defence argues r² = 0.65 means the model "doesn't fit well enough to draw conclusions." Evaluate both arguments using the statistics, and explain what the residual and r² actually establish and fail to establish here.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Ŷ = 45 + 2.5(12) = 45 + 30 = <strong>Rs. 75,000</strong></p><p><strong>(b)</strong> Residual = 62,000 − 75,000 = <strong>−Rs. 13,000</strong> (she earns Rs. 13,000 below the model's prediction).</p><p><strong>(c) Evaluating the plaintiff's argument:</strong> the negative residual means she earns less than the experience-based model predicts — that is a real and meaningful gap. However, the residual alone does not prove discrimination for two reasons. First, the model only controls for experience; salary may legitimately vary by role, department, education, or performance — all unconsidered. An employee in a lower-paying role with 12 years of experience may have a negative residual with no discrimination involved. Second, many employees have negative residuals in any regression (by construction, roughly half do) — the relevant question is whether female employees systematically have larger negative residuals than male employees with equivalent characteristics, which requires comparing residuals across groups, not pointing to one individual's residual.</p><p><strong>Evaluating the defence's argument:</strong> r²=0.65 does mean 35% of salary variation is unexplained, which is legitimate grounds for noting the model is imperfect. However, "doesn't fit well enough to draw conclusions" is too strong — r²=0.65 is moderate but not negligible, and a court routinely admits evidence from imperfect models. The more precise defence argument is that the unexplained 35% likely includes legitimate pay-differentiating factors (role, performance) that are not captured in a simple experience-only regression, meaning the gap could be fully explained by these omitted variables.</p><div class="what-tests">Prediction and residual computation · what a negative residual establishes and fails to establish · systematic vs individual residual analysis · evaluating both counsel's statistical arguments · why a simple bivariate regression is insufficient for employment discrimination analysis</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="cr02-bar">
+        <div class="inner-header" onclick="togI('cr02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Damages Testimony &amp; Employment Law</div>
+            <p>Regression is the workhorse of damages quantification in US federal litigation — antitrust, securities fraud, employment discrimination, patent infringement, and environmental harm cases all routinely rely on regression-based expert testimony. The cross-examination skills this topic builds — extrapolation identification, residual interpretation, and r² scope limitation — are among the most directly transferable quantitative skills from an academic QR course to actual courtroom practice.</p>
+            <p>The EEOC's own technical manual for employment discrimination cases specifies regression analysis as the preferred statistical tool for detecting systematic pay disparities. Understanding what a bivariate regression can and cannot establish (versus a properly-controlled multiple regression) is the foundation for evaluating whether a plaintiff's or defendant's statistical expert has actually run the right model.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="section-label">Regression Output Interpretation</div>
+
+  <!-- TOPIC 3: READING REGRESSION OUTPUT -->
+  <div class="topic-card" id="cr03" style="border-left-color:var(--cr)">
+    <div class="topic-header" onclick="tog('cr03')">
+      <span class="lec-tag" style="background:var(--cr)">TOPIC 3</span>
+      <div class="topic-title">Reading Regression Output — What the Numbers in a Table Mean</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="cr03-l">
+        <div class="inner-header" onclick="togI('cr03-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>In real litigation, regression results arrive as a <strong>table</strong> produced by software — not raw numbers to compute by hand. Reading that table correctly is what happens in depositions, hearings, and briefs. A lawyer who can run the computation but can't read the output is only half-equipped.</p>
+          <div class="notation"><span class="hl">Key table quantities:</span><br>Coefficient (b₀, b₁) — intercept and slope, same as computed by hand<br>R² — proportion of Y variation explained<br>SE (standard error of estimate) — average prediction error in original Y units<br>p-value for each coefficient — is the slope likely to be zero by chance? (p &lt; 0.05 = significant)<br>Data range — any prediction outside it is extrapolation</div>
+          <div class="pattern-warn"><div class="pw-label">Statistical Significance ≠ Practical Importance</div><p>p=0.001 means the slope is very unlikely to be zero — but b₁=0.003 is still practically trivial. Conversely, a large effect with p=0.12 might be worth investigating with more data. Significance and importance are two separate judgments.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr03-m">
+        <div class="inner-header" onclick="togI('cr03-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">Reading a table — check in this order:</span><br>1. What is X and Y? (units matter)<br>2. What is R²? (fraction of Y explained)<br>3. What is b₁ and its sign?<br>4. Is b₁ statistically significant? (p-value)<br>5. What is SE? (typical prediction error in Y units)<br>6. What was the X range? (extrapolation check)</div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr03-ex">
+        <div class="inner-header" onclick="togI('cr03-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Reading a Salary Regression Table</div>
+          <table class="data-table">
+            <tr><th>Variable</th><th>Coefficient</th><th>Std Error</th><th>p-value</th></tr>
+            <tr><td>Intercept</td><td>380.0</td><td>12.4</td><td>0.000</td></tr>
+            <tr><td>Years of Service</td><td>18.5</td><td>1.8</td><td>0.000</td></tr>
+          </table>
+          <p>R²=0.74 · SE=28.3 · n=45 · Data range: X=1–20 years</p>
+          <div class="notation">Equation: Ŷ = 380 + 18.5X<br>b₁=18.5 → each extra year adds Rs.18,500 salary on average<br>p=0.000 → highly significant, very unlikely to be chance<br>R²=0.74 → 74% of salary variation explained; 26% from other factors<br>SE=28.3 → predictions typically off by ±Rs.28,300<br><br>At X=15 (within range): Ŷ=380+18.5(15)=657.5 → Rs.657,500 · reliable<br>At X=25 (extrapolation): Ŷ=842.5 → outside 1–20 range · unreliable</div></div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr03-q">
+        <div class="inner-header" onclick="togI('cr03-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qcr03a">
+            <div class="q-header" onclick="togQ('qcr03a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Output: Intercept=50, Coefficient on X=3.2, R²=0.55, p(slope)=0.003, SE=15. X=monthly legal hours billed, Y=client satisfaction (out of 100). State the equation, predict Y at X=20, and interpret R² and SE together.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Equation: Ŷ = 50 + 3.2X. At X=20: Ŷ = 50+64 = <strong>114</strong> — exceeds the 100-point scale, suggesting X=20 may be outside the data range or the model breaks down at high billing hours (ceiling effect). Flag as potential extrapolation.</p><p>R²=0.55: 55% of satisfaction variation explained by billing hours; 45% from other factors (responsiveness, outcomes, communication). SE=15: predictions typically off by ±15 points on a 100-point scale — a predicted score of 82 has a realistic range of 67–97. The model should not claim precision beyond ±15 points.</p><div class="what-tests">Table reading · prediction · ceiling-effect flag · joint R²/SE interpretation</div></div>
+          </div>
+          <div class="question-block" id="qcr03b">
+            <div class="q-header" onclick="togQ('qcr03b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Model A: R²=0.91, SE=45. Model B: R²=0.68, SE=12. Same dataset. Which model do you prefer for making precise individual predictions, and is R² always the right metric to maximise?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Prefer Model B</strong> for individual predictions. Despite lower R², SE=12 means typical individual errors are 12 units — compared to Model A's SE=45, nearly four times larger. When the goal is predicting a specific outcome (one claimant's damages), SE is more relevant than R².</p><p>R² is not always the right metric. It measures how well the model explains overall variation — a model can have high R² but large individual errors if Y naturally has wide spread. In damages quantification, SE directly measures what the damages figure is likely to be wrong by, making it the more actionable metric.</p><div class="what-tests">R² vs SE · individual prediction vs overall fit · knowing which metric matters for which purpose</div></div>
+          </div>
+          <div class="question-block" id="qcr03c">
+            <div class="q-header" onclick="togQ('qcr03c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A regression table shows b₁=0.8 with p-value=0.42, and R²=0.08. The expert claims "there is a positive relationship." Is this supported, and what do all three numbers together tell you?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Not well supported.</strong> b₁=0.8 is positive in direction, but p=0.42 means a 42% chance of observing this slope by chance even if the true relationship is zero — far above the p&lt;0.05 threshold. The slope is not statistically significant. R²=0.08 confirms the relationship is negligibly weak — X explains only 8% of Y's variation. Together: a small, statistically unreliable, practically weak association. "There is a positive relationship" is technically accurate but deeply misleading — the data do not support concluding a meaningful positive relationship exists.</p><div class="what-tests">Three-number joint reading · statistical significance · what "positive direction" does and doesn't mean</div></div>
+          </div>
+          <div class="question-block" id="qcr03d">
+            <div class="q-header" onclick="togQ('qcr03d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">b₁=125, p=0.001, R²=0.12. A junior associate says "the slope is significant so the model is good." What is wrong, and what are the three most important deposition questions to ask the expert?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Wrong:</strong> significance and quality are different. p=0.001 confirms the slope is unlikely to be zero — the relationship is real. But R²=0.12 means X explains only 12% of Y's variation — the model is weak despite the significant slope. This often happens with large n (large samples make even tiny effects significant).</p><p><strong>Three deposition questions:</strong> (1) "What is the sample size — is significance driven by a large n rather than a strong effect?" (2) "What is the standard error — how large are typical prediction errors in original units?" (3) "What variables explain the remaining 88% of Y's variation, and why were they excluded?" — this forces disclosure of what the model doesn't account for.</p><div class="what-tests">Significance ≠ importance · how large n inflates significance · three targeted deposition questions</div></div>
+          </div>
+          <div class="question-block" id="qcr03e">
+            <div class="q-header" onclick="togQ('qcr03e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Antitrust expert output: Y=competitor market share (%), X=defendant's price (Rs.). Intercept=42.0 (p=0.000), Coefficient=−0.18 (p=0.008), R²=0.61, SE=4.2, n=36 months, data range X=Rs.80–160. Expert predicts competitor share=51.9% at defendant's current price of Rs.55. (a) Compute the prediction from the stated coefficients. (b) Identify every statistical problem. (c) What should opposing counsel argue and request?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a)</strong> Ŷ = 42.0+(−0.18)(55) = 42.0−9.9 = <strong>32.1%</strong> — not 51.9%. The expert's figure is arithmetically inconsistent with the reported coefficients. (If b₁ were +0.18, the prediction would be 42+9.9=51.9 — suggesting a possible sign error in the report.)</p><p><strong>(b) Statistical problems:</strong> (i) Extrapolation — Rs.55 is Rs.25 below the minimum observed price of Rs.80, a 31% overshoot of the data boundary. (ii) Sign inconsistency — b₁=−0.18 means lower defendant prices associate with lower competitor share, which contradicts the expert's harm narrative. (iii) Arithmetic error — 51.9% is inconsistent with stated coefficients. (iv) SE=4.2 means predictions carry ±4.2 percentage point uncertainty — the range at Rs.55 spans roughly 28%–36%, not a precise figure.</p><p><strong>(c) Opposing counsel:</strong> Move to exclude the Rs.55 prediction as extrapolation; request the original dataset to confirm the X range. Challenge the arithmetic on the record. Request clarification on the coefficient sign and how a negative b₁ supports the harm claim. Request a scatter plot and full residuals to verify the linear model holds within the Rs.80–160 range.</p><div class="what-tests">Arithmetic verification of expert output · extrapolation with precise distance · coefficient sign vs narrative · SE as prediction uncertainty band · multi-ground statistical challenge with evidence requests</div></div>
+          </div>
+          <div class="question-block" id="qcr03f">
+            <div class="q-header" onclick="togQ('qcr03f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Expert A: R²=0.93, claims "highly reliable." Expert B (same dataset): R²=0.93, SE=180,000 (Y in rupees), data range X=10–100, defendant's current X=150. How does Expert B's fuller reporting change your assessment of Expert A's conclusion? Identify the three most important cross-examination questions for Expert A.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Changed assessment:</strong> Expert A's R²=0.93 is accurate but misleading without context. Expert B reveals: (i) SE=Rs.1,80,000 — substantial absolute prediction error despite high R², meaning individual damage predictions carry a wide uncertainty band. (ii) X=150 is outside the data range (10–100) — any prediction at the defendant's current situation is extrapolation with no observational support. R²=0.93 describes fit within X=10–100; it provides zero information about predictive reliability at X=150.</p><p><strong>Three cross-examination questions:</strong> (1) "What is the standard error of the estimate, and in rupees, how large is the typical prediction error for an individual case?" — forces disclosure of SE alongside R². (2) "The defendant's current X is 150. Your data runs from X=10 to X=100. Can you identify any observations near X=150 that support the model's prediction there?" — forces acknowledgment of extrapolation. (3) "Does R²=0.93 provide any information about predictive accuracy outside the range of your data?" — establishes that R² is a within-sample fit statistic, not an out-of-range guarantee.</p><div class="what-tests">R² vs SE revisited · extrapolation with named range · why R² doesn't guarantee out-of-range reliability · three precise cross-examination questions</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr03-bar">
+        <div class="inner-header" onclick="togI('cr03-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · Expert Witness Practice</div><p>The three most damaging deposition questions against regression experts are almost never asked by unprepared counsel: "What is the SE?" (almost never volunteered), "Is this interpolation or extrapolation?" (almost never addressed), and "Does statistical significance mean the effect is large?" (almost always conflated). A lawyer who has internalised the R²-vs-SE distinction and the significance-vs-importance distinction can run these three questions reliably against any damages regression expert.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Multiple Regression — Conceptual Foundations</div>
+
+  <!-- TOPIC 4: MULTIPLE REGRESSION -->
+  <div class="topic-card" id="cr04" style="border-left-color:var(--cr)">
+    <div class="topic-header" onclick="tog('cr04')">
+      <span class="lec-tag" style="background:var(--cr)">TOPIC 4</span>
+      <div class="topic-title">Multiple Regression — What Controlling for Variables Actually Means</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="cr04-l">
+        <div class="inner-header" onclick="togI('cr04-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Simple regression has one explanatory variable. Multiple regression has two or more. The crucial difference is conceptual: each coefficient tells you the effect of that variable <strong>while holding all others constant.</strong> This "holding constant" is what statisticians mean by "controlling for."</p>
+          <p>In simple regression of salary on gender, the result reflects everything that differs between groups — role, experience, education, and gender jumbled together. Adding experience, role, and education as controls isolates the gender effect after accounting for those factors. If the gender coefficient drops to near zero, the gap is explained by the controls. If it stays large, the gap persists — the statistical foundation of a discrimination finding.</p>
+          <div class="notation"><span class="hl">Multiple regression (two predictors):</span> Ŷ = b₀ + b₁X₁ + b₂X₂<br>b₁ = change in Y per unit of X₁, holding X₂ constant<br>b₂ = change in Y per unit of X₂, holding X₁ constant</div>
+          <div class="pattern-warn"><div class="pw-label">The Mediation Trap</div><p>If job grade is itself a product of discrimination, controlling for job grade removes evidence of discrimination rather than isolating it. Whether to control for a variable requires a substantive judgment about causality — not just a statistical decision. This is the most sophisticated methodological attack in employment discrimination litigation.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr04-m">
+        <div class="inner-header" onclick="togI('cr04-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation"><span class="hl">General form:</span> Ŷ = b₀ + b₁X₁ + b₂X₂ + ... + bₖXₖ<br><br><span class="hl">Key concepts:</span><br>Adjusted R² — penalises for adding irrelevant variables (use instead of R² when comparing models with different numbers of predictors)<br>Omitted variable bias — excluding a relevant variable distorts the coefficients of included ones<br>Confounder — independently causes both X and Y; controlling for it is correct<br>Mediator — variable through which X causes Y; controlling for it removes evidence of the causal effect</div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr04-ex">
+        <div class="inner-header" onclick="togI('cr04-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">The Wage Gap — What Disappears When You Add Controls</div>
+          <p><strong>Stage 1 — Simple:</strong> Salary on Gender (1=male, 0=female)</p>
+          <div class="notation">Ŷ = 420 + 85·Gender → men earn Rs.85,000 more · R²=0.28</div>
+          <p><strong>Stage 2 — Multiple:</strong> Add experience and job grade</p>
+          <div class="notation">Ŷ = 280 + 12·Experience + 95·JobGrade + 8·Gender → gap shrinks to Rs.8,000 · R²=0.79</div>
+          <p>Adding controls absorbed most of the gender gap — men have more experience and higher grades on average. The remaining Rs.8,000 is the "pure" gender effect after these controls.</p>
+          <p><strong>The mediation trap:</strong> if job grade is itself the product of discrimination (women placed in lower grades because of gender), controlling for it removes evidence of discrimination. The statistical operation is correct; the interpretive choice is the error.</p>
+          <p><strong>Prediction:</strong> female employee, 8 years experience, job grade 5: Ŷ = 280+12(8)+95(5)+8(0) = 280+96+475 = <strong>Rs.851,000/year</strong></p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr04-q">
+        <div class="inner-header" onclick="togI('cr04-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qcr04a">
+            <div class="q-header" onclick="togQ('qcr04a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Ŷ = 50 + 3X₁ + 7X₂, X₁=years of education, X₂=years of experience. Interpret b₁=3 and b₂=7 precisely. Predict Y for 16 years education and 10 years experience.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>b₁=3: holding experience constant, each additional year of education is associated with 3 more units of Y on average. b₂=7: holding education constant, each additional year of experience is associated with 7 more units of Y on average.</p><p>Ŷ = 50+3(16)+7(10) = 50+48+70 = <strong>168</strong></p><div class="what-tests">Multiple regression coefficient interpretation · "holding constant" language · two-predictor prediction</div></div>
+          </div>
+          <div class="question-block" id="qcr04b">
+            <div class="q-header" onclick="togQ('qcr04b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Simple regression of injury claims (Y) on factory size (X₁) gives b₁=0.8, R²=0.62. Adding safety training hours (X₂) gives b₁=0.9, R²=0.78, b₂=−1.4. Why did b₁ change, and what does b₂=−1.4 tell you?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Why b₁ changed:</strong> factory size and training hours are likely correlated. When X₂ was omitted, its effect was partially absorbed into b₁, biasing it. Adding X₂ separates the two effects, producing a purer estimate of factory size's contribution.</p><p><strong>b₂=−1.4:</strong> holding factory size constant, each additional hour of safety training is associated with 1.4 fewer injury claims on average — training reduces injuries. This is the within-factory-size effect, isolated from firm scale.</p><div class="what-tests">Why coefficients change when controls are added · omitted variable bias · interpreting a negative coefficient after controlling</div></div>
+          </div>
+          <div class="question-block" id="qcr04c">
+            <div class="q-header" onclick="togQ('qcr04c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Ŷ = 0.60 − 0.02X₁ + 0.08X₂, where Y=recidivism rate, X₁=sentence length, X₂=prior convictions. A policymaker concludes longer sentences reduce recidivism. What does b₁ establish and what causal limitation applies?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>What b₁ establishes:</strong> holding prior convictions constant, a one-year increase in sentence length is associated with a 0.02 reduction in recidivism rate on average in this dataset. The direction supports the policymaker's claim.</p><p><strong>Causal limitation:</strong> sentence length is not randomly assigned — judges impose longer sentences based on crime severity and other factors that independently predict recidivism. Even after controlling for prior convictions, many variables (crime type, age, socioeconomic status) are omitted. A causal conclusion requires either randomised assignment or a quasi-experimental design — observational regression cannot establish it.</p><div class="what-tests">Coefficient interpretation with controls · limits of "controlling for" in observational data · the gap between association and policy-relevant causation</div></div>
+          </div>
+          <div class="question-block" id="qcr04d">
+            <div class="q-header" onclick="togQ('qcr04d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Define omitted variable bias in plain English, give one employment law example, and explain why it cannot be fully eliminated in any observational study.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Omitted variable bias:</strong> when a variable that genuinely affects Y is excluded from the regression, its influence gets absorbed into the coefficients of included variables — making those coefficients inaccurate.</p><p><strong>Employment example:</strong> in a salary regression controlling only for gender and years of service, the gender coefficient absorbs the influence of any omitted variable correlated with gender — job grade, negotiating behaviour — reflecting not just pure discrimination but also these omitted factors.</p><p><strong>Why it cannot be fully eliminated:</strong> no researcher can measure and include every relevant variable. Some are unobservable (motivation, relationship quality with supervisors), some unknown, and some are products of the process under study (making their inclusion methodologically contested). Randomised experiments solve this by design; observational regression cannot.</p><div class="what-tests">OVB definition · concrete employment example · why randomisation is the structural solution</div></div>
+          </div>
+          <div class="question-block" id="qcr04e">
+            <div class="q-header" onclick="togQ('qcr04e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Pay discrimination case: Plaintiff's expert — simple regression → b(female)=−85 (women earn Rs.85,000 less). Defence expert — adds job grade as control → b(female)=−12 (gap shrinks to Rs.12,000, not significant). Defence argues the gap is "fully explained." Plaintiff argues methodological error. (a) Who is right and on what grounds? (b) What evidence does the court need? (c) Draft a two-paragraph technical explanation for a non-technical judge.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a) Neither is entirely right.</strong> The defence expert's model is statistically correct: adding job grade as a control does reduce the gender coefficient substantially. However, the plaintiff is correct that there is a potential methodological error — specifically, the mediation trap. If job grade is itself the product of gender discrimination (women are systematically assigned to lower grades because of their gender, not because of their qualifications or performance), then job grade is a mediator of discrimination, not a confounder. Controlling for a mediator removes evidence of the causal effect rather than isolating it. The defence's model is only valid as an explanation of the pay gap if job grade is a legitimate, independently-determined variable — not if it is itself a discriminatory outcome.</p><p><strong>(b) Evidence the court needs:</strong> data on how job grade assignments are made — is there a systematic gender pattern in grade assignments after controlling for qualifications? An analysis of whether women and men with equivalent qualifications, performance ratings, and tenure are assigned to equivalent grades. If a gender gap persists in grade assignments after proper controls, controlling for grade in the salary regression removes evidence of discrimination rather than explaining it, and the defence model is methodologically flawed.</p><p><strong>(c) For a non-technical judge:</strong> "The defence expert argues that once we account for employees' job grades, the salary gap between men and women nearly disappears — implying the gap is explained by grade differences, not gender. This argument is valid only if job grades are assigned fairly. If the company systematically places women in lower grades regardless of their qualifications, then controlling for grade hides discrimination rather than explaining it — it is like arguing there is no race discrimination in sentencing because Black defendants receive longer sentences only because they are charged with more serious offences, when the charges themselves reflect discriminatory charging decisions.<br><br>The relevant question for this court is therefore not whether the salary gap disappears when grade is controlled, but whether grade assignment is itself free of gender bias. If it is not, the defence expert's model uses a discriminatory variable to explain away a discriminatory outcome — a statistical operation that is technically correct but substantively misleading. The court should require evidence on grade assignment practices before accepting the defence model's conclusion."</p><div class="what-tests">Mediation vs confounding · the full mediation trap argument · what additional evidence distinguishes the two models · drafting a non-technical judicial explanation of a sophisticated statistical issue</div></div>
+          </div>
+          <div class="question-block" id="qcr04f">
+            <div class="q-header" onclick="togQ('qcr04f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">An environmental expert regresses pollution levels (Y) on industrial output (X₁) and wind direction (X₂, a dummy variable: 1=wind blows toward town, 0=away). Result: Ŷ=10+0.8X₁+15X₂, R²=0.84. The factory argues b(X₁)=0.8 is small and its output causes minimal harm. (a) Interpret all three coefficients. (b) Evaluate the factory's claim using b₁ and b₂ together. (c) What does the interaction between X₁ and X₂ tell you that neither variable alone reveals, and why might the expert's model be missing something important?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>(a) Coefficients:</strong> b₀=10 → baseline pollution when output=0 and wind blows away from town. b₁=0.8 → holding wind direction constant, each unit increase in industrial output adds 0.8 units of pollution. b₂=15 → holding output constant, when wind blows toward town, pollution is 15 units higher than when it blows away.</p><p><strong>(b) Evaluating the factory's claim:</strong> the factory isolates b₁=0.8 and calls it small. But b₂=15 is nearly 19 times larger — wind direction has a dramatically larger effect on town pollution than output level. This does not exonerate the factory; it reveals that the factory's output (X₁) is a necessary precondition for the pollution — without industrial output to carry, wind direction has nothing to transport. The factory's argument conflates "our coefficient is small" with "our contribution is small," when in fact X₁ and X₂ interact multiplicatively in their real-world effect: output provides the pollution, wind provides the delivery mechanism.</p><p><strong>(c) The missing interaction:</strong> the current model assumes the effect of output on pollution is the same regardless of wind direction (b₁=0.8 always). But in reality, 0.8 units of output-related pollution probably only reaches the town on days when wind blows toward it. On other days, the same output causes minimal town-side harm. An interaction term X₁×X₂ in the model would capture this — it would show that the harmful dose of industrial output is effectively zero when wind blows away and substantially positive when it blows toward town. Without the interaction term, b₁=0.8 averages across wind conditions and understates the harm on the days the town is actually exposed. The expert's model may be missing the most legally relevant quantity: the pollution dose received by the town specifically, not the ambient pollution level averaged across all wind conditions.</p><div class="what-tests">Three-coefficient interpretation in a multiple regression with a dummy variable · evaluating a selective use of one coefficient · interaction effects and why additive models miss multiplicative real-world relationships · identifying a model specification gap with legal consequences</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="cr04-bar">
+        <div class="inner-header" onclick="togI('cr04-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">NY Bar · Employment &amp; Environmental Law</div><p>The mediation trap (T3-A) is the most sophisticated methodological issue in employment discrimination statistics — the EEOC Technical Manual addresses it explicitly, and courts have reached contradictory results on whether controlling for job grade is appropriate in pay equity cases. A lawyer who can articulate the mediation-vs-confounding distinction can mount or defeat the most technically advanced statistical defence available in discrimination litigation.</p><p>The interaction-effects gap (T3-B) appears in environmental tort cases, pharmaceutical litigation, and securities fraud cases — any situation where the harmful effect of one variable is contingent on the value of another. Identifying a missing interaction term as a model specification error is a high-level Daubert challenge that most opposing counsel never raises because they don't know to look for it.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part4-bivariate-regression.html">← Part 4</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-derivatives.html">Derivatives →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Correlation &amp; Regression — Deep Treatment · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>
+

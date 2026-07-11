@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Part 4 · Bivariate Analysis &amp; Regression</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--c7:#D4316A;--t2:#1A5C3A;--t3:#5C1A1A;--ez:#2E5C8A;--md:#8A5C1A;--hd:#5C1A2E;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .data-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px;font-family:'JetBrains Mono',monospace;}
+  .data-table th{background:var(--ink);color:var(--page);font-size:11px;letter-spacing:0.04em;padding:8px 10px;text-align:center;font-weight:600;}
+  .data-table td{padding:8px 10px;border-bottom:1px solid var(--rule);text-align:center;}
+  .data-table tr:nth-child(even) td{background:#FAFAF8;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .ez-badge{background:var(--ez);color:#fff;}
+  .md-badge{background:var(--md);color:#fff;}
+  .hd-badge{background:var(--hd);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens p{font-size:14px;margin-top:8px;}
+  .bar-lens p:first-of-type{margin-top:0;}
+  .bare-note{font-size:12px;color:var(--ink-faint);font-style:italic;margin-bottom:6px;}
+  .loading-msg{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-faint);padding:10px 0;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .notation { font-size: 14px; padding: 14px 16px; }
+    .example-block { padding: 16px 18px; }
+    .example-block p { font-size: 15px; }
+    .pattern-warn p { font-size: 15px; }
+    .q-header { padding: 14px 16px; }
+    .q-text { font-size: 15px; }
+    .q-body { padding: 0 16px 16px; }
+    .q-body p { font-size: 15px; }
+    .bar-lens p { font-size: 15px; }
+    .what-tests { font-size: 12px; }
+    .logic-table { font-size: 14px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Part 4 — Bivariate Analysis &amp; Regression</h1>
+  <div class="subtitle">Lec. 21–24 region · Dr. Tariq Ismaeel · 2 topics · Mid-term scope (per syllabus)</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Part 4</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">2 / 2 topics</span>
+</div>
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <!-- CLUSTER: BIVARIATE -->
+  <div class="section-label">Bivariate Data &amp; Scatter Plots</div>
+
+  <!-- T01: Bivariate & Scatter Plots -->
+  <div class="topic-card" id="b01" style="border-left-color:var(--c7)">
+    <div class="topic-header" onclick="tog('b01')">
+      <span class="lec-tag" style="background:var(--c7)">MID-TERM</span>
+      <div class="topic-title">Bivariate Data &amp; Scatter Plots</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="b01-l">
+        <div class="inner-header" onclick="togI('b01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p><strong>Bivariate data</strong> is just two measurements taken on the same set of things, paired up. "Bi" = two, "variate" = variable. Every single case in your dataset gives you a pair of numbers — not one number, two, that travel together.</p>
+          <p>A <strong>scatter plot</strong> is the picture of that pairing: one variable goes on the horizontal axis, the other on the vertical, and every pair becomes a single dot. The question a scatter plot answers in one glance is: <strong>"as one thing changes, does the other thing tend to change with it, and in which direction?"</strong></p>
+          <p>Three things to read off a scatter plot, in plain English, before any formula touches it:</p>
+          <div class="notation">
+            <span class="hl">Direction:</span> do the dots drift upward (positive) or downward (negative) as you move left to right?<br>
+            <span class="hl">Strength:</span> do the dots hug a tight line, or are they scattered loosely around a vague trend?<br>
+            <span class="hl">Form:</span> is the trend roughly a straight line, or does it curve?
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Translation Trap</div>
+            <p>"Association" and "causation" are not the same word, even when a word problem makes them sound interchangeable. A scatter plot can show ice-cream sales and drowning incidents both rising together through summer — strong positive association, zero causal link between the two. The hidden third factor (heat) drives both. PU-style questions will describe a strong relationship and ask you to evaluate a causal claim built on it; the correct answer is almost always "association does not establish causation" unless the question explicitly gives you a controlled experimental design.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b01-m">
+        <div class="inner-header" onclick="togI('b01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Convention:</span> the variable you suspect explains or predicts goes on x (explanatory/independent). The variable you're trying to predict or explain goes on y (response/dependent).<br><br>
+            <span class="hl">Positive association:</span> low x pairs with low y, high x pairs with high y — dots trend up-right.<br>
+            <span class="hl">Negative association:</span> low x pairs with high y, high x pairs with low y — dots trend down-right.<br>
+            <span class="hl">No association:</span> dots form a shapeless cloud — knowing x tells you nothing about y.<br>
+            <span class="hl">Outlier:</span> a point that sits well away from the overall pattern formed by the rest of the data.
+          </div>
+          <p>Strength is a separate judgment from direction. A relationship can be strongly negative (tight downward line) or weakly positive (vague upward drift with lots of scatter) — direction and strength answer two different questions, and a question that asks for one is not answered by giving the other.</p>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b01-ex">
+        <div class="inner-header" onclick="togI('b01-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Reading a Scatter Plot — Hours of Revision vs. Errors Made</div>
+            <table class="data-table">
+              <tr><th>Hours Revised (X)</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+              <tr><th>Errors Made (Y)</th><td>18</td><td>16</td><td>13</td><td>12</td><td>9</td><td>7</td><td>5</td><td>3</td></tr>
+            </table>
+            <p><strong>Direction:</strong> as X rises, Y consistently falls — negative association.</p>
+            <p><strong>Strength:</strong> the drop is steady and near-uniform at every step (18→16→13→12→9→7→5→3) — the points sit close to a single descending line, so this is a <em>strong</em> negative association, not just "some" negative association.</p>
+            <p><strong>Form:</strong> the decrease is roughly constant per hour — this looks linear, not curved.</p>
+            <p>Plain-English conclusion before any number-crunching: more revision is strongly and consistently associated with fewer errors. Whether revision <em>causes</em> fewer errors, or whether more disciplined students simply both revise more and err less, is a separate question this scatter plot alone cannot answer.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b01-q">
+        <div class="inner-header" onclick="togI('b01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qb01a">
+            <div class="q-header" onclick="togQ('qb01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A regulator plots "number of factory inspections per year" (X) against "reported safety violations" (Y) for 40 factories and finds a strong positive association. A factory owner argues: "This proves inspections cause violations — stop inspecting us." Identify the flaw and a more plausible explanation.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Flaw:</strong> the owner reads association as causation, and reverses the plausible causal direction without justification.</p><p><strong>More plausible explanation:</strong> factories with more inspections find more violations because they're being looked at more carefully — not because inspecting <em>causes</em> the violations to occur. The violations were likely already there; inspection frequency determines detection rate, not occurrence rate.</p><div class="what-tests">Association vs. causation · reversed-causation fallacy · detection bias as an alternative explanation</div></div>
+          </div>
+
+          <div class="question-block" id="qb01b">
+            <div class="q-header" onclick="togQ('qb01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A scatter plot of "years of litigation experience" (X) against "case duration in months" (Y) for 50 lawyers shows points scattered with no visible trend in any direction. What does this tell a client choosing a lawyer, and what does it not tell them?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>What it tells the client:</strong> in this dataset, years of experience shows no association with how long a case takes — knowing a lawyer's experience gives no predictive information about case duration.</p><p><strong>What it does not tell the client:</strong> it doesn't mean experience is irrelevant to outcome quality, settlement value, or cost — only that it's unrelated to <em>duration</em> specifically, in this sample. No association on one variable pair says nothing about other variable pairs not plotted.</p><div class="what-tests">No-association interpretation · scope limitation of a single scatter plot · resisting overgeneralisation</div></div>
+          </div>
+
+          <div class="question-block" id="qb01c">
+            <div class="q-header" onclick="togQ('qb01c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A study plots "monthly ice-cream sales" against "monthly drowning incidents" across a coastal town over 24 months and finds a strong positive association. A defendant in a wrongful-death suit involving a swimming pool argues this proves ice-cream consumption increases drowning risk, and seeks to introduce ice-cream sales data as causal evidence. As opposing counsel, construct the strongest rebuttal using the bivariate-analysis concepts above.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Core rebuttal:</strong> the association, however strong, is explained by a lurking third variable — ambient temperature/season. Hot months drive both more ice-cream purchases and more swimming (and therefore more drowning exposure). Neither variable causes the other.</p><p><strong>Constructing the argument formally:</strong> demand the defendant show (a) a plausible causal mechanism linking ice-cream consumption to drowning physiologically, and (b) that the association survives after controlling for season/temperature. Without both, the correlation is consistent with — and far better explained by — the common-cause structure.</p><p><strong>Why this matters in a wrongful-death context specifically:</strong> courts require causal evidence to meet a higher bar than mere statistical association (often "more likely than not" causation, not just correlation). A strong r-value alone, without a control for confounders, should not be admitted as proof of causal mechanism, and counsel should object to its introduction on exactly that basis.</p><div class="what-tests">Classic lurking-variable scenario applied to evidentiary standards · distinguishing statistical association from legal causation · constructing an evidentiary objection from a stats concept</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="b01-bare">
+        <div class="inner-header" onclick="togI('b01-bare')"><span class="inner-label">Bare Practice · Easy / Medium / Hard</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p class="bare-note">Pure mathematical/statistical practice — no legal scenario, no disguise. Tests the underlying concept directly, the way the textbook and exam exercises do.</p>
+          <div id="bare-biv" class="bare-container"><div class="loading-msg">Loading questions…</div></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b01-bar">
+        <div class="inner-header" onclick="togI('b01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · LSAT Connection</div>
+            <p>LSAT Logical Reasoning has an entire recurring question family built on exactly this concept: a stimulus presents a correlation, the conclusion claims causation, and the correct answer either identifies the missing causal mechanism or proposes the lurking variable. Recognising this pattern instantly — "correlation stated, causation concluded, where's the third factor" — is one of the highest-yield pattern recognitions on the exam.</p>
+            <p>In practice, this is also the single most common form of statistical evidence misuse in litigation involving epidemiology, environmental harm, and product liability — expert reports frequently present a strong association as if it settles causation, and a lawyer who can name the lurking-variable problem on sight has a real cross-examination advantage.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CLUSTER: CORRELATION & REGRESSION -->
+  <div class="section-label">Pearson Correlation &amp; Simple Linear Regression</div>
+
+  <!-- T02: Correlation & Regression -->
+  <div class="topic-card" id="b02" style="border-left-color:var(--c7)">
+    <div class="topic-header" onclick="tog('b02')">
+      <span class="lec-tag" style="background:var(--c7)">MID-TERM</span>
+      <div class="topic-title">Pearson Correlation &amp; Simple Linear Regression</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="b02-l">
+        <div class="inner-header" onclick="togI('b02-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>A scatter plot shows you direction and strength <em>by eye</em>. <strong>Pearson's correlation coefficient (r)</strong> is the same judgment, turned into one precise number between -1 and +1, so two people don't have to argue about whether a relationship "looks fairly strong" — they can just compare numbers.</p>
+          <p><strong>Regression</strong> answers a different, more ambitious question: not just "are these related," but "if I'm given a new X value I haven't seen before, what's my best single-number prediction for Y?" Regression fits the one straight line that sits closest to all the points at once, then lets you read predictions off that line.</p>
+          <div class="notation">
+            <span class="hl">r close to +1:</span> strong positive — points hug an upward line<br>
+            <span class="hl">r close to -1:</span> strong negative — points hug a downward line<br>
+            <span class="hl">r close to 0:</span> little to no linear relationship<br>
+            <span class="hl">r is unitless</span> — it doesn't matter if X is in rupees and Y is in kilometres, r is always between -1 and +1
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">The Translation Trap</div>
+            <p>"r = 0.3" sounds unimpressive but is not automatically "weak" or "unimportant" — strength judgments depend on field and context (r = 0.3 might be a major finding in social science, trivial in physics). A PU question that simply states an r-value and asks you to "comment" wants direction + a defensible strength judgment + an explicit refusal to claim causation from r alone, not a single-word answer.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b02-m">
+        <div class="inner-header" onclick="togI('b02-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Pearson's r:</span><br>
+            r = [n·Σxy − Σx·Σy] / √([n·Σx² − (Σx)²][n·Σy² − (Σy)²])<br><br>
+            <span class="hl">Regression line:</span> ŷ = b₀ + b₁x<br>
+            b₁ (slope) = [n·Σxy − Σx·Σy] / [n·Σx² − (Σx)²]<br>
+            b₀ (intercept) = ȳ − b₁x̄<br><br>
+            <span class="hl">Coefficient of determination:</span> r² — the proportion of variation in Y "explained" by X. r² = 0.80 means 80% of the spread in Y is accounted for by its linear relationship with X; the remaining 20% is unexplained by this model.
+          </div>
+          <p>Notice b₁'s formula is the numerator of r's formula, divided by only the x-side of the denominator. They share the same bones — r tells you how tightly the points cluster around a line; b₁ tells you the steepness of that line. A dataset can have a very steep slope and weak r (lots of scatter around a steep trend) or a shallow slope and strong r (tight scatter around a nearly flat trend) — slope and correlation strength are not the same thing.</p>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b02-ex">
+        <div class="inner-header" onclick="togI('b02-ex')"><span class="inner-label">Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Full Computation — Advertising Spend vs. Units Sold</div>
+            <table class="data-table">
+              <tr><th>Spend Rs'000 (X)</th><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td><td>12</td><td>14</td><td>16</td></tr>
+              <tr><th>Units Sold (Y)</th><td>14</td><td>20</td><td>24</td><td>32</td><td>35</td><td>40</td><td>42</td><td>50</td></tr>
+            </table>
+            <div class="notation">
+              n = 8 &nbsp;·&nbsp; Σx = 72 &nbsp;·&nbsp; Σy = 257 &nbsp;·&nbsp; Σxy = 2726 &nbsp;·&nbsp; Σx² = 816<br>
+              x̄ = 9.0 &nbsp;·&nbsp; ȳ = 32.125<br><br>
+              r = [8(2726) − (72)(257)] / √([8(816)−72²][8(9285)−257²])<br>
+              r = 2824 / √(816 × 9759) ≈ <strong>0.9934</strong><br><br>
+              b₁ = [8(2726) − (72)(257)] / [8(816) − 72²] = 2824 / 1248 ≈ <strong>2.4583</strong><br>
+              b₀ = 32.125 − (2.4583)(9.0) ≈ <strong>10.0</strong><br><br>
+              Regression equation: <span class="hl">ŷ = 10.0 + 2.4583x</span>
+            </div>
+            <p><strong>Interpreting r = 0.9934:</strong> extremely strong positive linear relationship — advertising spend and units sold move together almost in lockstep within this data range.</p>
+            <p><strong>Interpreting b₁ = 2.4583:</strong> each additional Rs. 1,000 spent on advertising is associated with roughly 2.46 more units sold, on average, within the observed range.</p>
+            <p><strong>Interpreting b₀ = 10.0:</strong> the model predicts 10 units sold at zero advertising spend — this is the y-intercept, not necessarily a reliable real-world prediction, since x = 0 may sit outside or at the very edge of the data actually observed.</p>
+            <p><strong>Prediction at x = 18 (extrapolation):</strong> ŷ = 10.0 + 2.4583(18) ≈ 54.25 units. Flag this explicitly as extrapolation — 18 lies outside the observed X range (2 to 16), so the prediction assumes the same linear relationship continues beyond the data, which is an assumption, not a guarantee.</p>
+            <p><strong>r² = 0.9868:</strong> about 98.7% of the variation in units sold is explained by advertising spend in this model — only about 1.3% is left unexplained.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b02-q">
+        <div class="inner-header" onclick="togI('b02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qb02a">
+            <div class="q-header" onclick="togQ('qb02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">An expert report states: "r = 0.85 between years since manufacture and product defect rate, therefore age causes defects." A lawyer challenges only the causal claim, not the r-value itself. Is this the right challenge to bring, and what should it say?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Yes, it's the right challenge.</strong> r = 0.85 is a strong positive correlation and the computation itself isn't in dispute — the leap from "strongly correlated" to "causes" is the actual weak point.</p><p><strong>What it should say:</strong> r measures linear association only; it cannot by itself distinguish "age causes defects" from "age and defects share a common cause" (e.g., materials degrading with storage conditions) or even reverse causation in unusual cases. The expert needs to show a mechanism (e.g., material fatigue over time) and rule out confounders, not just cite r.</p><div class="what-tests">r as association, not proof of mechanism · structuring a precise expert-report challenge</div></div>
+          </div>
+
+          <div class="question-block" id="qb02b">
+            <div class="q-header" onclick="togQ('qb02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A regression model predicts monthly legal-aid case intake from local unemployment rate, fitted on data from months where unemployment ranged 4%–9%. A policymaker wants a prediction at 18% unemployment. What should you tell them about using this model, using the regression concepts above?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Flag it as extrapolation.</strong> 18% lies far outside the observed range (4%–9%) the line was fitted on. The model assumes the same linear relationship holds throughout, but there's no data evidence that relationship stays linear — or even stays positive — at unemployment levels double the highest value observed.</p><p><strong>What to tell the policymaker:</strong> the prediction can be computed mathematically, but it carries no statistical guarantee; real-world relationships often change shape (saturate, accelerate, or reverse) outside the studied range, so the number should be presented as a rough extrapolation, not a reliable forecast.</p><div class="what-tests">Extrapolation risk · the boundary between interpolation and extrapolation · communicating model limitations to a non-technical decision-maker</div></div>
+          </div>
+
+          <div class="question-block" id="qb02c">
+            <div class="q-header" onclick="togQ('qb02c')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">In a wage-discrimination case, plaintiff's expert reports r = 0.40 between gender and salary (coded numerically) across 200 employees, claiming this proves discrimination. Defendant's expert reports a multiple regression controlling for experience, role, and education showing the gender effect drops to near zero once these are included. Reconcile the two reports using the concepts in this topic, and explain which is more probative and why.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Reconciliation:</strong> both reports can be numerically correct and not actually contradict each other. r = 0.40 (simple correlation, two variables only) measures the raw association between gender and salary, ignoring everything else that might differ systematically between genders in this workforce — e.g., if one gender group happens to have less average experience, that alone could produce a moderate r without any direct gender effect on pay.</p><p><strong>The defendant's regression is more probative</strong> because it isolates the gender effect after holding the confounding variables (experience, role, education) constant — this is precisely the lurking-variable problem from the bivariate topic, addressed properly this time by controlling for the suspected confounders rather than ignoring them.</p><p><strong>Important caveat for the plaintiff to raise in response:</strong> the defendant's model is only as good as the confounders it controls for — if "role" itself reflects historic discriminatory assignment (women systematically placed in lower-paid roles), controlling for role could mask rather than explain away the discrimination. The statistical question ("does the gender effect survive controls") and the legal question ("were the controls themselves products of discrimination") are different, and a court needs both addressed, not just the regression output taken at face value.</p><div class="what-tests">Simple correlation vs. multiple regression with controls · the lurking-variable problem applied to employment discrimination law · recognising when "controlling for X" can hide rather than explain a causal pathway — the kind of two-layer analytical move PU finals reward at Tier 3</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="b02-bare">
+        <div class="inner-header" onclick="togI('b02-bare')"><span class="inner-label">Bare Practice · Easy / Medium / Hard</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p class="bare-note">Pure mathematical/statistical practice — no legal scenario, no disguise. Tests the underlying concept directly, the way the textbook and exam exercises do.</p>
+          <div id="bare-corr" class="bare-container"><div class="loading-msg">Loading questions…</div></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="b02-bar">
+        <div class="inner-header" onclick="togI('b02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens">
+            <div class="bar-label">NY Bar · Litigation Connection</div>
+            <p>Regression analysis underlies a huge share of expert testimony in employment discrimination, antitrust, securities fraud, and damages calculation cases — the "but-for" world in damages litigation is frequently built from a regression model's predicted value. A lawyer who understands what r² actually measures (proportion of variance explained, not "percent correct") and the interpolation/extrapolation boundary can ask the single most damaging cross-examination question to a poorly-supported regression: "how far outside your data's range are you asking this court to extrapolate?"</p>
+            <p>On the LSAT, the multiple-regression-with-controls scenario above is a direct preview of "alternative explanation" Logical Reasoning questions — the correct answer choice frequently identifies exactly this kind of confound that the stimulus's correlation hasn't ruled out.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part3-mathematical-modeling.html">← Part 3</a>
+  <a class="nav-link" href="index.html">⌂ Home</a>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#A0A8B0;">Part 4 · In Progress</span>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  QR-II · Part 4 · Bivariate Analysis &amp; Regression · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+
+  function renderBare(containerId, questions){
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    if(!questions || !questions.length){ el.innerHTML = '<div class="loading-msg">No questions available.</div>'; return; }
+    const badgeClass = {easy:'ez-badge', medium:'md-badge', hard:'hd-badge'};
+    el.innerHTML = questions.map(q => `
+      <div class="question-block" id="${q.id}">
+        <div class="q-header" onclick="togQ('${q.id}')">
+          <span class="tier-badge ${badgeClass[q.difficulty]||'ez-badge'}">${q.difficulty.toUpperCase()}</span>
+          <span class="q-text">${q.q}</span>
+          <svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="q-body"><p>${q.a}</p></div>
+      </div>
+    `).join('');
+  }
+
+  // Bare questions inlined — no external file dependency
+  (function() {
+    var data = {"topics":[{"topic":"bivariate-scatter","bareQuestions":[{"id":"bb-e1","difficulty":"easy","q":"A scatter plot shows that as X increases, Y also tends to increase. What is this called?","a":"Positive association (positive correlation) between X and Y."},{"id":"bb-e2","difficulty":"easy","q":"In a dataset of 30 points, one point lies far away from the general pattern formed by the rest. What is this point called?","a":"An outlier."},{"id":"bb-m1","difficulty":"medium","q":"Dataset: X = 5, 10, 15, 20, 25 and Y = 40, 35, 30, 24, 20. Describe the direction and form of the relationship.","a":"Direction: negative \u2014 Y consistently falls as X rises. Form: roughly linear, since the decrease per step (5, 5, 6, 4) is close to constant rather than accelerating or curving."},{"id":"bb-m2","difficulty":"medium","q":"Two variables, ice-cream sales and sunburn cases, show a strong positive correlation across a year of monthly data. Name the lurking variable most likely responsible, and explain why it produces this pattern.","a":"Ambient temperature / season. Hot months independently increase both ice-cream purchases and sun exposure (hence sunburn), producing a strong association between the two even though neither causes the other."},{"id":"bb-h1","difficulty":"hard","q":"A dataset of 20 points shows a weak positive association (loosely scattered cloud, slight upward drift). One additional extreme outlier is added, far above the rest of the Y values at a middling X value. Explain, conceptually, what this is likely to do to the apparent strength of the correlation, and why scatter plots should always be inspected visually rather than relying on a correlation number alone.","a":"A single extreme outlier can substantially distort the correlation coefficient in either direction \u2014 here, since the outlier sits at a middling X but extreme Y, it tends to weaken or even reverse the impression of a clean linear trend, pulling the line and the r-value away from what the other 20 points actually show. This is exactly why a correlation coefficient computed from raw numbers, without first looking at the scatter plot, can be seriously misleading \u2014 a single point can dominate the statistic while being visually obvious as an anomaly on the plot."},{"id":"bb-h2","difficulty":"hard","q":"Explain, in your own words, why 'no visible linear trend on a scatter plot' does not necessarily mean 'no relationship at all' between two variables.","a":"Pearson-type and visual-linear assessment only detect linear (straight-line) relationships. Two variables can have a strong, even perfectly predictable, non-linear relationship \u2014 for example, a U-shaped or curved pattern \u2014 that produces a near-zero linear correlation and an apparently random-looking scatter, while in fact Y is fully determined by X through a non-linear rule. 'No linear trend' should be read narrowly as 'no straight-line relationship detected,' not as 'X and Y are unrelated.'"}]},{"topic":"correlation-regression","bareQuestions":[{"id":"cr-e1","difficulty":"easy","q":"Given X = 2, 4, 6, 8 and Y = 5, 9, 11, 15, compute \u03a3x, \u03a3y, x\u0304, and \u0233.","a":"\u03a3x = 20, \u03a3y = 40, x\u0304 = 5, \u0233 = 10."},{"id":"cr-e2","difficulty":"easy","q":"A study reports r = -0.92 between two variables. State the direction and strength in plain words.","a":"Strong negative linear relationship \u2014 as one variable increases, the other decreases, and the points lie close to a single descending line."},{"id":"cr-m1","difficulty":"medium","q":"Compute Pearson's r for: X = 1, 2, 3, 4, 5 and Y = 20, 16, 13, 9, 7.","a":"n = 5, \u03a3x = 15, \u03a3y = 65, \u03a3xy = 162, \u03a3x\u00b2 = 55, \u03a3y\u00b2 = 955.<br>r = [5(162) \u2212 (15)(65)] / \u221a([5(55) \u2212 15\u00b2][5(955) \u2212 65\u00b2]) = -195 / \u221a(50 \u00d7 550) \u2248 <strong>-0.995</strong> \u2014 an almost perfect negative linear relationship."},{"id":"cr-m2","difficulty":"medium","q":"A regression line is given as \u0177 = 25 + 3x. Predict \u0177 when x = 12, and state what the slope (3) means in plain language.","a":"\u0177 = 25 + 3(12) = 25 + 36 = 61.<br>The slope of 3 means: for every one-unit increase in x, the predicted value of y increases by 3 units, on average, within the range the model was fitted on."},{"id":"cr-h1","difficulty":"hard","q":"Given X (room temperature, \u00b0C) = 20, 22, 24, 26, 28, 30 and Y (ice-cream units sold) = 50, 58, 62, 70, 75, 85, compute the full regression equation \u0177 = b\u2080 + b\u2081x.","a":"n = 6, \u03a3x = 150, \u03a3y = 400, \u03a3xy = 10234, \u03a3x\u00b2 = 3820.<br>b\u2081 = [6(10234) \u2212 (150)(400)] / [6(3820) \u2212 150\u00b2] = 1404 / 420 \u2248 <strong>3.3429</strong><br>x\u0304 = 25, \u0233 = 66.667<br>b\u2080 = 66.667 \u2212 (3.3429)(25) \u2248 <strong>-16.905</strong><br>Regression equation: <span style=\"font-family:'JetBrains Mono',monospace\">\u0177 = -16.905 + 3.3429x</span>"},{"id":"cr-h2","difficulty":"hard","q":"Using the regression from the previous question (\u0177 = -16.905 + 3.3429x, fitted on X ranging 20\u201330\u00b0C), a student predicts ice-cream sales at 5\u00b0C. Compute the prediction, and explain why this number should not be trusted even though it is mathematically correct.","a":"\u0177 = -16.905 + 3.3429(5) \u2248 -0.19, i.e. a negative predicted number of units sold \u2014 which is impossible in reality (you cannot sell a negative quantity).<br>This is a textbook extrapolation failure: 5\u00b0C lies far outside the fitted range (20\u201330\u00b0C), and the linear model has no basis for assuming the same relationship holds there. The nonsensical negative result is itself the proof that extrapolating this far beyond the observed data range produces unreliable, sometimes physically impossible, predictions."}]}]};
+    var biv = data.topics.find(function(t){ return t.topic === 'bivariate-scatter'; });
+    var corr = data.topics.find(function(t){ return t.topic === 'correlation-regression'; });
+    renderBare('bare-biv', biv ? biv.bareQuestions : []);
+    renderBare('bare-corr', corr ? corr.bareQuestions : []);
+  })();
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>
