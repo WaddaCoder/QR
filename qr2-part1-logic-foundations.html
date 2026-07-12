@@ -223,19 +223,46 @@
       </div>
       <div class="inner-section" id="t01-ex">
         <div class="inner-header" onclick="togI('t01-ex')">
-          <span class="inner-label">Worked Example</span>
+          <span class="inner-label">Worked Examples</span>
           <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="inner-body">
           <div class="example-block">
-            <div class="ex-label">Extracting Standard Form</div>
+            <div class="ex-label">Easy — All Signal Words Present</div>
+            <p>"All persons accused of a crime are entitled to legal representation. Kamran has been accused of a crime. Therefore Kamran is entitled to legal representation."</p>
+            <p>"Therefore" is the explicit conclusion indicator — everything before it is a premise. Standard form:</p>
+            <div class="notation">
+              P1: All persons accused of a crime are entitled to legal representation.<br>
+              P2: Kamran has been accused of a crime.<br>
+              ∴ C: Kamran is entitled to legal representation.
+            </div>
+            <p>Nothing ambiguous. The signal word does all the work. This is the baseline skill — find the indicator, separate premises from conclusion, write the form.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Medium — Premises Flagged, Conclusion Unmarked</div>
             <p>"Since the contract was signed under duress, and contracts signed under duress are voidable, this contract is voidable."</p>
+            <p>"Since" flags the premises. The conclusion "this contract is voidable" appears last but has no indicator word — it must be identified as the claim everything else is built to support.</p>
             <div class="notation">
               P1: The contract was signed under duress.<br>
               P2: Contracts signed under duress are voidable.<br>
               ∴ C: This contract is voidable.
             </div>
-            <p>Notice "since" flags the premises, and the conclusion is stated last but isn't marked with a conclusion-indicator word at all — it has to be identified as the claim the rest of the sentence is built to support, not located by a keyword.</p>
+            <p>One step harder than Easy: you must locate the conclusion by meaning, not by a signal word.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — No Signal Words, Tangential Claims Present</div>
+            <p>A regulator's report states: "Inspection rates rose by 22% this year. We expanded our team by four officers in March. Compliance complaints fell 31%. Resource allocation models suggest further efficiency gains are achievable. Our enforcement programme is delivering results."</p>
+            <p><strong>Step 1 — conclusion:</strong> "Our enforcement programme is delivering results" — the claim everything else is offered to support.</p>
+            <p><strong>Step 2 — genuine premises:</strong> P1: Inspection rates rose 22%. P2: Compliance complaints fell 31%.</p>
+            <p><strong>Step 3 — discard tangential claims:</strong> "We expanded our team" is background context. "Resource allocation models suggest efficiency gains" is forward-looking commentary. Neither is a reason for the current conclusion.</p>
+            <div class="notation">
+              P1: Inspection rates rose 22% this year.<br>
+              P2: Compliance complaints fell 31%.<br>
+              ∴ C: The enforcement programme is delivering results.
+            </div>
+            <p><strong>Does the conclusion follow?</strong> Not necessarily — correlation between inspections and fewer complaints doesn't rule out a third cause. The argument looks substantial in a press release but has a genuine premise-gap under formal scrutiny. This gap is exactly what legal cross-examination exposes.</p>
           </div>
         </div>
       </div>
@@ -281,6 +308,48 @@
               <div class="what-tests">Standard form extraction · distinguishing a valid logical structure from a merely plausible-sounding one · the premise-relevance gap that recurs across every later fallacy and causation topic</div>
             </div>
           </div>
+
+          <div class="question-block" id="q01d">
+            <div class="q-header" onclick="togQ('q01d')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A defence barrister's closing argument: "My client was seen leaving the building at 9:05 PM, confirmed by CCTV. The victim was found at 9:20 PM, four kilometres away. No vehicle matching my client's description was recorded on any route between the two locations." Reconstruct this in standard form, identifying all premises and the implicit conclusion.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>P1: The client was seen leaving the building at 9:05 PM (CCTV confirmed).<br>P2: The victim was found 4 km away at 9:20 PM.<br>P3: No vehicle matching the client's description was recorded on any route between the two locations.</p>
+              <p>∴ C (implicit): The client could not have reached the victim's location in time — the client did not commit the offence.</p>
+              <p>The conclusion is suppressed — deliberately left for the jury to draw. An argument with an implicit conclusion is still an argument; the claim is real even when unstated. Identifying it requires asking: "What is all this evidence being offered to establish?"</p>
+              <div class="what-tests">Standard form with suppressed (implicit) conclusion · identifying what an argument aims to establish when the conclusion is never stated · temporal impossibility as an argument structure</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q01e">
+            <div class="q-header" onclick="togQ('q01e')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Classify each as an argument or non-argument and state why: (i) "It rained every day last week in Lahore." (ii) "Since the permit expired, construction must stop." (iii) "The claimant is 42, works in finance, and has three dependants." (iv) "Speeding fines have had no deterrent effect on accident rates, so the penalty structure must be redesigned."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(i) <strong>Non-argument.</strong> A single factual report — no claim advanced for acceptance on the basis of reasons.</p>
+              <p>(ii) <strong>Argument.</strong> "Since" signals a premise; "must stop" is the conclusion. P1: The permit expired. ∴ C: Construction must stop.</p>
+              <p>(iii) <strong>Non-argument.</strong> A list of biographical facts with no conclusion drawn from them. They could serve as premises elsewhere but as stated they are mere description.</p>
+              <p>(iv) <strong>Argument.</strong> P1: Speeding fines have had no deterrent effect on accident rates. ∴ C: The penalty structure must be redesigned. "So" is the conclusion indicator.</p>
+              <div class="what-tests">Argument vs non-argument across four cases · a list of facts is not itself an argument · identifying conclusion indicators in natural language</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q01f">
+            <div class="q-header" onclick="togQ('q01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A judicial opinion: "The appellant contends the search was unlawful — no warrant was obtained. The respondent argues exigent circumstances justified it. It is well established that exigent circumstances are a recognised exception to the warrant requirement. The officers credibly testified they believed evidence would be destroyed within minutes. We find the search was lawful." (a) Reconstruct the court's own argument in standard form. (b) Identify any premise the court treats as established without argument. (c) Identify the weakest inferential step and its significance for an appellate challenge.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> P1: Exigent circumstances are a recognised exception to the warrant requirement.<br>P2: The officers credibly believed evidence would be destroyed within minutes.<br>∴ C: The search was lawful.</p>
+              <p><strong>(b)</strong> P1 is treated as established without argument — "it is well established" is an assertion, not a case made. Appropriate as shorthand for settled law, but formally an unargued premise.</p>
+              <p><strong>(c)</strong> The weakest step: P2 says the officers <em>believed</em> evidence would be destroyed — the court accepts subjective belief as sufficient without separately establishing that the belief was objectively reasonable. Subjective belief and objectively justified belief are different standards. On appeal, this gap is the most exploitable: were the officers' beliefs reasonable by an objective standard, or merely sincerely held? If the objective-reasonableness requirement applies and wasn't satisfied, the exigent circumstances exception doesn't trigger regardless of how credible the officers appeared.</p>
+              <div class="what-tests">Extracting the court's argument from a multi-party passage · unargued premises in judicial opinions · subjective vs objective belief standards as an appellate gap</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q01g">
+            <div class="q-header" onclick="togQ('q01g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A corporate memo states: "Our subsidiary has operated without a current environmental licence since March. Regulators have not issued an enforcement notice. Industry sources suggest the regulator is under-resourced. We believe continued operation poses minimal legal risk." (a) Reconstruct the implicit argument for "minimal legal risk." (b) Identify the suppressed premise connecting under-resourcing to the conclusion. (c) Evaluate validity and explain what a court would likely say about the "regulator hasn't acted yet" reasoning if enforcement eventually occurs.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> P1: No enforcement notice has been issued.<br>P2: The regulator is under-resourced.<br>P3 (suppressed): If enforcement is unlikely, legal risk is minimal.<br>∴ C: Continued operation poses minimal legal risk.</p>
+              <p><strong>(b)</strong> The suppressed premise conflates probability of enforcement with actual legal exposure — it assumes undetected illegality equals legal compliance, which is false. Liability has been accruing since March regardless of regulator action.</p>
+              <p><strong>(c)</strong> The argument is formally invalid because P3 is legally false. Courts consistently hold that regulatory delay does not constitute acquiescence, does not create estoppel, and does not reduce underlying liability. Worse: the memo itself could become evidence of wilful non-compliance — it shows the subsidiary was aware of unlicensed operation and continued anyway, which aggravates rather than mitigates exposure. The reasoning that was meant to reduce risk documents the knowing risk.</p>
+              <div class="what-tests">Reconstructing an implicit multi-premise argument · naming and exposing a suppressed premise · enforcement probability vs legal liability as distinct concepts · how a flawed legal memo can become evidence of aggravated non-compliance</div>
+            </div>
+          </div>
+
         </div>
       </div>
       <div class="inner-section" id="t01-bar">
@@ -340,15 +409,33 @@
       </div>
       <div class="inner-section" id="t02-ex">
         <div class="inner-header" onclick="togI('t02-ex')">
-          <span class="inner-label">Worked Example</span>
+          <span class="inner-label">Worked Examples</span>
           <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="inner-body">
           <div class="example-block">
-            <div class="ex-label">Classifying Three Arguments</div>
-            <p><strong>(a)</strong> "Every contract requires offer, acceptance, and consideration. This agreement has all three. Therefore it is a valid contract." — <strong>Deductive.</strong> The conclusion is guaranteed if both premises are true; nothing about contract law is left to probability here.</p>
-            <p><strong>(b)</strong> "The last six judgments from this bench have favoured the plaintiff in negligence claims. The seventh case is likely to favour the plaintiff too." — <strong>Inductive.</strong> A pattern from six specific cases is used to predict a seventh; the conclusion is probable, not certain — a sufficiently different seventh case could break the pattern.</p>
-            <p><strong>(c)</strong> "The safe was found open, the cash missing, and only the manager had the combination. The manager is the most likely suspect." — <strong>Abductive.</strong> This is the simplest explanation for the observations, not the only logically possible one — someone else could have obtained the combination, but absent further evidence, the manager is the best available explanation.</p>
+            <div class="ex-label">Easy — Single Argument, One Reasoning Type</div>
+            <p>"All registered solicitors must hold a practising certificate. Tariq is a registered solicitor. Therefore Tariq must hold a practising certificate."</p>
+            <p><strong>Classification: Deductive.</strong> If both premises are true, the conclusion cannot be false — it follows with logical necessity. There is no probability, no inference to the best explanation, no generalisation from cases. The conclusion is contained in the premises once you combine them.</p>
+            <p>The test: could the conclusion be false while both premises are true? Here — no. That is the defining mark of a valid deductive argument.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Medium — Three Arguments, Three Types</div>
+            <p><strong>(a)</strong> "Every contract requires offer, acceptance, and consideration. This agreement has all three. Therefore it is a valid contract." — <strong>Deductive.</strong> Conclusion guaranteed by premises; no probabilistic element.</p>
+            <p><strong>(b)</strong> "The last six judgments from this bench have favoured the plaintiff in negligence claims. The seventh case is likely to favour the plaintiff too." — <strong>Inductive.</strong> Pattern from past cases used to predict a future one; probable, not certain — one different case breaks it.</p>
+            <p><strong>(c)</strong> "The safe was found open, the cash missing, and only the manager had the combination. The manager is the most likely suspect." — <strong>Abductive.</strong> The simplest explanation for the observations; not the only logically possible one, but the best available without further evidence.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Mixed Types in One Argument, Identify Each Step</div>
+            <p>A litigator argues: "In the last 12 similar cases before this jurisdiction, courts awarded damages when both negligence and causation were shown [1]. Negligence is established by the defendant's own admission [2]. Expert testimony confirms the plaintiff's injury was caused by the defendant's conduct [3]. This jurisdiction consistently follows the emerging trend toward higher damages in medical negligence [4]. Therefore substantial damages are the appropriate outcome [5]."</p>
+            <p><strong>Step-by-step classification:</strong></p>
+            <p>[1] → [5]: <strong>Inductive.</strong> 12 past cases generalised to predict this one; not guaranteed, pattern-based.</p>
+            <p>[2] → establishing negligence: <strong>Deductive.</strong> If the admission establishes the standard's breach as a matter of law, the legal element follows necessarily.</p>
+            <p>[3] → causation element: <strong>Abductive.</strong> Expert testimony is the best available explanation of the causal link — other explanations haven't been excluded, but this is the most fitting given available evidence.</p>
+            <p>[4] → damages level: <strong>Inductive.</strong> A trend across cases generalised to predict the appropriate quantum here.</p>
+            <p><strong>Key insight:</strong> real legal arguments are almost never purely one type. Classifying each step separately reveals which parts of the argument are logically secure (deductive steps) and which are vulnerable to challenge (the inductive and abductive ones).</p>
           </div>
         </div>
       </div>
@@ -398,6 +485,45 @@
               <div class="what-tests">Mixed reasoning types in a single argument · overgeneralisation · correlation vs. causation · post hoc fallacy · Tier 3 because it requires simultaneously identifying the structure and multiple flaws</div>
             </div>
           </div>
+
+          <div class="question-block" id="q02d">
+            <div class="q-header" onclick="togQ('q02d')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A forensic expert testifies: "The wound pattern is most consistent with a left-handed assailant. We have found no other plausible explanation given the angle of entry. The accused is left-handed." What type of reasoning does the expert employ, and what is the significant limitation of this type of reasoning in a criminal trial?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Abductive.</strong> The expert is inferring the best explanation for the wound pattern from the available evidence — left-handedness fits the observations better than the alternatives examined. "Most consistent with" and "no other plausible explanation" are the tell-tale language of abductive reasoning.</p>
+              <p><strong>Significant limitation in a criminal trial:</strong> abductive reasoning establishes that a hypothesis is the best current explanation, not that it is the only possible explanation or that it is true beyond reasonable doubt. The criminal standard requires the prosecution to exclude reasonable doubt — but abductive reasoning by definition leaves open the possibility that an unexamined explanation could fit equally well or better. Defence counsel's move here is straightforward: challenge the "no other plausible explanation" claim by proposing one (a right-handed assailant in an unusual position, an ambidextrous attacker) and showing the expert's examination didn't test for it.</p>
+              <div class="what-tests">Abductive reasoning identification · signal language for inference to best explanation · limitation of abduction against criminal standard · specific cross-examination strategy</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q02e">
+            <div class="q-header" onclick="togQ('q02e')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Classify and explain: "In all previous cases where this court found both fraudulent intent and a third-party victim, it imposed a custodial sentence. This case involves both elements. The court will impose a custodial sentence." Is this deductive, inductive, or abductive? Would the classification change if the word "will" were replaced with "should"?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>As written: Inductive.</strong> "In all previous cases" generalises from past precedents to predict the outcome of this one. Even if the pattern is consistent across all prior cases, the conclusion remains probable — not certain. A court could depart from precedent, distinguish this case on its facts, or consider new mitigating factors no previous case raised.</p>
+              <p><strong>If "will" → "should":</strong> the classification shifts to <strong>Deductive</strong> — or more precisely, a normative deductive argument. "Should" makes this a claim about what the principle of consistency requires, not a prediction of what will happen. If P1 = courts must treat like cases alike, P2 = this case is like all prior cases, then C = this court should impose a custodial sentence follows as a logical requirement of the consistency principle. The prediction "will" depends on empirical regularity (inductive); the normative claim "should" depends on a legal principle (deductive from that principle).</p>
+              <div class="what-tests">Inductive reasoning from precedent · the is/ought distinction as a classification tool · how replacing a descriptive prediction with a normative claim changes the reasoning type</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q02f">
+            <div class="q-header" onclick="togQ('q02f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">An appellate judgment reads: "The trial judge found that the defendant's conduct fell below the standard of a reasonable person [1]. Every person whose conduct falls below the reasonable person standard owes damages to those harmed [2]. The defendant therefore owes damages to the plaintiff [3]. We note that in 14 of the last 16 comparable cases before this court, appellants in the defendant's position failed [4]. We dismiss the appeal [5]." (a) Classify the reasoning type for each numbered step. (b) Which steps are doing the actual legal work versus which are rhetorical reinforcement? (c) If step [1] were successfully challenged on appeal to a higher court, which subsequent steps collapse and which survive independently?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Classification:</strong><br>[1]: Finding of fact — not classified as a reasoning type per se, but the court treats it as an established premise.<br>[1]+[2]→[3]: <strong>Deductive.</strong> If the standard was breached (P1) and breach creates liability (P2), liability follows necessarily.<br>[4]: <strong>Inductive.</strong> Pattern from 14/16 past cases used to reinforce the outcome — not legally determinative, but rhetorically supporting.<br>[5]: Conclusion drawn from the above.</p>
+              <p><strong>(b) Legal work vs rhetoric:</strong> Steps [1], [2], [3] are doing the actual legal work — together they form a valid deductive argument for liability. Step [4] is pure rhetorical reinforcement: precedent patterns don't determine outcomes, and a court that dismissed this appeal solely on the 14/16 statistic without the deductive chain [1]→[3] would be committing an inductive fallacy. [4] adds persuasive weight; [1]→[3] provides the legal basis.</p>
+              <p><strong>(c) If [1] collapses:</strong> The entire deductive chain [1]→[2]→[3] collapses because [1] is the factual premise — without it, [2]'s legal rule has nothing to apply to, and [3] has no foundation. Step [4] survives independently (the statistical pattern about appellants remains true) but it cannot carry the judgment on its own — a 14/16 success rate for plaintiffs in past cases provides no legal basis for this specific finding of liability. The judgment fails with [1] even though [4] remains intact.</p>
+              <div class="what-tests">Step-by-step reasoning classification in a multi-stage judgment · distinguishing legally operative from rhetorically supportive reasoning · premise collapse analysis — what survives and what falls when a foundational premise is challenged</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q02g">
+            <div class="q-header" onclick="togQ('q02g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A public health regulator argues: "Twelve of the fourteen countries that implemented mandatory vaccination achieved herd immunity within 18 months [1]. Voluntary programmes have achieved herd immunity in only 3 of 11 countries [2]. This country has failed its voluntary programme for two consecutive years [3]. Therefore mandatory vaccination is the most appropriate policy response [4]." (a) Classify the reasoning type for the move from [1]+[2]+[3] to [4]. (b) Identify the strongest objection to this argument purely on logical grounds — not on policy or ethical grounds. (c) What additional premise, if added, would convert the weakest inferential step into a deductive one?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> The move from [1]+[2]+[3] to [4] is <strong>Inductive.</strong> [1] and [2] are statistical generalisations from other countries' outcomes. [3] applies this country's specific situation. But [4] — that mandatory vaccination is "most appropriate" — is a normative conclusion that goes beyond what purely statistical premises can establish. Even granting [1] and [2] as true, the conclusion requires an additional bridge: that what worked in those 12 countries will work here, and that no other intervention could achieve the same result. Neither bridge is provided by the three premises alone.</p>
+              <p><strong>(b) Strongest logical objection:</strong> the argument conflates correlation with necessity. [1] shows mandatory vaccination was associated with herd immunity in 12 of 14 cases — it doesn't establish that mandatory vaccination caused the immunity rather than other factors correlated with the countries that chose mandatory programmes (e.g., higher baseline compliance culture, different vaccine types, different demographic profiles). The 2 failures in the mandatory group are unexplained. Most critically, [2] shows voluntary programmes fail more often — but "more often" doesn't mean "always," and this country's specific features might place it in the 3-of-11 success category rather than the 8-of-11 failure category.</p>
+              <p><strong>(c) Converting the weakest step to deductive:</strong> the weakest step is the move from [3] (this country failed its voluntary programme) to the conclusion that mandatory is appropriate. Adding: "For any country that fails its voluntary vaccination programme for two or more consecutive years, mandatory vaccination is the appropriate policy response" would make [4] follow deductively from [3] combined with this general rule. The rule itself would then bear all the normative weight — and would need independent justification — but the logical structure would be secure.</p>
+              <div class="what-tests">Inductive reasoning from comparative policy data · normative conclusions from empirical premises · the correlation/causation gap in public health arguments · converting an inductive step to deductive by supplying a general rule · this is the LSAT "Strengthen by supplying a missing premise" question type formalised</div>
+            </div>
+          </div>
+
         </div>
       </div>
       <div class="inner-section" id="t02-bar">
@@ -466,16 +592,45 @@
       </div>
       <div class="inner-section" id="t03-ex">
         <div class="inner-header" onclick="togI('t03-ex')">
-          <span class="inner-label">Worked Example</span>
+          <span class="inner-label">Worked Examples</span>
           <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="inner-body">
           <div class="example-block">
-            <div class="ex-label">Translating Compound Statements</div>
+            <div class="ex-label">Easy — Single Connective, Two Variables</div>
+            <p>Symbolise: "The contract is valid only if it was signed." Let p = the contract is valid, q = it was signed.</p>
+            <div class="notation">p → q</div>
+            <p>"Only if" introduces a conditional where the clause after "only if" is the consequent. Plain check: if the contract is valid (p=T) but unsigned (q=F), the sentence is violated — that makes p→q false in that row, exactly as a conditional requires. Now build the truth table:</p>
+            <table class="logic-table"><thead><tr><th>p</th><th>q</th><th>p→q</th></tr></thead><tbody>
+            <tr><td>T</td><td>T</td><td>T</td></tr>
+            <tr><td>T</td><td>F</td><td>F</td></tr>
+            <tr><td>F</td><td>T</td><td>T</td></tr>
+            <tr><td>F</td><td>F</td><td>T</td></tr>
+            </tbody></table>
+            <p>One false row (p=T, q=F) — this is a contingency, not a tautology or contradiction. A valid unsigned contract is the only combination the rule prohibits.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Medium — Biconditional with Compound Antecedent</div>
             <p>"The defendant is liable if and only if both negligence is proven and the harm was foreseeable."</p>
             <p>Let p = negligence is proven, q = harm was foreseeable, r = defendant is liable.</p>
             <div class="notation">r ↔ (p ∧ q)</div>
-            <p>Reading it back into English to check the translation: "r if and only if (p and q)" — liability holds exactly when both negligence and foreseeability hold together, and fails if either is missing. This matches the original sentence, confirming the translation is correct in both directions, which is the actual test of a correct symbolisation — not just going English-to-symbols, but symbols-to-English landing back on the same meaning.</p>
+            <p>Reading back: "r if and only if (p and q)" — liability holds exactly when both elements hold, fails if either is missing. This matches the original in both directions, confirming the translation. The truth table has 8 rows (three variables); r=T only in the single row where p=T, q=T, r=T.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Three Variables, Identify Tautology or Contingency</div>
+            <p>Determine whether (p → q) → ((p ∧ r) → (q ∧ r)) is a tautology.</p>
+            <div class="notation">
+              Strategy: the whole statement has the form A→B where A=(p→q) and B=((p∧r)→(q∧r)).<br>
+              A conditional is false only when A=T and B=F.<br>
+              When is B false? Only when p∧r=T and q∧r=F.<br>
+              p∧r=T requires p=T and r=T. q∧r=F with r=T requires q=F.<br>
+              So: p=T, r=T, q=F. Check A: p→q = T→F = F.<br>
+              So A=F — the only row where B=F also makes A=F, meaning A→B is never F.<br>
+              Result: <strong>Tautology.</strong>
+            </div>
+            <p>The insight: this statement says "if p implies q, then (p and r) implies (q and r)" — adding the same condition r to both sides of a valid implication preserves validity. Rather than building all 8 rows, the strategic approach finds the only possible false row and shows A is false there too. This shortcut — assume the whole is false, derive a contradiction — is faster than full table construction on complex statements.</p>
           </div>
         </div>
       </div>
@@ -585,6 +740,25 @@
             </div>
           </div>
 
+          <div class="question-block" id="q03g">
+            <div class="q-header" onclick="togQ('q03g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A legislative drafter proposes a data-sharing rule: "Personal data may be shared if the subject has consented OR a court order requires it, AND the recipient is a verified partner." (a) Formalise using p = subject consented, q = court order requires sharing, r = recipient is verified partner, S = data may be shared. (b) Build the truth table. (c) The drafter later claims "if the subject consents, sharing is always allowed regardless of partner status." Evaluate this claim against your formalisation and truth table. (d) Propose a formalisation that would make the drafter's intended interpretation correct, and identify the legal consequence of the change.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> S ↔ [(p ∨ q) ∧ r] — sharing is permitted if and only if (consent or court order) AND verified partner.</p>
+              <p><strong>(b) Key rows (8 total, showing S=T rows):</strong></p>
+              <table class="logic-table"><thead><tr><th>p</th><th>q</th><th>r</th><th>p∨q</th><th>(p∨q)∧r</th><th>S</th></tr></thead><tbody>
+              <tr><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>T</td><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+              <tr><td>T</td><td>T</td><td>F</td><td>T</td><td>F</td><td>F</td></tr>
+              <tr><td>T</td><td>F</td><td>F</td><td>T</td><td>F</td><td>F</td></tr>
+              <tr><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td></tr>
+              </tbody></table>
+              <p><strong>(c) Drafter's claim evaluated:</strong> "If consent, sharing always allowed regardless of partner status" would mean p → S — S=T whenever p=T, regardless of r. But the truth table shows rows where p=T, r=F → S=F (e.g. row 5: p=T, q=F, r=F → S=F). The drafter's claim is <strong>false</strong> against the current formalisation. Partner verification (r) is a necessary condition under [(p∨q)∧r]; consent alone is not sufficient.</p>
+              <p><strong>(d) Revised formalisation:</strong> S ↔ [p ∨ (q ∧ r)] — sharing is permitted if consent exists (regardless of partner status) OR if a court order exists AND the recipient is verified. Legal consequence: the revised rule creates a significant data protection gap — any data subject who has ever consented to anything could have their data shared with any recipient, verified or not, as long as consent exists. Under GDPR-equivalent frameworks this would be a major compliance failure; consent to sharing with one party is not consent to sharing with all parties. The drafter's "intended interpretation," if implemented, removes the partner-verification safeguard entirely for consented data.</p>
+              <div class="what-tests">Formalising a three-variable compound with mixed connectives · truth table for biconditional with compound consequent · testing a verbal claim against a truth table · revising formalisation to match a different interpretation · tracing legal consequences of a connective change</div>
+            </div>
+          </div>
+
         </div>
       </div>
       <div class="inner-section" id="t03-bar">
@@ -651,12 +825,26 @@
       </div>
       <div class="inner-section" id="t04-ex">
         <div class="inner-header" onclick="togI('t04-ex')">
-          <span class="inner-label">Worked Example</span>
+          <span class="inner-label">Worked Examples</span>
           <svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="inner-body">
           <div class="example-block">
-            <div class="ex-label">Proving De Morgan 1 by Truth Table</div>
+            <div class="ex-label">Easy — Writing the Contrapositive</div>
+            <p>Given: "If a witness is under oath, the witness must testify truthfully." (p → q where p = under oath, q = must testify truthfully)</p>
+            <p>Three related statements:</p>
+            <div class="notation">
+              Original:      p → q  &nbsp;&nbsp; "If under oath, must testify truthfully."<br>
+              Contrapositive: ¬q → ¬p &nbsp;"If not testifying truthfully, not under oath."<br>
+              Converse:       q → p  &nbsp;&nbsp; "If testifying truthfully, must be under oath." ← NOT equivalent<br>
+              Inverse:        ¬p → ¬q &nbsp;"If not under oath, need not testify truthfully." ← NOT equivalent
+            </div>
+            <p>The contrapositive is logically equivalent to the original — they have identical truth tables. The converse and inverse are equivalent to each other but not to the original. Only two of these four are pairs.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Medium — Proving De Morgan by Truth Table</div>
+            <p>Prove: ¬(p ∧ q) ≡ ¬p ∨ ¬q</p>
             <table class="logic-table">
               <thead><tr><th>p</th><th>q</th><th>p∧q</th><th>¬(p∧q)</th><th>¬p</th><th>¬q</th><th>¬p∨¬q</th></tr></thead>
               <tbody>
@@ -666,7 +854,26 @@
                 <tr><td>F</td><td>F</td><td>F</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
               </tbody>
             </table>
-            <p>Compare the ¬(p∧q) column against the ¬p∨¬q column: F,T,T,T in both, every single row. The two statements are equivalent — this table <em>is</em> the proof, not just an illustration of it.</p>
+            <p>Columns ¬(p∧q) and ¬p∨¬q are identical in every row — F,T,T,T. The table is the proof. Legal reading: "NOT (negligence AND causation)" means "no negligence OR no causation (or both)" — exactly what a defendant argues when contesting liability on either element.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Chained Equivalences in Statutory Interpretation</div>
+            <p>A statute reads: "A person is not exempt unless they are registered AND have paid the levy." Formalise, derive the contrapositive, apply De Morgan, and interpret each step legally.</p>
+            <div class="notation">
+              Step 1 — Formalise:<br>
+              "Not exempt unless registered AND paid" = ¬E → ¬(R ∧ L) ... wait, "unless" means "if not"<br>
+              Re-read: "A person is not exempt unless [condition]" = "If not [condition], then not exempt"<br>
+              = ¬(R ∧ L) → ¬E, equivalently: E → (R ∧ L)<br>
+              "To be exempt, you must be registered AND have paid the levy."<br><br>
+              Step 2 — Contrapositive of E → (R ∧ L):<br>
+              ¬(R ∧ L) → ¬E<br>
+              "If not (registered AND paid), then not exempt."<br><br>
+              Step 3 — Apply De Morgan to ¬(R ∧ L):<br>
+              (¬R ∨ ¬L) → ¬E<br>
+              "If not registered OR not paid (either failing), then not exempt."
+            </div>
+            <p><strong>Legal significance:</strong> Step 3 is the most useful form for enforcement — it tells the regulator exactly what they need to prove to deny exemption: either registration is absent OR payment is absent. Either one suffices. A taxpayer who argues "I paid the levy so I should be exempt" must also demonstrate registration — Step 3 makes clear that satisfying one disjunct of the antecedent (¬R ∨ ¬L) triggers the denial of exemption, while failing both means the antecedent is false, and exemption may still apply.</p>
           </div>
         </div>
       </div>
@@ -754,6 +961,17 @@
               <p><strong>(c) Taxpayer X:</strong> p=T, q=F → p∧q=F → antecedent false → rule does not require X to file. The authority's notice is not supported by this rule. X should challenge by demonstrating q=F.</p>
               <p><strong>(d) Taxpayer Y:</strong> p=F, q=T → p∧q=F → same. The conjunction requires both simultaneously. Y is not subject to the filing obligation under this rule.</p>
               <div class="what-tests">Compound antecedent · all four patterns evaluated · vacuously true when one conjunct fails · two taxpayers demonstrating the same logical gap from different directions</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="q04g">
+            <div class="q-header" onclick="togQ('q04g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A constitutional provision states: "The President may declare a state of emergency only if the National Assembly has been dissolved OR an external threat has been certified by the Defence Council." (a) Formalise (let E = emergency declared, D = Assembly dissolved, T = external threat certified). (b) Using De Morgan and contrapositive, derive the conditions under which declaring an emergency is unconstitutional. (c) The President declares an emergency. The Assembly was not dissolved, but the Defence Council certified an external threat. Is this constitutional under your formalisation? (d) A minister argues: "Since the provision uses OR, satisfying either condition alone is sufficient — the President need not meet both." Evaluate this argument, and identify whether the minister's reading introduces any logical ambiguity about the President's obligations when neither condition holds.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> E → (D ∨ T) — declaring an emergency requires dissolution OR certified threat (or both).</p>
+              <p><strong>(b) Unconstitutional declaration:</strong> Contrapositive: ¬(D ∨ T) → ¬E. Apply De Morgan: (¬D ∧ ¬T) → ¬E. "If the Assembly is NOT dissolved AND no external threat is certified, declaring an emergency is unconstitutional." Both conditions must be absent simultaneously to make a declaration unconstitutional — failing just one while the other holds is not enough to prohibit it.</p>
+              <p><strong>(c) President's declaration:</strong> D=F (Assembly not dissolved), T=T (threat certified). D∨T = F∨T = T. The antecedent of E→(D∨T) is E=T (emergency declared) and the consequent is T — the conditional holds. <strong>Constitutional.</strong> One condition being satisfied is sufficient under the OR structure.</p>
+              <p><strong>(d) Minister's argument:</strong> The minister is correct that the OR structure means either condition alone suffices — this is standard inclusive-or logic and the formalisation confirms it. However, the minister's reading introduces an important ambiguity: E→(D∨T) is a conditional, not a biconditional. It says when an emergency requires justification, not that the President must declare one when either condition holds. The provision imposes a necessary condition on declarations, not a sufficient condition triggering them. A situation where D=T and T=T permits a declaration but doesn't require one — the President retains discretion. The minister may be conflating "permitted when either holds" with "obligated when either holds," which are different legal positions and would require a biconditional (E ↔ (D∨T)) to establish the obligation reading.</p>
+              <div class="what-tests">Formalising a constitutional provision · contrapositive + De Morgan for enforcement analysis · evaluating a specific factual scenario against the formalisation · conditional vs biconditional as the necessary/sufficient distinction in constitutional law · permission vs obligation as a logical structure gap</div>
             </div>
           </div>
 
