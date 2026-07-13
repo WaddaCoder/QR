@@ -199,8 +199,14 @@
       <div class="inner-section" id="q01-ph3">
         <div class="inner-header" onclick="togI('q01-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
+                    <div class="example-block">
+            <div class="ex-label">Easy — Translate Two Sentences, Evaluate Both</div>
+            <p>(a) "Every contract must be in writing to be enforceable." Domain: all contracts in the jurisdiction. (b) "There exists a contract that was enforced orally." Translate and evaluate given 3 oral contracts were enforced last year.</p>
+            <p>(a) ∀x C(x) [Written(x) → Enforceable(x)]? No — re-read: "every contract MUST be in writing to BE enforceable" = ∀x [Enforceable(x) → Written(x)]. Evaluate: if even one enforceable oral contract exists, this universal is false. (b) ∃x C(x) [Enforced(x) ∧ ¬Written(x)]: 3 oral contracts were enforced. T(∃) = TRUE — three witnesses. The existential and universal are mutually inconsistent: the existential witnesses falsify the universal. Three enforced oral contracts disprove the "must be in writing" rule as stated.</p>
+          </div>
+
           <div class="example-block">
-            <div class="ex-label">English → Symbol → Evaluate → English Check → Legal Application</div>
+            <div class="ex-label">Medium — English → Symbol → Evaluate → English Check → Legal Application</div>
             <p><strong>Sentence:</strong> "Every public authority that receives a complaint must acknowledge it within 14 days. At least one authority failed to do so last quarter."</p>
             <p><strong>Step 1 — Phase 1:</strong> "every public authority" → ∀. "At least one authority" → ∃. Two separate statements.</p>
             <p><strong>Step 2 — Define:</strong></p>
@@ -214,6 +220,13 @@
             <p><strong>Step 3 — Evaluate the tension:</strong> Claim 1 is a universal rule (obligation). Claim 2 is an existential fact (at least one violation). These are in direct tension — Claim 2 provides a counterexample to Claim 1 as applied in practice. The rule was not universally followed.</p>
             <p><strong>Step 4 — What can we infer?</strong> From ∃x [R(x) ∧ ¬A(x)], call that authority X. R(X)=T and ¬A(X)=T. Substituting into Claim 1: R(X) → A(X) should hold, but A(X)=F. This is a genuine violation of the rule, not a vacuous case.</p>
             <p><strong>Step 5 — English check:</strong> ∀x [R(x)→A(x)] = "every authority that received a complaint acknowledged it within 14 days." ∃x [R(x)∧¬A(x)] = "there exists at least one authority that received a complaint but did not acknowledge within 14 days." Both match originals. The formalisation is correct, and it immediately reveals the precise nature of the violation.</p>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Quantifier Scope Ambiguity in a Contractual Clause</div>
+            <p>"All deliveries must be inspected by a quality officer." Two readings: (A) ∀x [Delivery(x) → ∃y [QO(y) ∧ Inspects(y,x)]] — for every delivery, SOME quality officer inspects it. (B) ∃y [QO(y) ∧ ∀x [Delivery(x) → Inspects(y,x)]] — SOME SPECIFIC quality officer inspects ALL deliveries.</p>
+            <p>Reading A is satisfied if each delivery is inspected by any quality officer (possibly different ones). Reading B requires one dedicated QO to inspect everything. If the company has 5 QOs each handling different days, Reading A is satisfied but Reading B is not. A dispute: 50 deliveries were inspected by 5 different QOs (10 each). Under A: satisfied. Under B: no single QO inspected all 50, so violated.</p>
+            <p>Quantifier scope rule: ∀x ∃y means "for each x, there is some y" (existential varies with x). ∃y ∀x means "there is one fixed y for all x" (existential is fixed). The scope difference (∀ before ∃ vs ∃ before ∀) creates two logically distinct contract interpretations with completely different compliance requirements. Contract drafters should specify "a quality officer" (∀x ∃y) vs "the designated quality officer" (∃y ∀x) to avoid this ambiguity.</p>
+          </div>
           </div>
         </div>
       </div>
@@ -289,6 +302,11 @@
         </div>
       </div>
 
+            <div class="question-block" id="qq01e">
+              <div class="q-header" onclick="togQ('qq01e')"><span class="tier-badge t3-badge">T3 · E</span><span class="q-text">"For every employee who has been with the company for more than 5 years, there exists a performance review that gives them a rating of Excellent or above." (a) Formalise using nested quantifiers. (b) A labour tribunal asks: "How many employees need to be checked to verify this claim?" (c) A company provides one review per employee with an Excellent rating. Is the claim satisfied? (d) An employee with 6 years service has three reviews: Good, Good, Excellent. Is the claim satisfied for this employee? What if they had only two reviews: Good, Good?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>(a) ∀e [Employee(e) ∧ Service(e)>5 → ∃r [Review(r,e) ∧ Rating(r)≥Excellent]].</p><p>(b) To verify the universal, every employee with more than 5 years must be checked. If there are n such employees, all n must be verified. A universal admits no shortcuts — missing one could reveal a counter-example. To FALSIFY the claim, only ONE employee needs to be found with no Excellent review.</p><p>(c) One review per employee with Excellent: ∃r [Review(r,e) ∧ Rating≥Excellent] = TRUE for each e (one witness per employee). The claim is satisfied. The existential only requires at least one qualifying review to exist — one is sufficient.</p><p>(d) Employee with reviews {Good, Good, Excellent}: ∃r ... = TRUE (the Excellent review is the witness). Claim satisfied for this employee. Employee with only {Good, Good}: no Excellent review exists. ∃r [Rating≥Excellent] = FALSE. This employee is a counter-example to the universal claim. The company's claim is FALSE if even one 5+-year employee has no Excellent review in their history.</p><div class="what-tests">Nested ∀∃ quantifiers · verifying universal requires checking all instances · existential only needs one witness · one counter-example falsifies universal · three reviews with one Excellent satisfies existential · two Good reviews are a counter-example</div></div>
+            </div>
+
       <div class="inner-section" id="q01-bar">
         <div class="inner-header" onclick="togI('q01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
@@ -358,8 +376,14 @@
       <div class="inner-section" id="q02-ph3">
         <div class="inner-header" onclick="togI('q02-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
+                    <div class="example-block">
+            <div class="ex-label">Easy — Negate One Universal, Negate One Existential</div>
+            <p>(a) Negate: "Every defendant is presumed innocent." (b) Negate: "There exists a contract that is voidable."</p>
+            <p>(a) ∀x D(x) [Innocent(x)]. Negation: ¬∀x D(x) [Innocent(x)] ≡ ∃x D(x) [¬Innocent(x)]. English: "There exists at least one defendant who is NOT presumed innocent." Note: the negation does not say "no defendant is innocent" — it says at least one is not. (b) ∃x C(x) [Voidable(x)]. Negation: ¬∃x C(x) [Voidable(x)] ≡ ∀x C(x) [¬Voidable(x)]. English: "No contract is voidable" (every contract is not voidable). The flip-and-negate rule: ¬∀↔∃¬ and ¬∃↔∀¬.</p>
+          </div>
+
           <div class="example-block">
-            <div class="ex-label">Negating Both Directions with English Check</div>
+            <div class="ex-label">Medium — Negating Both Directions with English Check</div>
             <p><strong>Statement A:</strong> "All witnesses who testified were cross-examined."</p>
             <div class="notation">
               Step 1 — Phase 1: "all witnesses who testified" → ∀<br>
@@ -383,6 +407,13 @@
               Step 4 — English: "Every item in this case was obtained with a valid warrant." ✓<br><br>
               Legal meaning: to defeat the ∃ claim ("some evidence was obtained illegally"), the defence must show EVERY piece of evidence was lawfully obtained — a heavy burden, which is why existential allegations of illegality shift the burden of production.
             </div>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Negate a Conditional Universal and Apply to a Specific Legal Dispute</div>
+            <p>Contract clause: "For all purchase orders above Rs.100,000, written approval is required." Formalise and negate it. A manager approved 3 oral orders above Rs.100,000. Does the negation apply?</p>
+            <p>Formalisation: ∀x [Order(x) ∧ Value(x)>100,000 → WrittenApproval(x)]. This is ∀x [P(x)→Q(x)].</p>
+            <p>Negation: ¬∀x [P(x)→Q(x)] ≡ ∃x [P(x) ∧ ¬Q(x)]. English: "There exists a purchase order above Rs.100,000 that does NOT have written approval." The manager's 3 oral approvals mean ∃x [Order(x) ∧ Value>100,000 ∧ ¬WrittenApproval(x)] = TRUE. The negation holds — the clause was violated. Key: negating ∀x[P→Q] gives ∃x[P∧¬Q], NOT ∃x[P→¬Q] (a common error). The P condition remains POSITIVE (P stays, only Q is negated). Three oral orders are three witnesses to the negation; one is sufficient to falsify the universal clause.</p>
+          </div>
           </div>
         </div>
       </div>
@@ -460,6 +491,11 @@
         </div>
       </div>
 
+            <div class="question-block" id="qq02e">
+              <div class="q-header" onclick="togQ('qq02e')"><span class="tier-badge t3-badge">T3 · E</span><span class="q-text">A court order states: "No party to this proceeding shall disclose any documents marked Confidential to persons outside the legal team." (a) Formalise using ¬∃ or ∀. (b) Negate the formalisation and state what the negation means in English. (c) A paralegal shared one document marked Confidential with a journalist. Does the court order's negation hold? (d) The company argues: "This was an isolated mistake, not a pattern." Evaluate whether the quantifier structure of the order permits the "isolated mistake" defence.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>(a) Two equivalent formalisations: ¬∃x∃y [Party(x) ∧ DocConf(x,y) ∧ Outside(y)]. Equivalently: ∀x∀y [Party(x) ∧ DocConf(x,y) → ¬Outside(y)]. The order is a universal prohibition.</p><p>(b) Negation of ¬∃x∃y […] = ∃x∃y [Party(x) ∧ DocConf(x,y) ∧ Outside(y)]: "There exists a party and a person outside the legal team such that the party disclosed a confidential document to that person." This is a contempt trigger.</p><p>(c) Paralegal shares one document: ∃x∃y [Party(paralegal) ∧ DocConf(paralegal, journalist) ∧ Outside(journalist)] = TRUE. The negation holds — one instance is sufficient to violate a universal prohibition. The court order has been breached.</p><p>(d) "Isolated mistake" defence: the universal ∀x∀y [...→¬Outside(y)] requires ZERO disclosures. The structure permits no exceptions — "isolated" or "pattern" are irrelevant to whether the universal was violated. One disclosure falsifies the prohibition. The "isolated mistake" argument might be relevant to REMEDY (reduced penalty for first offence) but is logically irrelevant to whether a violation occurred. The violation is a binary fact established by the existence of one counter-example; frequency or intent does not change whether the universal was breached.</p><div class="what-tests">¬∃ and ∀ as equivalent formalisations of universal prohibition · negation = existential witness · one disclosure falsifies universal prohibition · isolated mistake irrelevant to whether violation occurred · frequency relevant to remedy not liability</div></div>
+            </div>
+
       <div class="inner-section" id="q02-bar">
         <div class="inner-header" onclick="togI('q02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
@@ -529,8 +565,14 @@
       <div class="inner-section" id="q03-ph3">
         <div class="inner-header" onclick="togI('q03-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
+                    <div class="example-block">
+            <div class="ex-label">Easy — Negate One Conditional, Find the Counterexample</div>
+            <p>"If a person is a licensed driver, they have passed a driving test." Formalise and negate. If John has a licence but never passed a test, which statement does he witness?</p>
+            <p>Formalisation: ∀x [Licensed(x) → PassedTest(x)]. Negation: ∃x [Licensed(x) ∧ ¬PassedTest(x)]. English: "There exists a licensed person who has NOT passed a driving test." John: Licensed(John)=T, PassedTest(John)=F. John satisfies [Licensed ∧ ¬PassedTest] — he is a witness to the negation. The original universal is FALSE. Key: P stays positive in the negation (Licensed remains unchanged), only Q is negated (¬PassedTest). A common error is to write ∃x[¬Licensed(x)∨¬PassedTest(x)] — this incorrectly negates P too.</p>
+          </div>
+
           <div class="example-block">
-            <div class="ex-label">Complete Negation — Three Legal Rules, Three Counterexamples</div>
+            <div class="ex-label">Medium — Complete Negation — Three Legal Rules, Three Counterexamples</div>
             <p><strong>Rule A:</strong> "Every employee who works overtime is entitled to additional pay."</p>
             <div class="notation">
               Formalise: ∀x [O(x)→E(x)] where O(x)="x works overtime," E(x)="x is entitled to additional pay"<br>
@@ -555,6 +597,13 @@
               English: "There exists a person who was convicted of a drug offence whose licence was NOT suspended."<br>
               Wrong version students write: ∃x [¬C(x) ∧ ¬S(x)] — "someone not convicted had no suspension." This is irrelevant to the rule — the rule says nothing about non-convicted persons. It is NOT a counterexample.
             </div>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Nested Conditional with Three Predicates, Identify the Counterexample Structure</div>
+            <p>Rule: "All employees who handle financial data AND have access to client accounts must have completed the Advanced Security Training." Formalise, negate, and identify exactly what a counter-example must look like.</p>
+            <p>Formalisation: ∀x [(F(x) ∧ A(x)) → S(x)] where F=handles financial data, A=access to client accounts, S=completed Advanced Security Training.</p>
+            <p>Negation: ∃x [(F(x) ∧ A(x)) ∧ ¬S(x)]. Counter-example structure: an employee who BOTH handles financial data AND has account access, but has NOT completed the training. This is precise — an employee with only F but not A is not a counter-example (the antecedent F∧A is false for them). An employee who completed the training is not a counter-example (¬S is false). The counter-example must satisfy ALL THREE conditions: F=T, A=T, S=F. A compliance audit should check only employees satisfying F∧A (the antecedent) and verify S for each. Employees with only one risk factor need not be checked for this specific rule.</p>
+          </div>
           </div>
         </div>
       </div>
@@ -631,6 +680,11 @@
 
         </div>
       </div>
+
+            <div class="question-block" id="qq03e">
+              <div class="q-header" onclick="togQ('qq03e')"><span class="tier-badge t3-badge">T3 · E</span><span class="q-text">A constitutional provision: "No person who has been convicted of a felony within the last ten years shall hold public office." (a) Rewrite as a universal conditional. (b) Negate and state what a counter-example must look like. (c) A candidate was convicted 11 years ago. Are they a counter-example? (d) A different candidate was convicted 8 years ago but received a full pardon. The constitution is silent on pardons. Who bears the burden of proving the predicate is satisfied or not, and what does the quantifier structure tell you about the burden?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>(a) Universal conditional: ∀x [Person(x) ∧ FelonyLast10(x) → ¬HoldOffice(x)]. Or equivalently: ¬∃x [Person(x) ∧ FelonyLast10(x) ∧ HoldOffice(x)].</p><p>(b) Negation: ∃x [Person(x) ∧ FelonyLast10(x) ∧ HoldOffice(x)]. Counter-example: a specific person who (i) was convicted of a felony (ii) within the last 10 years AND (iii) currently holds or is seeking public office. All three conditions must be simultaneously true for a counter-example to exist.</p><p>(c) Candidate convicted 11 years ago: FelonyLast10(candidate) = FALSE (11 years exceeds the 10-year window). The antecedent is false — the conditional is vacuously TRUE for this candidate. Not a counter-example. The candidate is NOT prohibited by this provision. The 10-year time limit is a component of the predicate; outside the window, the prohibition simply doesn’t apply.</p><p>(d) Candidate convicted 8 years ago with pardon. The provision says "convicted" — does a pardon affect FelonyLast10(x)? If "convicted" means conviction on record (pardon does not expunge), FelonyLast10(x)=T and the prohibition applies. If "convicted" means currently under legal disability from conviction (pardon removes), FelonyLast10(x)=F and the prohibition doesn’t apply. Burden analysis: the universal provision places the burden on the challenger to prove the three conditions (conviction, recency, office-holding) to trigger the prohibition. Once the challenger establishes FelonyLast10(x)=T and HoldOffice(x)=T, the universal imposes the prohibition automatically. The candidate with a pardon must then argue that the pardon extinguishes FelonyLast10(x) — effectively arguing the antecedent is false. This is an affirmative defence that shifts the interpretive burden to the candidate to establish what "convicted" means in the constitutional context.</p><div class="what-tests">Universal conditional form of prohibition · counter-example requires all three conditions simultaneously · 11-year conviction outside 10-year window = vacuously true, not prohibited · pardon dispute as a predicate definition question · challenger establishes antecedent; candidate must rebut by arguing antecedent false</div></div>
+            </div>
 
       <div class="inner-section" id="q03-bar">
         <div class="inner-header" onclick="togI('q03-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
