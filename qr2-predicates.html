@@ -202,8 +202,14 @@
       <div class="inner-section" id="p01-ph3">
         <div class="inner-header" onclick="togI('p01-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
+                    <div class="example-block">
+            <div class="ex-label">Easy — Write One Predicate, Evaluate for Two Values</div>
+            <p>"A contract is binding if it has offer, acceptance, and consideration." Write the predicate B(x) and evaluate for: (a) x = a contract with all three elements; (b) x = a letter of intent with no consideration.</p>
+            <p>Predicate: B(x) = "x has offer AND x has acceptance AND x has consideration." (a) B(contract with all three) = T ∧ T ∧ T = TRUE. (b) B(letter of intent, no consideration) = T ∧ T ∧ F = FALSE. The predicate correctly captures that all three elements are necessary — failing any one element gives a false value even if the other two are present.</p>
+          </div>
+
           <div class="example-block">
-            <div class="ex-label">English → Predicate → Evaluate → English Check</div>
+            <div class="ex-label">Medium — English → Predicate → Evaluate → English Check</div>
             <p><strong>Given:</strong> "A lawyer who holds a valid practising certificate is authorised to appear in the High Court."</p>
             <p><strong>Step 1 — Phase 1 check:</strong> "a lawyer" introduces a blank subject → this is a predicate statement, not a propositional one. It makes a claim about each lawyer individually, not about a single named person.</p>
             <p><strong>Step 2 — Define predicates and domain:</strong></p>
@@ -216,6 +222,12 @@
             <p><strong>Step 3 — Evaluate at a specific individual:</strong> Lawyer Ali holds a valid certificate. So C(Ali) = T. By the conditional: C(Ali) → A(Ali), since C(Ali) = T, we conclude A(Ali) = T. Ali is authorised.</p>
             <p><strong>Step 4 — Check a second individual:</strong> Lawyer Raza has an expired certificate. C(Raza) = F. The conditional C(Raza) → A(Raza) has a false antecedent — it is vacuously true but tells us nothing about A(Raza). We cannot conclude Raza is authorised, but we also cannot conclude he is not authorised from this rule alone. A false antecedent leaves the consequent completely undetermined.</p>
             <p><strong>Step 5 — English check:</strong> reading C(x) → A(x) back into English: "if x holds a valid certificate, then x is authorised" — this matches the original sentence, confirming the formalisation is correct in both directions.</p>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Two Predicates with Shared Domain, Find Where Both Are True</div>
+            <p>Domain D = {all employees}. P(x) = "x earns more than Rs.30,000." Q(x) = "x has worked more than 5 years." Evaluate P(x) ∧ Q(x) for: Alice (Rs.35,000, 3 years), Bob (Rs.25,000, 8 years), Carol (Rs.40,000, 7 years). Then write: "There exists an employee who satisfies both P and Q."</p>
+            <p>Alice: P=T (35,000>30,000), Q=F (3<5). P∧Q = F. Bob: P=F (25,000<30,000), Q=T (8>5). P∧Q = F. Carol: P=T (40,000>30,000), Q=T (7>5). P∧Q = T. Existential claim: ∃x∈D [P(x)∧Q(x)]: TRUE — Carol is the witness. Universal claim: ∀x∈D [P(x)∧Q(x)]: FALSE — Alice and Bob falsify it. Legal application: a benefit clause "all employees who earn above Rs.30,000 AND have served more than 5 years" would cover only Carol.</p>
+          </div>
           </div>
         </div>
       </div>
@@ -256,6 +268,11 @@
 
         </div>
       </div>
+
+            <div class="question-block" id="qp01e">
+              <div class="q-header" onclick="togQ('qp01e')"><span class="tier-badge t3-badge">T3 · E</span><span class="q-text">A statute says: "A person commits an offence if they (1) knowingly possess (2) a prohibited substance (3) within a school zone." Write the predicate O(x), evaluate it for four cases, and explain why a defendant who satisfies conditions (1) and (2) but not (3) cannot be convicted under this specific statute — even if they could be convicted of a different offence.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>Predicate: O(x) = Knowing(x) ∧ Possess_Prohibited(x) ∧ InSchoolZone(x). Three necessary conditions in conjunction.</p><p>Cases: (1) A: knows, possesses, in school zone. O(A) = T∧T∧T = TRUE — guilty of this offence. (2) B: knows, possesses, NOT in school zone. O(B) = T∧T∧F = FALSE — not guilty of THIS offence. (3) C: possesses (unknowingly), in school zone. O(C) = F∧T∧T = FALSE — missing the mental element (mens rea). (4) D: in school zone but possesses a permitted substance. O(D) = T∧F∧T = FALSE — substance element fails.</p><p>Why B cannot be convicted of THIS offence: the school-zone element is a conjunct that is false for B. A conjunction is false if ANY conjunct is false (F∧T∧T=F). The prosecution cannot rely on predicates (1) and (2) alone to establish the statutory offence — all three elements must be proven. B may be guilty of simple possession under a different statute that lacks the school-zone element. The point of conjunctive statutory elements is to create a higher-specificity offence — proving the base elements (knowing possession) is necessary but not sufficient for the enhanced school-zone offence.</p><div class="what-tests">Conjunctive predicate with three elements · falsehood of ANY conjunct falsifies the whole · necessary vs sufficient conditions in statutory elements · enhanced vs base offence as predicates with different conjunct sets · mens rea as a predicate conjunct</div></div>
+            </div>
 
       <div class="inner-section" id="p01-bar">
         <div class="inner-header" onclick="togI('p01-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
@@ -324,8 +341,14 @@
       <div class="inner-section" id="p02-ph3">
         <div class="inner-header" onclick="togI('p02-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
+                    <div class="example-block">
+            <div class="ex-label">Easy — Write R(x,y), Evaluate for Two Pairs</div>
+            <p>R(x,y) = "x owes money to y." Evaluate: R(Ahmed, Bank) where Ahmed has a loan; R(Company, Ahmed) where Ahmed is an employee (not a debtor to the company).</p>
+            <p>R(Ahmed, Bank) = TRUE — Ahmed has a loan obligation to the Bank. R(Company, Ahmed) = FALSE — Company pays Ahmed (employment relationship), but Ahmed does not owe money to Company. Note: binary predicates are ORDERED — R(x,y) asks whether x bears the relation to y, not the reverse. R(Ahmed, Bank) ≠ R(Bank, Ahmed). The loan creates a directed relation.</p>
+          </div>
+
           <div class="example-block">
-            <div class="ex-label">English → Binary Predicate → Chain Evaluation → English Check</div>
+            <div class="ex-label">Medium — English → Binary Predicate → Chain Evaluation → English Check</div>
             <p><strong>Given:</strong> "An employer is vicariously liable for any harm caused by an employee while acting within the scope of their employment."</p>
             <p><strong>Step 1 — Phase 1:</strong> two blanks — the employer (x) and the employee (y) → binary predicate structure. A third element, the harm, is implied but treated as background.</p>
             <p><strong>Step 2 — Define:</strong></p>
@@ -340,6 +363,12 @@
             <p><strong>Step 3 — Evaluate:</strong> Company C employs Driver D. D caused an accident while making a delivery (within scope). E(C,D)=T, S(D)=T, H(D)=T → conjunction=T → V(C)=T. Company C is vicariously liable.</p>
             <p><strong>Step 4 — What if D was on a personal errand?</strong> S(D)=F → conjunction=F → V(C) is not forced to be T by this rule. Vicarious liability does not apply. The employer may still be liable on other grounds, but this specific rule doesn't establish it.</p>
             <p><strong>Step 5 — English check:</strong> [E(x,y) ∧ S(y) ∧ H(y)] → V(x) reads back as "if x employs y, and y was acting within scope, and y caused harm, then x is vicariously liable" — exactly matching the original rule. Formalisation confirmed.</p>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Three-Party Chain, Identify Transitivity and Its Limits</div>
+            <p>L(x,y) = "x is legally liable to y." Given: L(A,B) = TRUE (A breached a contract with B). L(B,C) = TRUE (B failed to pay C due to A's breach). Does L(A,C) = TRUE?</p>
+            <p>Legal analysis: L is NOT automatically transitive in contract law. A's liability runs to B (privity of contract). B's liability to C may arise from a separate contract between B and C. A does not automatically become liable to C simply because a chain of obligations connects them. L(A,C) depends on whether: (i) a direct contractual or tortious duty exists between A and C, (ii) A's breach was sufficiently proximate to C's loss to create a duty of care in tort, or (iii) there is a statutory basis for extending liability to C. Without these, L(A,C) = FALSE despite L(A,B)=T and L(B,C)=T. The chain is legally non-transitive. Binary predicates capturing legal relations should be checked for transitivity explicitly — many legal relations that appear chain-like are actually non-transitive.</p>
+          </div>
           </div>
         </div>
       </div>
@@ -380,6 +409,11 @@
 
         </div>
       </div>
+
+            <div class="question-block" id="qp02e">
+              <div class="q-header" onclick="togQ('qp02e')"><span class="tier-badge t3-badge">T3 · E</span><span class="q-text">S(x,y) = "x has signed a contract with y." Is S symmetric (S(x,y) ↔ S(y,x))? Is it transitive (S(x,y) ∧ S(y,z) → S(x,z))? Is it reflexive (S(x,x))? Give a legal counter-example or proof for each property. Then explain why the symmetry analysis matters for determining who is bound by an arbitration clause in a multi-party contract.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>Symmetric: S(x,y) ↔ S(y,x)? If x signed a contract with y, then by definition y also signed a contract with x (contracts require mutual assent). S is SYMMETRIC in standard bilateral contracts. Counter-example where symmetry might break: a unilateral contract (x makes an offer; y accepts by performance, not signature). But if "signed" means both parties signed, then S is symmetric.</p><p>Transitive: S(x,y) ∧ S(y,z) → S(x,z)? Not necessarily. x signed with y; y signed with z; this does NOT mean x signed with z. Example: A signs a supply contract with B; B signs a distribution contract with C. A has no contractual relationship with C. S is NOT TRANSITIVE. Counter-example is trivially easy to find in any supply chain.</p><p>Reflexive: S(x,x)? A person cannot typically sign a contract with themselves (no separate parties). S is NOT REFLEXIVE as a legal matter (self-contracting is generally void for lack of separate parties).</p><p>Arbitration clause significance: S(x,y) ∧ ArbitrClause(contract) → BoundByArbitr(x,y). Because S is symmetric, both x and y are bound by the arbitration clause when they signed the same contract. Because S is non-transitive, z (who signed with y but not x) is NOT automatically bound by x-y's arbitration clause. Multi-party disputes often turn on this: party C cannot be compelled to arbitrate with A under A-B's clause if C only signed the B-C contract. The symmetry tells you who is bound; the non-transitivity tells you who is not.</p><div class="what-tests">Symmetry (yes for bilateral signed contracts) · non-transitivity (supply chain counter-example) · non-reflexivity (no self-contracting) · arbitration clause binding only parties to that specific signed contract · why non-transitivity matters for multi-party dispute resolution</div></div>
+            </div>
 
       <div class="inner-section" id="p02-bar">
         <div class="inner-header" onclick="togI('p02-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
@@ -453,8 +487,14 @@
       <div class="inner-section" id="p03-ph3">
         <div class="inner-header" onclick="togI('p03-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Example</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
+                    <div class="example-block">
+            <div class="ex-label">Easy — Translate One Universal and One Existential, Evaluate Both</div>
+            <p>Domain: all employees of Company X (n=50). P(x) = "x has signed the NDA." (a) Write ∀x P(x) in English and evaluate given 47 of 50 signed. (b) Write ∃x P(x) in English and evaluate.</p>
+            <p>(a) ∀x P(x) = "Every employee has signed the NDA." With 47/50 signed, 3 have not. Three counter-examples falsify the universal. ∀x P(x) = FALSE. (b) ∃x P(x) = "There exists at least one employee who has signed the NDA." 47 witnesses confirm this. ∃x P(x) = TRUE. Key insight: a universal requires all 50 to be true; an existential requires only one. Three unsigned NDAs kill the universal while strengthening the existential claim. Legal consequence: the company cannot make the claim "all our employees have signed NDAs" (compliance language requires the universal); but "some employees have signed" is trivially true.</p>
+          </div>
+
           <div class="example-block">
-            <div class="ex-label">Full Pipeline — Legal Sentence → Quantified Predicate → Evaluate → English Check</div>
+            <div class="ex-label">Medium — Full Pipeline — Legal Sentence → Quantified Predicate → Evaluate → English Check</div>
             <p><strong>Given:</strong> "Every registered company that fails to file its annual return is subject to a penalty, and at least one registered company failed to file last year."</p>
             <p><strong>Step 1 — Phase 1:</strong> Two separate claims. First: a claim about EVERY registered company with a condition → ∀ with a conditional predicate. Second: a claim about AT LEAST ONE registered company → ∃.</p>
             <p><strong>Step 2 — Define:</strong></p>
@@ -468,6 +508,14 @@
             <p><strong>Step 3 — Derive a conclusion:</strong> From ∃x F(x), there is some specific company — call it Company A — where F(A)=T. From ∀x [F(x) → P(x)], apply to Company A: F(A)→P(A). Since F(A)=T, by modus ponens: P(A)=T. Company A is subject to a penalty.</p>
             <p><strong>Step 4 — What does ∀x [F(x)→P(x)] say about a company that DID file?</strong> For Company B that filed: F(B)=F → F(B)→P(B) is vacuously true. The rule says nothing about whether B is subject to a penalty on other grounds. It only guarantees penalties for failures; it doesn't guarantee freedom from penalties for compliant companies (which might be penalised for other reasons).</p>
             <p><strong>Step 5 — English check:</strong> ∀x [F(x)→P(x)] reads "for every company x, if x failed to file, then x is subject to a penalty." ∃x F(x) reads "there is at least one company that failed to file." Both match the original. Formalisation confirmed.</p>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Nested Quantifiers in a Contract Dispute</div>
+            <p>Translate: "For every supplier, there exists at least one order that has been delivered on time." Let S = set of suppliers, O = set of orders, D(s,o) = "order o for supplier s was delivered on time." Write in predicate logic and evaluate given: Supplier A has 5 orders, all on time; Supplier B has 4 orders, 3 on time, 1 late.</p>
+            <p>Translation: ∀s∈S [∃o∈O(s) D(s,o)]. For every supplier s, there exists at least one order o in that supplier's orders that was delivered on time.</p>
+            <p>Supplier A: 5 orders, all on time. ∃o D(A,o) = TRUE (multiple witnesses). A satisfies the predicate. Supplier B: 4 orders, 3 on time. ∃o D(B,o) = TRUE (3 witnesses). B also satisfies the predicate. ∀s∈S [∃o D(s,o)] = TRUE for both A and B.</p>
+            <p>Legal nuance: this formula says NOTHING about whether most orders were on time, or whether the late orders matter. A supplier with 100 orders and 99 late deliveries satisfies the formula if even one was on time. The formula is a weak claim. A stronger clause would be: ∀s∈S ∀o∈O(s) D(s,o) (all orders for all suppliers on time) — which Supplier B cannot satisfy (one late order). Contract drafters must choose between the existential (∃) and universal (∀) claim; the difference is enormous for enforcement.</p>
+          </div>
           </div>
         </div>
       </div>
@@ -509,6 +557,11 @@
         </div>
       </div>
 
+            <div class="question-block" id="qp03e">
+              <div class="q-header" onclick="togQ('qp03e')"><span class="tier-badge t3-badge">T3 · E</span><span class="q-text">A regulatory compliance clause: "All employees in senior roles who handle client data must have completed data protection training within the last 12 months." (a) Define the domain and predicates. (b) Write the full formalisation. (c) The compliance officer reports: "92% of relevant employees are trained." Is the organisation compliant? (d) The company argues: "The 8% are on extended leave — practical compliance is 100%." Evaluate this argument logically and legally.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>(a) Domain D = all employees. Predicates: S(x) = "x is in a senior role"; H(x) = "x handles client data"; T(x) = "x completed data protection training within 12 months."</p><p>(b) Formalisation: ∀x∈D [(S(x) ∧ H(x)) → T(x)]. For every employee x: if x is senior AND handles client data, then x has completed training.</p><p>(c) 92% compliance: the universal quantifier requires ALL employees satisfying S(x)∧H(x) to satisfy T(x). The 8% who haven't trained are counter-examples. ∀x[(S(x)∧H(x))→T(x)] = FALSE. The organisation is NOT compliant under the literal clause. A universal admits no exceptions.</p><p>(d) Company "extended leave" argument: logically, the argument is "the 8% are on leave, therefore S(x)∧H(x)=FALSE for them (they are not currently handling data)." If "handles client data" means currently handles (not job-title handles), then an employee on extended leave may not satisfy H(x), making the antecedent false and the implication vacuously true for those employees. Whether this defence succeeds depends on: (i) whether H(x) is defined by job role or current activity; (ii) whether "extended leave" changes their classification as data handlers; (iii) whether the regulation has a "reasonable exceptions" clause. Logically, if H(x) = "currently active data handler," the argument works. If H(x) = "job role involves data handling," the argument fails — the role persists during leave. Legal interpretation of the predicate H(x) is the entire dispute.</p><div class="what-tests">Universal quantifier admits no partial compliance · 8% untrained = false universal · vacuous truth for employees on leave (if antecedent false) · predicate H(x) defined by role vs by current activity · legal interpretation of predicate as the dispute</div></div>
+            </div>
+
       <div class="inner-section" id="p03-bar">
         <div class="inner-header" onclick="togI('p03-bar')"><span class="inner-label">Bar &amp; LSAT Lens</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="inner-body">
@@ -521,6 +574,144 @@
       </div>
 
     </div>
+  </div>
+
+  <div class="topic-card" id="p04">
+    <div class="topic-header">
+      <span class="topic-num">P04</span>
+      <span class="topic-title">Truth Sets — T(P) and Set Operations on Predicates</span>
+    </div>
+
+    <div class="inner-section" id="p04-ph1">
+      <div class="inner-header" onclick="togI('p04-ph1')"><span class="inner-label">Phase 1 — Concept</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation">
+          <p><strong>Truth Set Definition:</strong> Given a predicate P(x) and domain D, the truth set of P is:</p>
+          <p>T(P) = {x ∈ D | P(x) = TRUE}</p>
+          <p>T(P) is the set of ALL elements in the domain for which P is true. It converts a predicate into a set.</p>
+          <p><strong>Set Operations from Logical Connectives:</strong></p>
+          <p>T(P ∧ Q) = T(P) ∩ T(Q) &nbsp;&nbsp; (AND → Intersection)</p>
+          <p>T(P ∨ Q) = T(P) ∪ T(Q) &nbsp;&nbsp; (OR → Union)</p>
+          <p>T(¬P) = D ∖ T(P) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (NOT → Complement relative to D)</p>
+          <p><strong>Connection to Quantifiers:</strong></p>
+          <p>∀x P(x) is TRUE ⇔ T(P) = D (truth set equals entire domain)</p>
+          <p>∃x P(x) is TRUE ⇔ T(P) ≠ ∅ (truth set is non-empty)</p>
+          <p>¬∃x P(x) is TRUE ⇔ T(P) = ∅ (truth set is empty)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="inner-section" id="p04-ph2">
+      <div class="inner-header" onclick="togI('p04-ph2')"><span class="inner-label">Phase 2 — Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="notation">
+          <p><strong>Step 1 — Define the Domain:</strong> State D explicitly. T(P) is always relative to a domain.</p>
+          <p><strong>Step 2 — Evaluate P(x) for each element:</strong> List which x satisfy P(x)=T to build T(P).</p>
+          <p><strong>Step 3 — Apply set operations:</strong> Use ∩, ∪, ∖ to combine truth sets for compound predicates.</p>
+          <p><strong>Step 4 — Check quantifier statements:</strong> Compare T(P) to D and ∅ to evaluate ∀ and ∃ claims.</p>
+          <p><strong>Common error:</strong> Forgetting that T(P) depends on D. The same predicate P(x) = "x is even" has different truth sets over the naturals, the integers, and the reals.</p>
+        </div>
+        <div class="example-block">
+          <div class="ex-label">Worked Example — Building Truth Sets from a Legal Domain</div>
+          <p>D = {Ahmed, Bilal, Carol, Dina, Elan}. Their monthly salaries: 28,000 / 35,000 / 42,000 / 31,000 / 55,000.</p>
+          <p>P(x) = "x earns more than Rs.30,000." Q(x) = "x earns more than Rs.40,000."</p>
+          <p>T(P) = {Bilal, Carol, Dina, Elan} (all above 30,000). T(Q) = {Carol, Elan} (above 40,000).</p>
+          <p>T(P ∧ Q) = T(P) ∩ T(Q) = {Carol, Elan}. T(P ∨ Q) = T(P) ∪ T(Q) = {Bilal, Carol, Dina, Elan}.</p>
+          <p>T(¬P) = D ∖ T(P) = {Ahmed}. ∀x P(x)? T(P) ≠ D (Ahmed missing) → FALSE. ∃x Q(x)? T(Q) ≠ ∅ → TRUE.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="inner-section" id="p04-ph3">
+      <div class="inner-header" onclick="togI('p04-ph3')"><span class="inner-label">Phase 3 — Full Pipeline Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label">Easy — Identify T(P), Evaluate One Quantifier Claim</div>
+            <p>D = {Contract A, Contract B, Contract C, Contract D}. W(x) = "x was signed within the last year." Signed: A (yes), B (no), C (yes), D (yes). T(W) = {A, C, D}. Is ∀x W(x) true? T(W) ≠ D (B is missing) → FALSE. Is ∃x W(x) true? T(W) ≠ ∅ → TRUE. Identifying T(W) from the domain first, then comparing to D or ∅ to evaluate quantifier claims, is the standard pipeline.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Medium — English → Predicate → Truth Set → Set Operation → Legal Conclusion</div>
+            <p>Domain D = 6 suppliers: S1–S6. P(x) = "x delivered on time" (S1,S2,S4,S5). Q(x) = "x passed quality inspection" (S2,S3,S5,S6). Which suppliers satisfy both? Which satisfy at least one?</p>
+            <p>T(P) = {S1,S2,S4,S5}. T(Q) = {S2,S3,S5,S6}. T(P∧Q) = T(P)∩T(Q) = {S2,S5}. T(P∨Q) = T(P)∪T(Q) = {S1,S2,S3,S4,S5,S6} = D. T(¬P∧Q) = T(Q)∖T(P) = {S3,S6} (on-time failures who passed quality).</p>
+            <p>Legal conclusion: a contract requiring both on-time delivery AND quality approval covers only S2 and S5. A contract requiring either criterion covers all 6 suppliers. S3 and S6 passed quality but were late — potentially eligible for partial payment under a quality-only clause.</p>
+          </div>
+
+          <div class="example-block">
+            <div class="ex-label">Hard — Truth Set Analysis Reveals the Scope of a Statutory Obligation</div>
+            <p>A regulation applies to: B(x) = "x is a business" AND R(x) = "x generates annual revenue above Rs.10 crore" AND S(x) = "x operates in a scheduled sector." Domain D = 100 entities in a registry. T(B)=80, T(R)=45, T(S)=30, T(B∧R∧S)=18.</p>
+            <p>The regulation targets T(B∧R∧S) = 18 entities. ∀x∈D [(B(x)∧R(x)∧S(x))→Regulate(x)].</p>
+            <p>Regulator's enforcement scope = 18. But: T(B)∩T(R) = say 40 (businesses above Rs.10 crore, some in unscheduled sectors). The 22 entities in T(B∧R)∖T(B∧R∧S) are large businesses outside scheduled sectors — NOT regulated. A legislative gap: if they cause the same harms as scheduled-sector entities, the truth-set analysis exposes the gap between the regulation's reach (18 entities) and the problem's full scope (40 large businesses). Using truth sets to map regulatory scope is a practical legislative drafting and gap-analysis tool.</p>
+          </div>
+      </div>
+    </div>
+
+    <div class="inner-section" id="p04-q">
+      <div class="inner-header" onclick="togI('p04-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+            <div class="question-block" id="qp04a">
+              <div class="q-header" onclick="togQ('qp04a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">D = {1,2,3,4,5,6}. P(x) = "x is even." Q(x) = "x is greater than 3." Find T(P), T(Q), T(P∧Q), T(P∨Q), and T(¬P).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>T(P) = {2,4,6}. T(Q) = {4,5,6}. T(P∧Q) = T(P)∩T(Q) = {4,6}. T(P∨Q) = T(P)∪T(Q) = {2,4,5,6}. T(¬P) = D∖T(P) = {1,3,5}.</p><p>Check: T(¬P) = T(P)^c within D = elements NOT in T(P). All odd numbers. ∀x P(x)? T(P)={2,4,6}≠D → FALSE (1,3,5 are counter-examples). ∃x Q(x)? T(Q)≠∅ → TRUE.</p><div class="what-tests">Truth set enumeration · intersection and union · complement relative to domain · linking to ∀ and ∃ evaluations</div></div>
+            </div>
+
+            <div class="question-block" id="qp04b">
+              <div class="q-header" onclick="togQ('qp04b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">D = {all students in a law class, n=40}. P(x) = "x passed the midterm." T(P) contains 32 students. Q(x) = "x completed all assignments." T(Q) contains 35 students. T(P∩Q) = 28 students. (a) Find |T(P∪Q)| using inclusion-exclusion. (b) Find |T(¬P∧Q)| (completed assignments but failed midterm). (c) Evaluate: "Every student who completed all assignments passed the midterm." Is this true?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>(a) |T(P∪Q)| = |T(P)|+|T(Q)|-|T(P∩Q)| = 32+35-28 = 39. One student satisfies neither.</p><p>(b) T(¬P∧Q) = T(Q)∖T(P) = students who completed assignments but failed. |T(Q)|-|T(P∩Q)| = 35-28 = 7 students completed assignments but failed the midterm.</p><p>(c) "Every student who completed assignments passed" = ∀x Q(x)→P(x), i.e. T(Q)⊆T(P). Check: |T(¬P∧Q)| = 7 ≠ 0. There are 7 counter-examples (completed assignments, failed midterm). T(Q)⋄T(P), so the claim is FALSE.</p><div class="what-tests">Inclusion-exclusion formula · set difference for ¬∧ combination · ∀x[Q(x)→P(x)] ⇔ T(Q)⊆T(P) · counter-examples falsify the universal</div></div>
+            </div>
+
+            <div class="question-block" id="qp04c">
+              <div class="q-header" onclick="togQ('qp04c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Two compliance predicates: P(x) = "x has a valid operating licence." Q(x) = "x has a current safety certificate." A regulator says: "All businesses operating legally must satisfy both." Rewrite this as a truth set requirement. Given T(P) = {A,B,C,D} and T(Q) = {B,C,E,F} in a domain of 7 businesses {A,B,C,D,E,F,G}: (a) Who is fully compliant? (b) Who has no compliance at all? (c) Who is partially compliant (one but not both)?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>Truth set requirement: full compliance = T(P∧Q) = T(P)∩T(Q). The regulator requires ∀x[Operate(x)→(P(x)∧Q(x))], i.e. operating businesses must be in T(P∧Q).</p><p>(a) Fully compliant: T(P)∩T(Q) = {A,B,C,D}∩{B,C,E,F} = {B,C}. Only B and C have both.</p><p>(b) No compliance: T(¬P∧¬Q) = D∖(T(P)∪T(Q)) = {A,B,C,D,E,F,G}∖{A,B,C,D,E,F} = {G}. Business G has neither licence nor certificate.</p><p>(c) Partially compliant: T(P∨Q)∖T(P∧Q) = {A,B,C,D,E,F}∖{B,C} = {A,D,E,F}. A and D have licences only; E and F have certificates only.</p><div class="what-tests">Regulatory requirement as truth set condition · full vs partial compliance via intersection vs symmetric difference · set complement for zero-compliance entities · truth set analysis maps enforcement priorities</div></div>
+            </div>
+
+            <div class="question-block" id="qp04d">
+              <div class="q-header" onclick="togQ('qp04d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Prove using truth sets that ¬(P∧Q) ≡ ¬P∨¬Q (De Morgan's Law). Use D = {1,2,3,4,5}, P(x) = "x &lt; 4", Q(x) = "x is odd" to verify numerically, then give the general set-theoretic proof.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>Numerical verification: T(P) = {1,2,3}. T(Q) = {1,3,5}. T(P∧Q) = {1,3}. T(¬(P∧Q)) = D∖{1,3} = {2,4,5}. T(¬P) = {4,5}. T(¬Q) = {2,4}. T(¬P∨¬Q) = {4,5}∪{2,4} = {2,4,5}. Both sides equal {2,4,5} ✓ De Morgan verified numerically.</p><p>General proof: T(¬(P∧Q)) = D∖T(P∧Q) = D∖(T(P)∩T(Q)). By set-theoretic De Morgan: D∖(A∩B) = (D∖A)∪(D∖B). So = (D∖T(P))∪(D∖T(Q)) = T(¬P)∪T(¬Q) = T(¬P∨¬Q). QED. De Morgan's Law is the logical bridge between ¬(P∧Q) and ¬P∨¬Q, verified both by the truth set approach and by the set-theoretic proof using the complement of an intersection.</p><div class="what-tests">De Morgan's Law via truth sets · numerical verification with specific domain · general proof using set complement of intersection · logical equivalence as truth set equality</div></div>
+            </div>
+
+            <div class="question-block" id="qp04e">
+              <div class="q-header" onclick="togQ('qp04e')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A constitutional provision: "Every citizen who is 18 or older AND is not disqualified by a court order has the right to vote." Domain D = 5 million adult citizens. T(Age18plus) = 4.8M. T(NoCourt) = 4.6M. T(Voter) = T(Age18plus) ∩ T(NoCourt) = 4.4M. A government proposes adding a third condition: T(RegisteredVoter) and estimates this set contains 3.2M. (a) Compute the new eligible voter set. (b) Compute how many citizens lose eligibility under the new proposal. (c) A constitutional challenge argues: "The new condition adds a restriction not in the text." Formalise this as a truth set argument. (d) The government responds: "Registration is an administrative process, not a restriction." Evaluate using truth sets.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>(a) New eligible set: T(Age18plus) ∩ T(NoCourt) ∩ T(RegisteredVoter). We know T(Age18plus)∩T(NoCourt) = 4.4M. Assuming T(RegisteredVoter) ⊆ T(Age18plus) (all registered voters are adults), and using |A∩B| information: new eligible ≤ min(4.4M, 3.2M) = at most 3.2M. Exact figure requires |T(Voter)∩T(Registered)| which is not given; assume 3.2M ≤ 4.4M so all registered voters are eligible voters, giving 3.2M.</p><p>(b) Citizens losing eligibility: 4.4M − 3.2M = 1.2M citizens who were eligible under the original constitution but would not be under the new proposal.</p><p>(c) Constitutional challenge as truth set argument: the original provision defines T(Voter_constitutional) = T(Age18plus) ∩ T(NoCourt). The proposal defines T(Voter_new) = T(Age18plus) ∩ T(NoCourt) ∩ T(Registered). Since T(Voter_new) ⊆ T(Voter_constitutional) and |T(Voter_new)| &lt; |T(Voter_constitutional)|, the proposal REDUCES the truth set of eligible voters. Adding a conjunct to a predicate can only narrow or maintain the truth set, never expand it. The proposal unconstitutionally restricts the right to vote by adding a condition not in the text: T(Voter_new) ⊊ T(Voter_constitutional).</p><p>(d) Government response: "Registration is administrative, not a restriction." Evaluated by truth sets: regardless of how registration is characterised, T(Voter_new) ⊊ T(Voter_constitutional). 1.2M people who satisfy the constitutional eligibility conditions cannot vote under the new proposal. Whether registration is "administrative" or "restrictive" is a label; the truth set reduction is factual and undeniable. A right that is contingent on an administrative act that can fail (non-registration) is functionally restricted even if theoretically available. The truth set analysis provides the constitutional argument's mathematical core: any proper subset relationship between the new and old voter sets, regardless of the reason for it, constitutes a restriction.</p><div class="what-tests">Truth set of conjunctive predicate · adding a conjunct only narrows truth set · proper subset as constitutional restriction · 1.2M loses eligibility · government label ("administrative") doesn't change truth set reduction · truth set as the factual core of constitutional argument</div></div>
+            </div>
+
+            <div class="question-block" id="qp04f">
+              <div class="q-header" onclick="togQ('qp04f')"><span class="tier-badge t3-badge">T3 · D</span><span class="q-text">A statute says "all persons who are employees AND work more than 20 hours per week AND are paid less than the minimum wage are entitled to back pay." Three policy proposals: (P1) Change "AND" between first two conditions to "OR." (P2) Add a new condition: "AND have filed a complaint." (P3) Change "employees" to "workers" (broader category). Analyse each proposal's effect on T(entitled) and state whether each expands, narrows, or maintains the eligible group.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>Original: T(entitled) = T(Employee) ∩ T(Over20hrs) ∩ T(UnderMinWage). Conjunctive predicate.</p><p>P1: Change first AND to OR → T(entitled_P1) = [T(Employee) ∪ T(Over20hrs)] ∩ T(UnderMinWage). Union is always ⊇ intersection: T(Employee)∪T(Over20hrs) ⊇ T(Employee)∩T(Over20hrs). So T(entitled_P1) ⊇ T(entitled). P1 EXPANDS the eligible group — it now includes underpaid workers who work over 20 hours even if not classified as "employees" (e.g. contractors), plus underpaid employees regardless of hours. This significantly extends coverage.</p><p>P2: Add "AND filed complaint" → T(entitled_P2) = T(entitled) ∩ T(Complaint). Intersection is always ⊆ either component: T(entitled_P2) ⊆ T(entitled). P2 NARROWS the eligible group — only entitled persons who also filed complaints receive back pay. This creates a procedural barrier that excludes eligible workers who don't navigate the complaint system. The set of entitled persons is reduced to at most |T(Complaint)| ≤ |T(entitled)|.</p><p>P3: Change "employees" to "workers" → T(entitled_P3) = T(Worker) ∩ T(Over20hrs) ∩ T(UnderMinWage). If T(Worker) ⊇ T(Employee) (workers is a broader category), then T(entitled_P3) ⊇ T(entitled). P3 EXPANDS — it covers gig workers, contractors, and others outside the employee definition who would otherwise be excluded. The exact expansion depends on the size of T(Worker)∖T(Employee) ∩ the other conditions.</p><div class="what-tests">OR replaces AND → union ⊇ intersection → expands truth set · additional conjunct → intersection narrows truth set · broader predicate → larger first set → expands truth set · truth set analysis as legislative impact assessment tool · each proposal's mathematical effect is deterministic</div></div>
+            </div>
+      </div>
+    </div>
+
+            <div class="question-block" id="qp04g">
+              <div class="q-header" onclick="togQ('qp04g')"><span class="tier-badge t3-badge">T3 · E</span><span class="q-text">A lawyer argues: "My client satisfies the eligibility predicate E(x) because T(E) ⊆ T(F) and my client is in T(F)." Is this argument valid? Construct a counter-example using small sets. Then state the correct inference pattern and explain why it matters in statutory eligibility disputes.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="q-body"><p>The argument is INVALID. T(E) ⊆ T(F) means every member of T(E) is in T(F) — if something is E, it is also F. This is the direction E → F. The lawyer's client is in T(F). The lawyer is inferring client ∈ T(E) from client ∈ T(F) and T(E)⊆T(F). This is the fallacy of affirming the consequent: F → E inferred from E → F.</p><p>Counter-example: D = {1,2,3,4,5}. T(E) = {2,4} (even numbers). T(F) = {2,3,4,5} (numbers ≥2). T(E)⊆T(F) is true (both 2 and 4 are ≥2). The client is the number 3: 3 ∈ T(F) (3≥2). But 3 ∉ T(E) (3 is not even). The lawyer's argument fails: being in T(F) does not entail being in T(E) when T(E)⊆T(F).</p><p>Correct inference pattern: T(E)⊆T(F) means E(x)→F(x). Valid inference: if client ∈ T(E), then client ∈ T(F) (modus ponens). Invalid inference: if client ∈ T(F), then client ∈ T(E) (affirming consequent). For statutory eligibility: if the statute defines eligibility as E(x) and T(E)⊆T(F), then satisfying F is necessary but not sufficient for eligibility. A claimant must prove E(x) directly, not just demonstrate membership in any superset of T(E).</p><div class="what-tests">Subset direction (T(E)⊆T(F) means E→F not F→E) · affirming the consequent as the fallacy · counter-example with small concrete sets · necessary vs sufficient condition for eligibility · claimant must prove the predicate directly not a superset membership</div></div>
+            </div>
+
+      <div class="inner-section" id="p04-bar">
+      <div class="inner-header" onclick="togI('p04-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="inner-body">
+        <div class="bar-lens">
+          <div class="bar-label">Core Formula</div>
+          <div class="bar-content">T(P) = {x ∈ D | P(x) = T} &nbsp;&middot;&nbsp; T(P∧Q)=T(P)∩T(Q) &nbsp;&middot;&nbsp; T(P∨Q)=T(P)∪T(Q) &nbsp;&middot;&nbsp; T(¬P)=D∖T(P)</div>
+        </div>
+        <div class="bar-lens">
+          <div class="bar-label">Quantifier Links</div>
+          <div class="bar-content">∀x P(x) TRUE ⇔ T(P)=D &nbsp;&middot;&nbsp; ∃x P(x) TRUE ⇔ T(P)≠∅ &nbsp;&middot;&nbsp; ¬∃x P(x) TRUE ⇔ T(P)=∅</div>
+        </div>
+        <div class="bar-lens">
+          <div class="bar-label">Set Effect of Logical Operations</div>
+          <div class="bar-content">Adding conjunct (AND) → narrows T(P) &nbsp;&middot;&nbsp; Adding disjunct (OR) → expands T(P) &nbsp;&middot;&nbsp; Negation → complement in D</div>
+        </div>
+        <div class="bar-lens">
+          <div class="bar-label">De Morgan via Truth Sets</div>
+          <div class="bar-content">T(¬(P∧Q)) = T(¬P∨¬Q) = (D∖T(P))∪(D∖T(Q))</div>
+        </div>
+        <div class="bar-lens">
+          <div class="bar-label">Legal Application</div>
+          <div class="bar-content">Regulatory scope = T(condition1∧condition2∧…) &nbsp;&middot;&nbsp; Each added condition narrows the regulated set &nbsp;&middot;&nbsp; T(P)⊊T(Q) means P-eligible set is a proper subset of Q-eligible set</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <div style="height:32px;"></div>
