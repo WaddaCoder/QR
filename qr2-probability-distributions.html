@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Probability &amp; Distributions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens .bar-content{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:var(--ink);}
+  .ztable{width:100%;border-collapse:collapse;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+  .ztable th{background:var(--ink);color:var(--page);padding:5px 8px;text-align:center;}
+  .ztable td{padding:4px 8px;text-align:center;border-bottom:1px solid var(--rule);}
+  .ztable tr:nth-child(even) td{background:#FAFAF8;}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+  @media(min-width:1024px) and (orientation:landscape){.container{max-width:1280px;padding:0 24px;}.site-header{padding:32px 32px 26px;}.site-header h1{font-size:26px;}.topic-header{padding:18px 22px;}.topic-title{font-size:19px;}.inner-header{padding:15px 22px;}.inner-body{padding:6px 24px 24px;}.notation{font-size:14px;}.example-block{padding:16px 18px;}.example-block p{font-size:15px;}.q-header{padding:14px 16px;}.q-text{font-size:15px;}.q-body{padding:0 16px 16px;}.q-body p{font-size:15px;}}
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}.fp-btn:nth-child(2){font-size:13px;}.fp-btn:nth-child(3){font-size:15px;}.fp-btn:nth-child(4){font-size:17px;}.fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Probability &amp; Distributions</h1>
+  <div class="subtitle">Section 3 Supplement · Dr. Tariq Ismaeel · 4 topics · Finals</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Finals Supplement</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">4 topics</span>
+</div>
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+  <div class="section-label">Foundations</div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PROB01 — Foundations of Probability         -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="topic-card" id="prob01" style="border-left-color:#1A5C8A">
+    <div class="topic-header" onclick="tog('prob01')">
+      <span class="lec-tag" style="background:#1A5C8A">PROB 01</span>
+      <div class="topic-title">Foundations of Probability — Sample Space, Rules, and Conditional Probability</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="prob01-l">
+        <div class="inner-header" onclick="togI('prob01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p><strong>Probability</strong> is a number between 0 and 1 that measures how likely an event is to occur. P = 0 means impossible; P = 1 means certain. The <strong>sample space S</strong> is the set of all possible outcomes. An <strong>event A</strong> is any subset of S.</p>
+          <p>Three interpretations: <strong>Classical</strong> — equal likelihood (flipping a fair coin). <strong>Empirical/Frequentist</strong> — long-run relative frequency (30% of defendants are convicted based on historical data). <strong>Subjective</strong> — a personal degree of belief (a lawyer believes there is a 70% chance of winning).</p>
+          <div class="pattern-warn"><div class="pw-label">Why Probability Precedes Statistics</div><p>Every statistical procedure in this course — confidence intervals, hypothesis tests, chi-square — produces a number that is a probability (the p-value) or uses probability to define a range (the CI). Without a foundation in what probability means, these numbers cannot be correctly interpreted. Probability is the language; statistics is what you say with it.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob01-m">
+        <div class="inner-header" onclick="togI('prob01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Classical probability:</span> P(A) = |A| / |S| = favourable outcomes / total outcomes<br>
+            <span class="hl">Complement rule:</span> P(A') = 1 − P(A) &nbsp; [A' = "not A"]<br>
+            <span class="hl">Addition rule (general):</span> P(A∪B) = P(A) + P(B) − P(A∩B)<br>
+            <span class="hl">Addition rule (mutually exclusive):</span> P(A∪B) = P(A) + P(B) &nbsp; [if A∩B = ∅]<br>
+            <span class="hl">Multiplication rule (independent):</span> P(A∩B) = P(A) × P(B)<br>
+            <span class="hl">Multiplication rule (general):</span> P(A∩B) = P(A) × P(B|A)<br>
+            <span class="hl">Conditional probability:</span> P(A|B) = P(A∩B) / P(B) &nbsp; [P(B) > 0]<br>
+            <span class="hl">Independence test:</span> A and B are independent iff P(A|B) = P(A)
+          </div>
+          <div class="pattern-warn"><div class="pw-label">Mutually Exclusive vs Independent — Most Confused Pair in Probability</div><p>Mutually exclusive: if A occurs, B cannot. P(A∩B) = 0. Independent: whether A occurs tells you nothing about B. P(A|B) = P(A). These are NOT the same thing — in fact, two events with nonzero probability cannot be both mutually exclusive AND independent (if A∩B=∅ then P(A|B)=0≠P(A)). On an exam: "mutually exclusive" means use the simple addition rule; "independent" means use the simple multiplication rule.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob01-ex">
+        <div class="inner-header" onclick="togI('prob01-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Easy — Classical Probability and Complement Rule</div>
+            <p>A jury pool of 80 people contains 30 lawyers, 25 doctors, and 25 teachers. One person is selected at random. Find: (a) P(lawyer), (b) P(not a lawyer), (c) P(lawyer or doctor).</p>
+            <p>(a) P(lawyer) = 30/80 = <strong>3/8 = 0.375</strong></p>
+            <p>(b) P(not lawyer) = 1 − 0.375 = <strong>0.625</strong>. Or directly: 50/80 = 0.625.</p>
+            <p>(c) Lawyer and doctor are mutually exclusive (cannot be both simultaneously in this sample). P(lawyer or doctor) = 30/80 + 25/80 = 55/80 = <strong>0.6875</strong>. No subtraction needed because they do not overlap.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Medium — Addition Rule with Overlap</div>
+            <p>In a criminal court database of 1000 cases: 350 defendants had a prior record (P), 200 cases involved a weapon (W), and 80 cases had both. Find: (a) P(prior record or weapon), (b) P(neither), (c) P(weapon | prior record).</p>
+            <p>(a) P(P∪W) = P(P) + P(W) − P(P∩W) = 350/1000 + 200/1000 − 80/1000 = 0.35 + 0.20 − 0.08 = <strong>0.47</strong></p>
+            <p>(b) P(neither) = 1 − P(P∪W) = 1 − 0.47 = <strong>0.53</strong></p>
+            <p>(c) P(W|P) = P(W∩P)/P(P) = 0.08/0.35 = <strong>0.229</strong>. Among defendants with prior records, 22.9% also used a weapon — higher than the overall weapon rate of 20%, suggesting a mild positive association.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Hard — Independence Test and Multiplication Rule</div>
+            <p>A regulatory body reviews two independent inspectors' reports on a factory. Inspector A correctly identifies a violation with probability 0.7. Inspector B correctly identifies a violation with probability 0.8. The inspectors work independently. Find: (a) P(both identify the violation), (b) P(at least one identifies it), (c) P(neither identifies it), (d) Are the events "A identifies it" and "B identifies it" mutually exclusive?</p>
+            <p>(a) Independent → multiply: P(A∩B) = 0.7 × 0.8 = <strong>0.56</strong></p>
+            <p>(b) P(at least one) = 1 − P(neither) = 1 − (1−0.7)(1−0.8) = 1 − 0.3×0.2 = 1 − 0.06 = <strong>0.94</strong>. Or: P(A) + P(B) − P(A∩B) = 0.7 + 0.8 − 0.56 = 0.94 ✓</p>
+            <p>(c) P(neither) = P(A')×P(B') = 0.3 × 0.2 = <strong>0.06</strong>. There is a 6% chance a genuine violation goes undetected by both.</p>
+            <p>(d) <strong>Not mutually exclusive.</strong> Both CAN happen simultaneously (probability 0.56). Mutual exclusivity would require P(A∩B)=0. Legal implication: when two independent inspectors both report a violation, it is highly credible — the probability of a false double-positive is very small if each is accurate.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob01-q">
+        <div class="inner-header" onclick="togI('prob01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qp01a">
+            <div class="q-header" onclick="togQ('qp01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A bag contains 5 red, 3 blue, and 2 green cards. One is drawn at random. Find: (a) P(red), (b) P(not green), (c) P(red or blue).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) P(red) = 5/10 = 0.5 &nbsp; (b) P(not green) = 1 − 2/10 = 0.8 &nbsp; (c) Red and blue are mutually exclusive: P(red or blue) = 5/10 + 3/10 = 8/10 = 0.8</p><div class="what-tests">Classical probability · complement rule · mutually exclusive addition rule</div></div>
+          </div>
+          <div class="question-block" id="qp01b">
+            <div class="q-header" onclick="togQ('qp01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">In a law firm: P(partner) = 0.20, P(female) = 0.45, P(female partner) = 0.09. Find: (a) P(partner or female), (b) P(female | partner), (c) Are being a partner and being female independent?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) P(P∪F) = 0.20 + 0.45 − 0.09 = <strong>0.56</strong></p><p>(b) P(F|P) = P(F∩P)/P(P) = 0.09/0.20 = <strong>0.45</strong></p><p>(c) P(F|P) = 0.45 = P(F). Yes — being a partner and being female are <strong>independent</strong> in this firm. The proportion of female partners (45%) equals the proportion of all female employees (45%). No gender gap in partnership rates.</p><div class="what-tests">General addition rule · conditional probability · independence test P(A|B)=P(A)</div></div>
+          </div>
+          <div class="question-block" id="qp01c">
+            <div class="q-header" onclick="togQ('qp01c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Two courts independently decide an appeal. Court A rules in plaintiff's favour with probability 0.6. Court B does so with probability 0.7. (a) P(both rule for plaintiff). (b) P(at least one rules for plaintiff). (c) P(exactly one rules for plaintiff).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) P(A∩B) = 0.6 × 0.7 = <strong>0.42</strong></p><p>(b) P(A∪B) = 0.6 + 0.7 − 0.42 = <strong>0.88</strong>. Or: 1 − (0.4)(0.3) = 1 − 0.12 = 0.88 ✓</p><p>(c) Exactly one: P(A∩B') + P(A'∩B) = (0.6)(0.3) + (0.4)(0.7) = 0.18 + 0.28 = <strong>0.46</strong>. Or: 0.88 − 0.42 = 0.46 ✓</p><div class="what-tests">Independent multiplication rule · complement shortcut for "at least one" · exactly one via P(A∩B')+P(A'∩B)</div></div>
+          </div>
+          <div class="question-block" id="qp01d">
+            <div class="q-header" onclick="togQ('qp01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Explain the difference between mutually exclusive events and independent events. Give a legal example of each. Can two events with non-zero probability be both mutually exclusive AND independent?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Mutually exclusive:</strong> A and B cannot happen together — P(A∩B)=0. Legal example: in a single verdict, "guilty" and "not guilty" are mutually exclusive. If one occurs, the other cannot.</p><p><strong>Independent:</strong> Whether A occurs gives no information about B — P(A|B)=P(A). Legal example: whether juror 1 voted guilty and whether juror 2 voted guilty are (ideally) independent — each deliberates separately.</p><p><strong>Cannot be both (if non-zero):</strong> If A∩B=∅ then P(A∩B)=0. For independence we need P(A∩B)=P(A)×P(B). If P(A)>0 and P(B)>0, then P(A)×P(B)>0≠0. Contradiction. So mutually exclusive events with non-zero probabilities are necessarily <em>dependent</em> — knowing A occurred tells you B definitely did not.</p><div class="what-tests">Conceptual distinction · legal examples · proof that ME and independent are incompatible for non-zero probabilities</div></div>
+          </div>
+          <div class="question-block" id="qp01e">
+            <div class="q-header" onclick="togQ('qp01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A factory's product liability claim rests on two defects: a design defect (D) and a manufacturing defect (M). P(D) = 0.15, P(M) = 0.25. An engineer claims the defects are independent. (a) Under independence, find P(D∩M), P(D∪M). (b) Investigation shows 120 of 500 products have at least one defect, and 10 have both. Is the independence assumption justified? (c) Compute the actual conditional probability P(M|D) from the data and compare to P(M). What does the discrepancy tell the court?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Under independence: P(D∩M) = 0.15 × 0.25 = 0.0375. P(D∪M) = 0.15 + 0.25 − 0.0375 = 0.3625. So we'd expect 36.25% of products to have at least one defect and 3.75% to have both.</p><p>(b) From data: P(D∪M) = 120/500 = 0.24. P(D∩M) = 10/500 = 0.02. Expected under independence: 36.25% and 3.75%. Actual: 24% and 2%. Both are substantially lower than the independence prediction — but also, P(D∩M) = 0.02 ≠ P(D)×P(M) = 0.0375. The independence assumption is <strong>not justified</strong> — the defects are negatively associated (both defects occurring together is less frequent than independence would predict).</p><p>(c) P(M|D) = P(M∩D)/P(D) = 0.02/0.15 = 0.133. P(M) = 0.25. Since P(M|D) = 0.133 ≠ P(M) = 0.25, the events are dependent. Knowing there is a design defect actually <em>lowers</em> the probability of a manufacturing defect from 25% to 13.3%. Legal implication: the defects are negatively correlated — perhaps design-defective products go through enhanced manufacturing inspection. The company cannot claim the defects are independent, but equally, the plaintiff cannot argue they compound each other — the data shows they don't co-occur as often as independent chance would predict.</p><div class="what-tests">Independence assumption testing · comparing predicted vs observed joint probability · negative association from P(M|D) < P(M) · legal implication of dependence direction</div></div>
+          </div>
+          <div class="question-block" id="qp01f">
+            <div class="q-header" onclick="togQ('qp01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A criminal investigation: 40% of suspects have a motive (M), 30% have opportunity (O), and 15% have both. (a) Are motive and opportunity independent? (b) P(motive | opportunity). (c) P(no motive and no opportunity). (d) A detective argues: "Since most people with opportunity also have motive, this suspect's opportunity is strong evidence of guilt." Evaluate this reasoning using the conditional probabilities.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) P(M)×P(O) = 0.40×0.30 = 0.12 ≠ P(M∩O) = 0.15. Not independent — motive and opportunity are positively associated.</p><p>(b) P(M|O) = 0.15/0.30 = <strong>0.50</strong>. Half of those with opportunity also have motive — higher than the base rate of 40% for motive.</p><p>(c) P(M'∩O') = 1 − P(M∪O) = 1 − (0.40+0.30−0.15) = 1 − 0.55 = <strong>0.45</strong>. 45% of suspects have neither.</p><p>(d) The detective's reasoning is partially flawed. P(M|O) = 0.50 means half of those with opportunity have motive — that is elevated above the base rate (0.40) showing some association. But the detective says "most" have motive when opportunity is present — 50% is not "most." More importantly, having both motive and opportunity does not establish guilt — it merely narrows the suspect pool. P(M∩O) = 0.15 means 15% of suspects have both — a significant group, not a unique identifier. The conditional probability shows elevated risk, not certainty. This is a base rate neglect argument: even among those with both M and O, the vast majority are innocent (assuming a small true guilty rate in the population).</p><div class="what-tests">Independence test · P(M|O)=0.50 vs P(M)=0.40 · positive association · "most" misrepresentation · base rate neglect in legal reasoning</div></div>
+          </div>
+          <div class="question-block" id="qp01g">
+            <div class="q-header" onclick="togQ('qp01g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A quality audit finds that 5% of products are defective. A testing machine correctly identifies a defective product as defective (sensitivity) 90% of the time and correctly identifies a good product as good (specificity) 95% of the time. (a) A product tests positive (machine says defective). Using a probability tree, find P(actually defective | tests positive). (b) A product tests negative. Find P(actually defective | tests negative). (c) The manufacturer argues the machine is 90% accurate — evaluate this claim using your results.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Define: D = defective, D' = good, + = positive test, − = negative test. P(D)=0.05, P(+|D)=0.90, P(−|D')=0.95 → P(+|D')=0.05.</p><p>(a) P(D∩+) = P(D)×P(+|D) = 0.05×0.90 = 0.045. P(D'∩+) = P(D')×P(+|D') = 0.95×0.05 = 0.0475. P(+) = 0.045+0.0475 = 0.0925. <strong>P(D|+) = 0.045/0.0925 = 0.486.</strong> A positive test means there is only a 48.6% chance the product is actually defective — barely above 50%!</p><p>(b) P(D∩−) = 0.05×0.10 = 0.005. P(D'∩−) = 0.95×0.95 = 0.9025. P(−) = 0.9075. <strong>P(D|−) = 0.005/0.9075 = 0.0055.</strong> A negative test leaves only a 0.55% chance of actual defect — the machine is excellent at ruling out defects.</p><p>(c) The "90% accurate" claim refers to sensitivity (90% of defectives are caught). But for a product that tests positive, there is only a 48.6% chance it is truly defective — slightly worse than a coin flip. This is because defectives are rare (5%) — the machine produces almost as many false positives (4.75%) as true positives (4.5%). The manufacturer's 90% claim is misleading in context: the relevant metric for a positive test result is the positive predictive value (48.6%), not sensitivity. This is the base rate problem applied to quality control — exactly the same logic as medical testing or DNA evidence.</p><div class="what-tests">Probability tree · P(D|+)=48.6% despite 90% sensitivity · P(D|−)=0.55% excellent at ruling out · PPV vs sensitivity distinction · base rate drives reliability</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob01-bar">
+        <div class="inner-header" onclick="togI('prob01-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Core Rules</div><div class="bar-content">P(A') = 1−P(A) · P(A∪B) = P(A)+P(B)−P(A∩B) · P(A∩B) = P(A)×P(B|A) · P(A|B) = P(A∩B)/P(B)</div></div>
+          <div class="bar-lens"><div class="bar-label">Shortcuts</div><div class="bar-content">Mutually exclusive: P(A∪B)=P(A)+P(B) · Independent: P(A∩B)=P(A)×P(B) · "At least one" = 1−P(none)</div></div>
+          <div class="bar-lens"><div class="bar-label">Independence Test</div><div class="bar-content">A and B independent iff P(A|B)=P(A) iff P(A∩B)=P(A)×P(B) · ME events with P>0 are always dependent</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PROB02 — Normal Distribution                -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="topic-card" id="prob02" style="border-left-color:#1A7A3A">
+    <div class="topic-header" onclick="tog('prob02')">
+      <span class="lec-tag" style="background:#1A7A3A">PROB 02</span>
+      <div class="topic-title">Normal Distribution — The Bell Curve, Z-Scores, and Table Reading</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="prob02-l">
+        <div class="inner-header" onclick="togI('prob02-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The <strong>Normal distribution</strong> is the most important distribution in statistics. It is bell-shaped, symmetric around its mean μ, and fully described by two parameters: mean μ (centre) and standard deviation σ (spread). It is written X ~ N(μ, σ²).</p>
+          <p>Many real phenomena are approximately normally distributed: heights, test scores, measurement errors, and — after large samples — sample means (Central Limit Theorem). In law, sentence lengths, fine amounts, income levels, and response times are often modelled as normal.</p>
+          <div class="pattern-warn"><div class="pw-label">The Z-Score — One Formula That Solves Everything</div><p>Any normal distribution problem reduces to one step: convert to the <strong>standard normal Z ~ N(0,1)</strong> using z = (x − μ)/σ. Then look up P(Z &lt; z) in the table. All probability questions about any normal distribution go through this single conversion.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob02-m">
+        <div class="inner-header" onclick="togI('prob02-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Distribution:</span> X ~ N(μ, σ²) &nbsp; μ = mean, σ = standard deviation<br>
+            <span class="hl">Z-score (standardise):</span> z = (x − μ) / σ<br>
+            <span class="hl">Standard normal:</span> Z ~ N(0, 1)<br>
+            <span class="hl">P(X &lt; x):</span> = P(Z &lt; z) = Φ(z) — read directly from table<br>
+            <span class="hl">P(X &gt; x):</span> = 1 − Φ(z)<br>
+            <span class="hl">P(a &lt; X &lt; b):</span> = Φ(z_b) − Φ(z_a) where z_a=(a−μ)/σ, z_b=(b−μ)/σ<br>
+            <span class="hl">Symmetry:</span> Φ(−z) = 1 − Φ(z) &nbsp; [use for negative z values]<br>
+            <span class="hl">Inverse (find x given prob p):</span> x = μ + z_p × σ
+          </div>
+          <p style="margin-top:10px;font-size:13px;"><strong>Standard Normal Table — Key Values (Φ(z) = P(Z &lt; z)):</strong></p>
+          <table class="ztable">
+            <tr><th>z</th><th>Φ(z)</th><th>z</th><th>Φ(z)</th><th>z</th><th>Φ(z)</th></tr>
+            <tr><td>0.00</td><td>0.5000</td><td>1.00</td><td>0.8413</td><td>2.00</td><td>0.9772</td></tr>
+            <tr><td>0.50</td><td>0.6915</td><td>1.28</td><td>0.8997</td><td>2.33</td><td>0.9901</td></tr>
+            <tr><td>0.67</td><td>0.7486</td><td>1.50</td><td>0.9332</td><td>2.58</td><td>0.9951</td></tr>
+            <tr><td>0.84</td><td>0.7995</td><td>1.65</td><td>0.9505</td><td>3.00</td><td>0.9987</td></tr>
+            <tr><td>-1.00</td><td>0.1587</td><td>1.96</td><td>0.9750</td><td>-1.96</td><td>0.0250</td></tr>
+          </table>
+          <div class="pattern-warn"><div class="pw-label">The 68–95–99.7 Rule (Empirical Rule)</div><p>P(μ−σ &lt; X &lt; μ+σ) = 0.6827 (68.27%) · P(μ−2σ &lt; X &lt; μ+2σ) = 0.9545 (95.45%) · P(μ−3σ &lt; X &lt; μ+3σ) = 0.9973 (99.73%). Memorise these — they give you instant approximate answers without a table and are directly tested in short questions.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob02-ex">
+        <div class="inner-header" onclick="togI('prob02-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Easy — Compute Z-Score and Find P(X &lt; x)</div>
+            <p>Sentence lengths in a jurisdiction are normally distributed with μ = 5 years, σ = 1.5 years. Find the probability that a randomly selected sentence is less than 7.5 years.</p>
+            <p><strong>Step 1 — Z-score:</strong> z = (7.5 − 5)/1.5 = 2.5/1.5 = <strong>1.67</strong></p>
+            <p><strong>Step 2 — Table:</strong> P(Z &lt; 1.67) ≈ 0.9525 (between 1.65 → 0.9505 and 2.00 → 0.9772; closer to 0.9505).</p>
+            <p><strong>Answer: P(X &lt; 7.5) ≈ 0.9525.</strong> About 95.25% of sentences are shorter than 7.5 years. A 7.5-year sentence is at the 95th percentile — unusually long relative to the norm.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Medium — P(a &lt; X &lt; b) Between Two Values</div>
+            <p>Using the same distribution (μ=5, σ=1.5): what proportion of sentences fall between 3.5 and 6.5 years?</p>
+            <p><strong>Z for 3.5:</strong> z₁ = (3.5 − 5)/1.5 = −1.5/1.5 = −1.00 → Φ(−1.00) = 1 − 0.8413 = 0.1587</p>
+            <p><strong>Z for 6.5:</strong> z₂ = (6.5 − 5)/1.5 = 1.5/1.5 = 1.00 → Φ(1.00) = 0.8413</p>
+            <p><strong>P(3.5 &lt; X &lt; 6.5)</strong> = Φ(1.00) − Φ(−1.00) = 0.8413 − 0.1587 = <strong>0.6826 ≈ 68.3%</strong></p>
+            <p>This is exactly the Empirical Rule (μ ± 1σ contains 68.27%). The range 3.5 to 6.5 is precisely μ ± σ. A defence attorney could argue that any sentence outside this range (below 3.5 or above 6.5 years) is statistically atypical for this jurisdiction.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Hard — Inverse Problem: Find x Given Probability</div>
+            <p>A financial regulator classifies fines as "excessive" if they fall in the top 5% of the distribution for the sector. Fines are N(μ=50,000, σ=12,000). Find the excessive threshold.</p>
+            <p><strong>We need x such that P(X &gt; x) = 0.05, i.e. P(X &lt; x) = 0.95.</strong></p>
+            <p><strong>Find z:</strong> From table, Φ(1.65) = 0.9505 ≈ 0.95. So z ≈ 1.65.</p>
+            <p><strong>Back-transform:</strong> x = μ + z × σ = 50,000 + 1.65 × 12,000 = 50,000 + 19,800 = <strong>Rs. 69,800.</strong></p>
+            <p>Any fine above Rs. 69,800 is in the top 5% and would be classified as excessive. The regulator can use this as a bright-line threshold — not arbitrary, but based on the empirical distribution of sector fines. Using z=1.96 (for top 2.5%): threshold = 50,000 + 1.96×12,000 = Rs. 73,520.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob02-q">
+        <div class="inner-header" onclick="togI('prob02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qp02a">
+            <div class="q-header" onclick="togQ('qp02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Exam scores are N(μ=70, σ=10). Find: (a) P(score &lt; 80), (b) P(score &gt; 90), (c) P(60 &lt; score &lt; 80).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) z=(80−70)/10=1.00. P(Z&lt;1.00)=<strong>0.8413.</strong></p><p>(b) z=(90−70)/10=2.00. P(Z&gt;2.00)=1−0.9772=<strong>0.0228.</strong> Only 2.28% of students score above 90.</p><p>(c) z₁=(60−70)/10=−1.00, z₂=1.00. P(−1&lt;Z&lt;1)=0.8413−0.1587=<strong>0.6826.</strong> Exactly the Empirical Rule: 68% of scores fall within one σ of the mean.</p><div class="what-tests">Z-score computation · P(X&lt;x) · P(X&gt;x) = 1−Φ(z) · P(a&lt;X&lt;b) = Φ(z₂)−Φ(z₁) · Empirical Rule</div></div>
+          </div>
+          <div class="question-block" id="qp02b">
+            <div class="q-header" onclick="togQ('qp02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Average case resolution time is N(μ=45, σ=8) days. A court order requires resolution within 60 days. (a) What proportion of cases comply? (b) The chief justice wants 99% compliance. What maximum resolution time should be set?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) z=(60−45)/8=15/8=1.875. Φ(1.875)≈Φ(1.88)≈0.9699. <strong>About 97% of cases comply</strong> with the 60-day limit.</p><p>(b) Need Φ(z)=0.99 → z≈2.33 (from table: Φ(2.33)=0.9901≈0.99). Time limit = μ+z×σ = 45+2.33×8 = 45+18.64 = <strong>63.6 days ≈ 64 days.</strong> Setting the limit at 64 days achieves 99% compliance under this distribution.</p><div class="what-tests">P(X&lt;x) for compliance rate · inverse: find x for given probability · z=2.33 for 99th percentile</div></div>
+          </div>
+          <div class="question-block" id="qp02c">
+            <div class="q-header" onclick="togQ('qp02c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">What is the 68–95–99.7 rule? A judge is told: "The fine imposed is 2.5 standard deviations above the mean for this category of offence." Without a table, what approximate probability can the judge assign to a fine this extreme or larger? What is the precise value from the table?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>68–95–99.7 Rule:</strong> Under a normal distribution, approximately 68% of values fall within 1σ of the mean, 95% within 2σ, and 99.7% within 3σ. These are exact probabilities: P(μ−σ&lt;X&lt;μ+σ)=0.6827, P(μ−2σ&lt;X&lt;μ+2σ)=0.9545, P(μ−3σ&lt;X&lt;μ+3σ)=0.9973.</p><p><strong>Approximation for z=2.5:</strong> Between 2σ (95%) and 3σ (99.7%) bounds, so P(X&gt;μ+2.5σ) is between (1−0.9545)/2=0.023 and (1−0.9973)/2=0.0014. Rough estimate: about 0.6%.</p><p><strong>Precise value:</strong> P(Z&gt;2.5)=1−Φ(2.5)=1−0.9938=<strong>0.0062.</strong> About 0.62% of fines exceed this level — i.e. roughly 1 in 160 cases. This is statistically rare and would support an "excessive" characterisation.</p><div class="what-tests">68-95-99.7 rule · approximation without table · precise P(Z>2.5)=0.0062 · statistical rarity in legal context</div></div>
+          </div>
+          <div class="question-block" id="qp02d">
+            <div class="q-header" onclick="togQ('qp02d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Income in a district is N(μ=35,000, σ=8,000) Rs. per month. The poverty line is Rs. 20,000. (a) What proportion of residents are below the poverty line? (b) The government wants to target the bottom 10% for subsidies. What income threshold defines eligibility?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) z=(20,000−35,000)/8,000=−15,000/8,000=−1.875. P(Z&lt;−1.875)=1−Φ(1.875)≈1−0.9699=<strong>0.0301.</strong> About 3% of residents fall below the poverty line.</p><p>(b) Need P(X&lt;x)=0.10 → Φ(z)=0.10 → z=−1.28 (since Φ(1.28)=0.8997, Φ(−1.28)=0.1003≈0.10). Income threshold = 35,000+(−1.28)×8,000 = 35,000−10,240 = <strong>Rs. 24,760.</strong> Residents earning below Rs. 24,760 qualify for subsidies, representing the bottom 10% of this income distribution.</p><div class="what-tests">Negative z-score · symmetry Φ(−z)=1−Φ(z) · inverse for bottom 10th percentile · z=−1.28</div></div>
+          </div>
+          <div class="question-block" id="qp02e">
+            <div class="q-header" onclick="togQ('qp02e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A drug concentration in blood follows N(μ=8, σ=1.5) mg/L. (a) Legal impairment threshold is 10 mg/L. What % of tested subjects exceed it? (b) A roadside test registers "positive" for any reading above 7 mg/L (set low to catch most cases). What % of tests are positive? (c) Of those testing positive, what proportion actually exceed the legal threshold? (d) A defence lawyer argues the roadside test produces "massive false positives." Evaluate using your calculations.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) z=(10−8)/1.5=1.333. P(Z&gt;1.333)≈1−Φ(1.33)≈1−0.9082=<strong>0.0918.</strong> About 9.2% of subjects exceed the legal threshold.</p><p>(b) z=(7−8)/1.5=−0.667. P(Z&gt;−0.667)=Φ(0.667)≈0.7475. <strong>About 74.75% of tests are positive</strong> at the 7 mg/L threshold.</p><p>(c) Of all tested subjects: 9.2% exceed 10 mg/L (truly impaired) and 74.75%−9.2%=65.55% test positive but are below 10 mg/L. P(above legal limit | positive test) = 9.2%/74.75% = <strong>12.3%.</strong> Only 12.3% of positive roadside tests correspond to legal impairment.</p><p>(d) The defence lawyer is substantially correct. The roadside test at 7 mg/L is positive for 75% of the population but legally impaired persons are only 9.2% — meaning 87.7% of positive tests are people below the legal threshold (false positives in the legal sense, though the system may be designed to err on the side of caution). The lawyer can argue that a positive roadside test alone provides very weak evidence of legal impairment. The test serves as a screening tool — intended to flag potential impairment for confirmatory laboratory testing — not as a standalone prosecution basis. A court should require the confirmatory 10 mg/L measurement before conviction.</p><div class="what-tests">P(X&gt;10)=9.2% · P(test positive)=74.75% · conditional P(legal|positive)=12.3% · false positive rate in legal screening context · screening vs confirmatory test distinction</div></div>
+          </div>
+          <div class="question-block" id="qp02f">
+            <div class="q-header" onclick="togQ('qp02f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Two expert witnesses disagree about a contamination case. Expert A: contamination levels are N(μ=40, σ=5) ppm. Expert B: N(μ=45, σ=8) ppm. The legal limit is 50 ppm. (a) Under each model, what is P(exceeding 50 ppm)? (b) A sample of 200 readings shows 28 readings above 50 ppm. Which model better fits? (c) The observed proportion is 14%. Compute z for each model's predicted probability and state which fits significantly better.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Expert A: z=(50−40)/5=2.00. P(Z&gt;2.00)=1−0.9772=<strong>0.0228</strong> (2.28%). Expert B: z=(50−45)/8=0.625. P(Z&gt;0.625)≈1−Φ(0.625)≈1−0.7340=<strong>0.2660</strong> (26.6%).</p><p>(b) Observed: 28/200=0.14=14%. Expert A predicts 2.28%, Expert B predicts 26.6%. The observed 14% is far from A's prediction (2.28%) and somewhat closer to B's (26.6%), though still not matching B exactly either.</p><p>(c) For Expert A: expected exceedances = 200×0.0228=4.56. Observed=28. z=(28−4.56)/√(200×0.0228×0.9772)=23.44/√4.45=23.44/2.11=<strong>11.1.</strong> Catastrophically far — Model A is comprehensively rejected. For Expert B: expected=200×0.266=53.2. Observed=28. z=(28−53.2)/√(200×0.266×0.734)=−25.2/√39.05=−25.2/6.25=<strong>−4.03.</strong> Also statistically significant but less extreme. Neither model fits perfectly; B is far less wrong. The true distribution likely lies between A and B — perhaps N(42, 7) or similar. Expert A's model is statistically untenable; Expert B's overpredicts exceedances but is in the right order of magnitude.</p><div class="what-tests">P(X>50) under two normal models · observed proportion 14% · model comparison via z-test of proportions · Expert A rejected · Expert B closer but still wrong</div></div>
+          </div>
+          <div class="question-block" id="qp02g">
+            <div class="q-header" onclick="togQ('qp02g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A judge must interpret a statistical expert's statement: "The defendant's financial transactions were 3.2 standard deviations above the mean for this industry. This is extremely unusual." (a) What is P(Z &gt; 3.2)? (b) If the industry has 10,000 firms, how many would be expected to exceed this level by chance? (c) The defence argues: "With 10,000 firms, seeing one at 3.2σ is not surprising at all." Evaluate this argument quantitatively. (d) Explain the difference between the probability for a single firm and the probability for the most extreme firm in a large sample.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) P(Z&gt;3.2)≈1−0.9993=<strong>0.0007.</strong> About 0.07% — less than 1 in 1000.</p><p>(b) Expected firms above 3.2σ: 10,000×0.0007=<strong>7 firms.</strong></p><p>(c) The defence has a valid statistical point. In an industry of 10,000 firms, we expect approximately 7 firms to exceed 3.2σ purely by chance — without any wrongdoing. Finding one firm at 3.2σ, when 7 are expected, is not statistically surprising at all. In fact, if no firms exceeded 3.2σ in a 10,000-firm industry, that would be the surprising result. The expert's statement about a single transaction being "extremely unusual" conflates the unconditional probability for one entity (0.07%) with the context of large-scale screening (where 7 such entities are expected). This is a multiple testing / base rate argument.</p><p>(d) For a single pre-specified firm: P(exceeding 3.2σ) = 0.0007 — genuinely rare. For the most extreme firm in 10,000: P(at least one exceeds 3.2σ) = 1−(1−0.0007)^10,000 ≈ 1−e^(−7) ≈ 0.999 — near certain. When investigators screen thousands of firms and flag the most extreme, the flagging itself carries no probabilistic weight because you are guaranteed to find extreme values in large samples. This is precisely why financial fraud investigations require additional qualitative evidence beyond statistical extremity alone.</p><div class="what-tests">P(Z>3.2)=0.07% · 7 firms expected at 3.2σ in 10,000 · defence argument statistically valid · single vs screened-population probability · multiple testing problem in enforcement</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob02-bar">
+        <div class="inner-header" onclick="togI('prob02-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">The Formula</div><div class="bar-content">z = (x−μ)/σ · P(X&lt;x) = Φ(z) · P(X&gt;x) = 1−Φ(z) · P(a&lt;X&lt;b) = Φ(z_b)−Φ(z_a) · x = μ+zσ (inverse)</div></div>
+          <div class="bar-lens"><div class="bar-label">Empirical Rule</div><div class="bar-content">μ±1σ: 68.27% · μ±2σ: 95.45% · μ±3σ: 99.73% · Memorise — instant approximations without table</div></div>
+          <div class="bar-lens"><div class="bar-label">Key Z Values</div><div class="bar-content">z=1.28 → 90th pctile · z=1.65 → 95th · z=1.96 → 97.5th · z=2.33 → 99th · z=2.58 → 99.5th</div></div>
+          <div class="bar-lens"><div class="bar-label">Symmetry Shortcut</div><div class="bar-content">Φ(−z) = 1−Φ(z) · P(Z&lt;−1.96)=0.025 · P(−1.96&lt;Z&lt;1.96)=0.95 · No need to memorise negative side of table</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:8px;">Discrete Distributions</div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PROB03 — Binomial Distribution              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="topic-card" id="prob03" style="border-left-color:#7A3A1A">
+    <div class="topic-header" onclick="tog('prob03')">
+      <span class="lec-tag" style="background:#7A3A1A">PROB 03</span>
+      <div class="topic-title">Binomial Distribution — Four Characteristics, Formula, and Legal Applications</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="prob03-l">
+        <div class="inner-header" onclick="togI('prob03-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The <strong>Binomial distribution</strong> models the number of successes in a fixed number of independent trials, where each trial has exactly two outcomes (success/failure) and the probability of success is constant.</p>
+          <p>The four characteristics are essential to memorise — they appear in short questions directly: (1) <strong>Fixed number of trials n.</strong> (2) <strong>Each trial is independent.</strong> (3) <strong>Exactly two outcomes</strong> per trial: success or failure. (4) <strong>Probability of success p is constant</strong> across all trials.</p>
+          <div class="pattern-warn"><div class="pw-label">Legal Applications Are Everywhere</div><p>Jury selection (each juror: minority or not), conviction rates (each case: guilty or not), compliance audits (each firm: compliant or not), election fraud detection (each ballot: valid or fraudulent), drug test results (each test: positive or negative). Any legal scenario with repeated binary outcomes under fixed conditions is a Binomial problem.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob03-m">
+        <div class="inner-header" onclick="togI('prob03-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Notation:</span> X ~ B(n, p) &nbsp; n = number of trials, p = probability of success<br>
+            <span class="hl">PMF:</span> P(X=k) = C(n,k) · pᵏ · (1−p)ⁿ⁻ᵏ &nbsp; for k = 0, 1, 2, ..., n<br>
+            <span class="hl">Combination:</span> C(n,k) = n! / [k!(n−k)!]<br>
+            <span class="hl">Mean:</span> E(X) = μ = np<br>
+            <span class="hl">Variance:</span> Var(X) = σ² = npq &nbsp; where q = 1−p<br>
+            <span class="hl">Std deviation:</span> σ = √(npq)<br>
+            <span class="hl">P(X ≥ k):</span> = 1 − P(X ≤ k−1) = 1 − [P(X=0)+...+P(X=k−1)]<br>
+            <span class="hl">Normal approximation:</span> valid when np ≥ 5 AND nq ≥ 5
+          </div>
+          <div class="pattern-warn"><div class="pw-label">C(n,k) — The Counting Part</div><p>C(n,k) counts the number of ways to choose k successes from n trials. It represents all the different orderings of k successes and (n−k) failures. C(5,2) = 5!/(2!3!) = 10 means there are 10 different sequences of exactly 2 successes in 5 trials. The formula then multiplies by pᵏ(1−p)ⁿ⁻ᵏ — the probability of any ONE specific sequence. Key values: C(n,0)=1, C(n,1)=n, C(n,n)=1.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob03-ex">
+        <div class="inner-header" onclick="togI('prob03-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Easy — Identify the Distribution and Compute P(X=k)</div>
+            <p>A magistrate court convicts 70% of cases brought before it. In the next 5 cases, find P(exactly 3 convictions).</p>
+            <p><strong>Check characteristics:</strong> n=5 (fixed), independent cases, two outcomes (conviction/acquittal), p=0.70 constant. X ~ B(5, 0.70) ✓</p>
+            <p><strong>P(X=3):</strong> C(5,3) · (0.70)³ · (0.30)² = 10 · 0.343 · 0.09 = 10 × 0.03087 = <strong>0.3087</strong></p>
+            <p>There is about a 30.9% chance of exactly 3 convictions in the next 5 cases.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Medium — Mean, Variance, and At-Least Probability</div>
+            <p>A fraud detection system correctly flags fraudulent claims with probability p=0.80. In a batch of 10 claims (all fraudulent), find: (a) E(X) and σ, (b) P(X=10), (c) P(X ≥ 8).</p>
+            <p>(a) E(X) = np = 10×0.80 = <strong>8 claims</strong> expected to be flagged. σ = √(npq) = √(10×0.8×0.2) = √1.6 = <strong>1.265</strong></p>
+            <p>(b) P(X=10) = C(10,10)·(0.8)¹⁰·(0.2)⁰ = 1·0.1074·1 = <strong>0.1074.</strong> There's a 10.7% chance all 10 are caught.</p>
+            <p>(c) P(X≥8) = P(X=8)+P(X=9)+P(X=10).</p>
+            <p>P(X=8) = C(10,8)·(0.8)⁸·(0.2)² = 45·0.1678·0.04 = <strong>0.3020</strong></p>
+            <p>P(X=9) = C(10,9)·(0.8)⁹·(0.2)¹ = 10·0.1342·0.2 = <strong>0.2684</strong></p>
+            <p>P(X≥8) = 0.3020 + 0.2684 + 0.1074 = <strong>0.6778.</strong> About 67.8% chance that 8 or more of the 10 fraudulent claims are caught.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Hard — When the Four Characteristics Are Violated</div>
+            <p>A lawyer argues: "We can use the Binomial to model the number of biased jurors in a panel, since each juror is either biased or not." Evaluate whether each Binomial assumption holds in a real jury selection scenario, and explain what violations mean for the model's validity.</p>
+            <p><strong>Characteristic 1 — Fixed n:</strong> ✓ Usually holds — jury size is fixed at 12 (or as specified).</p>
+            <p><strong>Characteristic 2 — Independence:</strong> <strong>Potentially violated.</strong> Jurors deliberate together — social influence can create dependence. If one juror reveals their position in deliberation, others may be influenced. Pre-deliberation independence is plausible but post-deliberation independence is not.</p>
+            <p><strong>Characteristic 3 — Binary outcomes:</strong> ✓ Each juror is biased or not — truly binary for the research question.</p>
+            <p><strong>Characteristic 4 — Constant p:</strong> <strong>Potentially violated.</strong> The probability of bias may vary systematically by juror background, occupation, race, or age. A retired police officer may have a different probability of bias against a criminal defendant than a social worker. If p varies across jurors, the Binomial assumption fails — a heterogeneous model (different p for each juror) would be more appropriate.</p>
+            <p><strong>Conclusion:</strong> The Binomial is a useful approximation for jury selection at the pool stage (before deliberation, with random selection) but breaks down in deliberation modelling and when juror heterogeneity is relevant. The court should treat Binomial-based statistical arguments as approximate, not exact.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob03-q">
+        <div class="inner-header" onclick="togI('prob03-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qp03a">
+            <div class="q-header" onclick="togQ('qp03a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">State the four characteristics of a Binomial experiment. For each, give a legal example where it holds and one where it is violated.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>1. Fixed n:</strong> Holds — auditing exactly 50 contracts from a batch. Violated — auditing "until a violation is found" (n is random).</p><p><strong>2. Independence:</strong> Holds — randomly selecting unrelated cases from a large court database. Violated — outcomes of appeals in the same family case (correlated by judge/facts).</p><p><strong>3. Binary outcome:</strong> Holds — each fine either paid on time or not. Violated — sentencing outcome with three options (probation/imprisonment/fine).</p><p><strong>4. Constant p:</strong> Holds — conviction rate in routine traffic violations (similar cases, same court). Violated — conviction rate across different crime types, judges, or time periods where p shifts.</p><div class="what-tests">Four characteristics stated with examples · violations identified · conceptual mastery of when Binomial applies</div></div>
+          </div>
+          <div class="question-block" id="qp03b">
+            <div class="q-header" onclick="togQ('qp03b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A quality audit selects 8 firms. Each firm has a 25% probability of a compliance violation. X ~ B(8, 0.25). Find: (a) E(X), Var(X), σ. (b) P(X=0). (c) P(X=2). (d) P(X ≥ 1).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) E(X)=8×0.25=<strong>2.</strong> Var(X)=8×0.25×0.75=<strong>1.5.</strong> σ=√1.5=<strong>1.225.</strong></p><p>(b) P(X=0)=C(8,0)·(0.25)⁰·(0.75)⁸=1·1·0.1001=<strong>0.1001.</strong> 10% chance no violations found.</p><p>(c) P(X=2)=C(8,2)·(0.25)²·(0.75)⁶=28·0.0625·0.1779=28×0.01112=<strong>0.3115.</strong></p><p>(d) P(X≥1)=1−P(X=0)=1−0.1001=<strong>0.8999.</strong> 90% chance at least one violation is found in the audit of 8 firms.</p><div class="what-tests">E(X)=np · Var=npq · P(X=0) via (1-p)ⁿ · P(X=2) with C(8,2) · complement for P(X≥1)</div></div>
+          </div>
+          <div class="question-block" id="qp03c">
+            <div class="q-header" onclick="togQ('qp03c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">In a district, 35% of voters support a particular reform. A random sample of 6 voters is taken. (a) Find P(exactly 2 support it). (b) Find P(majority — at least 4 — support it). (c) What is the expected number of supporters and the standard deviation?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>X~B(6, 0.35). q=0.65.</p><p>(a) P(X=2)=C(6,2)·(0.35)²·(0.65)⁴=15·0.1225·0.1785=15×0.02187=<strong>0.3280.</strong></p><p>(b) P(X≥4)=P(X=4)+P(X=5)+P(X=6). P(X=4)=C(6,4)·(0.35)⁴·(0.65)²=15·0.01501·0.4225=<strong>0.0951.</strong> P(X=5)=C(6,5)·(0.35)⁵·(0.65)¹=6·0.00525·0.65=<strong>0.0205.</strong> P(X=6)=C(6,6)·(0.35)⁶=<strong>0.00184.</strong> P(X≥4)=0.0951+0.0205+0.00184=<strong>0.1174.</strong> Only 11.7% chance a majority of the sample supports the reform.</p><p>(c) E(X)=6×0.35=<strong>2.1.</strong> σ=√(6×0.35×0.65)=√1.365=<strong>1.168.</strong></p><div class="what-tests">P(X=2) · P(X≥4) via three terms · E(X)=np=2.1 · σ=√(npq)=1.168</div></div>
+          </div>
+          <div class="question-block" id="qp03d">
+            <div class="q-header" onclick="togQ('qp03d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">A forensic lab correctly identifies a substance in 95% of tests. 10 independent samples are tested. (a) Find E(X) and the probability all 10 are correctly identified. (b) Find P(at least 9 correct). (c) The lab director says "our 95% accuracy means if we test 10 samples, 9.5 will be correct." Is this statement accurate? What does the 0.5 mean?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>X~B(10, 0.95).</p><p>(a) E(X)=10×0.95=<strong>9.5.</strong> P(X=10)=(0.95)¹⁰=<strong>0.5987.</strong> About 60% chance all 10 are correctly identified.</p><p>(b) P(X≥9)=P(X=9)+P(X=10). P(X=9)=C(10,9)·(0.95)⁹·(0.05)¹=10·0.6302·0.05=<strong>0.3151.</strong> P(X≥9)=0.3151+0.5987=<strong>0.9138.</strong> 91.4% chance 9 or 10 are correct.</p><p>(c) The director's statement is <strong>technically accurate but easily misunderstood.</strong> E(X)=9.5 is the long-run average — in repeated batches of 10, the average correct identifications is 9.5. But in any specific batch, you cannot get 9.5 results — you get 9, 10, or some other integer. The 0.5 is a mathematical average, not a prediction for a specific experiment. More usefully: P(X≥9)=91.4% and P(X=10)=59.9%, so the expected result in any given batch is either 9 or 10 correct identifications.</p><div class="what-tests">E(X)=9.5 · P(X=10)=(0.95)¹⁰=0.5987 · P(X≥9)=0.9138 · expectation as long-run average not single-trial prediction</div></div>
+          </div>
+          <div class="question-block" id="qp03e">
+            <div class="q-header" onclick="togQ('qp03e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A jury of 12 members must reach a unanimous verdict. Each juror independently convicts with probability p=0.6. (a) What is the probability of a unanimous conviction? (b) What is the probability of a hung jury (neither unanimous conviction nor unanimous acquittal, i.e. 1–11 convicting)? (c) If the threshold for conviction were lowered to 10-of-12 (supermajority), what is P(conviction)? (d) What are the policy implications of changing from unanimity to supermajority, using your probability calculations?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>X~B(12, 0.6).</p><p>(a) P(X=12)=(0.6)¹²=0.6¹²=<strong>0.00218.</strong> Only 0.22% chance of unanimous conviction.</p><p>(b) P(hung) = P(1≤X≤11) = 1−P(X=0)−P(X=12). P(X=0)=(0.4)¹²=0.000017. P(hung)=1−0.000017−0.00218=<strong>0.99780.</strong> Under unanimity with p=0.6, essentially every jury is hung — 99.8% of juries would fail to reach a verdict. This illustrates why unanimity requirements with genuinely uncertain cases lead to gridlock.</p><p>(c) P(X≥10)=P(X=10)+P(X=11)+P(X=12). P(X=10)=C(12,10)·(0.6)¹⁰·(0.4)²=66·0.006047·0.16=<strong>0.0638.</strong> P(X=11)=C(12,11)·(0.6)¹¹·(0.4)¹=12·0.003628·0.4=<strong>0.01742.</strong> P(X=12)=0.00218. P(X≥10)=0.0638+0.01742+0.00218=<strong>0.0834.</strong></p><p>(d) Policy implications: Under unanimity (X=12), p=0.6 gives conviction probability of 0.22% — the standard effectively requires near-certainty among jurors. Under 10-of-12 supermajority, conviction probability rises to 8.34% — still low but 38 times higher. Under simple majority (X≥7): P(X≥7)≈P(Z&gt;(6.5−7.2)/√2.88)≈P(Z&gt;−0.41)≈0.66. Moving from unanimity to majority multiplies conviction probability by 300×. The mathematical analysis shows that jury threshold choice is not merely procedural — it fundamentally determines whether any convictions occur when individual juror certainty is partial. The unanimity standard is a structural protection against conviction; lowering it substantially increases conviction rates even when individual juror probabilities are unchanged.</p><div class="what-tests">P(X=12)=0.0022 unanimous · P(hung)=99.78% under unanimity · P(X≥10)=8.34% supermajority · policy analysis of threshold choice · conviction rate multiplier from rule change</div></div>
+          </div>
+          <div class="question-block" id="qp03f">
+            <div class="q-header" onclick="togQ('qp03f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Election fraud detection: historical data shows 2% of ballots in a district are fraudulent. A random sample of 200 ballots is audited. X ~ B(200, 0.02). (a) Compute E(X) and σ. (b) Check whether the Normal approximation is valid. (c) Using the Normal approximation, find P(X ≥ 8). (d) Only 3 fraudulent ballots are found. A campaigner claims this is "proof" the election was clean. Evaluate statistically.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) E(X)=200×0.02=<strong>4.</strong> σ=√(200×0.02×0.98)=√3.92=<strong>1.98.</strong></p><p>(b) Normal approximation valid when np≥5 AND nq≥5. np=4&lt;5. <strong>Not valid</strong> — np is just below the threshold. The Poisson approximation (λ=np=4) would be more appropriate, but for exam purposes the Normal is often used with caution noted.</p><p>(c) Using Normal approximation (with continuity correction): P(X≥8)=P(X≥7.5). z=(7.5−4)/1.98=3.5/1.98=1.768. P(Z&gt;1.768)≈1−Φ(1.77)≈1−0.962=<strong>0.038.</strong> About 3.8% probability of 8 or more fraudulent ballots under the historical rate.</p><p>(d) Finding 3 fraudulent ballots (below the expected 4) does NOT prove the election was clean. Statistical reasoning: (i) The expected count is 4 and standard deviation is 1.98. Finding 3 is within one standard deviation of the expected (z=(3−4)/1.98=−0.505) — entirely consistent with the historical fraud rate. (ii) The sample is only 200 ballots from a larger election — sampling error alone could explain finding 3 rather than 4. (iii) "Proof" of cleanliness would require the confidence interval for the fraud rate to exclude 2% — here the observed rate is 3/200=1.5%, and the CI (approximately 1.5%±2×√(0.015×0.985/200)) = 1.5%±1.7% easily includes 2%. The finding of 3 fraudulent ballots is entirely consistent with a 2% fraud rate and proves nothing either way.</p><div class="what-tests">E(X)=4, σ=1.98 · np=4&lt;5 normal approximation marginal · P(X≥8)≈3.8% · finding 3 within 1σ of expected · CI includes 2% fraud rate · statistical non-significance not proof of cleanliness</div></div>
+          </div>
+          <div class="question-block" id="qp03g">
+            <div class="q-header" onclick="togQ('qp03g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A discrimination case: historically, 30% of promotions at a firm went to women. In the past year, 20 promotions were made and only 3 went to women. (a) Under X~B(20, 0.30), find P(X≤3). (b) Find E(X) and compare to 3. (c) What does P(X≤3) tell the court about whether the observed result is consistent with the historical rate? (d) The firm argues: "We had an unusual year — this happens by chance." At what significance level is this result statistically significant, and what is the legal implication?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) P(X≤3)=P(X=0)+P(X=1)+P(X=2)+P(X=3). P(X=0)=(0.7)²⁰=0.0008. P(X=1)=C(20,1)·(0.3)¹·(0.7)¹⁹=20·0.3·0.001139=0.00684. P(X=2)=C(20,2)·(0.3)²·(0.7)¹⁸=190·0.09·0.001628=0.02785. P(X=3)=C(20,3)·(0.3)³·(0.7)¹⁷=1140·0.027·0.002326=0.07159. P(X≤3)=0.0008+0.00684+0.02785+0.07159=<strong>0.1071.</strong></p><p>(b) E(X)=20×0.30=<strong>6.</strong> The expected number of female promotions under the historical rate is 6; the firm gave only 3 — half the expected number.</p><p>(c) P(X≤3)=0.1071=10.71%. This is the probability of observing 3 or fewer female promotions by chance if the true rate were 30%. This is greater than 5% (the conventional significance threshold), so the result is <strong>not statistically significant at α=0.05.</strong></p><p>(d) At α=0.10: P(X≤3)=10.71% &gt; 10% — not significant at 10% either, but only marginally. At α=0.05: not significant. The firm's argument has some statistical merit — this result is not overwhelmingly unlikely by chance. However, the legal implication is nuanced: (i) Statistical non-significance at α=0.05 does not prove no discrimination existed — it merely fails to rule out chance. (ii) The observed ratio (3/20=15%) vs historical (30%) is a 50% reduction in female promotion rates — substantively large even if not statistically significant at conventional levels. (iii) One year's data (n=20 promotions) provides low statistical power. The court should consider multiple years of data, which would provide a more reliable statistical test. The statistical analysis is inconclusive — it neither proves discrimination nor exonerates the firm.</p><div class="what-tests">P(X≤3)=10.71% · E(X)=6 vs observed 3 · not significant at 5% but marginal · statistical vs substantive significance · power limitation with small n · multi-year data needed</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob03-bar">
+        <div class="inner-header" onclick="togI('prob03-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Four Characteristics</div><div class="bar-content">1. Fixed n · 2. Independent trials · 3. Two outcomes (S/F) · 4. Constant p</div></div>
+          <div class="bar-lens"><div class="bar-label">Formula and Parameters</div><div class="bar-content">P(X=k) = C(n,k)·pᵏ·qⁿ⁻ᵏ · E(X)=np · Var=npq · σ=√(npq) · q=1−p</div></div>
+          <div class="bar-lens"><div class="bar-label">Key Values</div><div class="bar-content">C(n,0)=1 · C(n,1)=n · C(n,n)=1 · P(X≥1)=1−(1−p)ⁿ · Normal approx valid when np≥5 AND nq≥5</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PROB04 — Bayes' Theorem                     -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="topic-card" id="prob04" style="border-left-color:#5C1A5C">
+    <div class="topic-header" onclick="tog('prob04')">
+      <span class="lec-tag" style="background:#5C1A5C">PROB 04</span>
+      <div class="topic-title">Bayes' Theorem — Updating Beliefs with Evidence and the Prosecutor's Fallacy</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+      <div class="inner-section open" id="prob04-l">
+        <div class="inner-header" onclick="togI('prob04-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p><strong>Bayes' Theorem</strong> tells you how to update a probability estimate when new evidence arrives. You start with a <strong>prior probability</strong> P(H) — your belief before seeing evidence. You then observe evidence E and use Bayes' theorem to compute the <strong>posterior probability</strong> P(H|E) — your updated belief after seeing E.</p>
+          <p>This is the mathematically rigorous answer to: "Given that the test was positive, what is the actual probability the hypothesis is true?" It corrects for base rates, sensitivity, and false positive rates simultaneously.</p>
+          <div class="pattern-warn"><div class="pw-label">The Prosecutor's Fallacy — Most Important Legal Misuse of Probability</div><p>The <strong>prosecutor's fallacy</strong> is confusing P(evidence | innocent) with P(innocent | evidence). A prosecutor might say: "There is only a 1-in-a-million chance this DNA match occurred by chance" — meaning P(match | innocent) = 0.000001. But the relevant question is P(innocent | match). If the suspect was drawn from a pool of 10 million people, we'd expect 10 innocent matches. With 1 guilty person and 10 innocent matches, P(innocent | match) = 10/11 ≈ 91% — most matches are innocent. Bayes' theorem prevents this error.</p></div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob04-m">
+        <div class="inner-header" onclick="togI('prob04-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Bayes' Theorem:</span> P(H|E) = P(E|H) · P(H) / P(E)<br>
+            <span class="hl">Law of Total Probability:</span> P(E) = P(E|H)·P(H) + P(E|H')·P(H')<br>
+            <span class="hl">Full form:</span> P(H|E) = P(E|H)·P(H) / [P(E|H)·P(H) + P(E|H')·P(H')]<br><br>
+            <span class="hl">P(H):</span> Prior probability — belief before evidence<br>
+            <span class="hl">P(H|E):</span> Posterior probability — updated belief after evidence<br>
+            <span class="hl">P(E|H):</span> Likelihood — how probable is the evidence IF H is true?<br>
+            <span class="hl">P(E|H'):</span> False positive rate — how probable is evidence IF H is false?<br><br>
+            <span class="hl">Odds form (elegant):</span> Posterior odds = Prior odds × Likelihood Ratio<br>
+            <span class="hl">where:</span> Odds(H) = P(H)/P(H') &nbsp; LR = P(E|H)/P(E|H')
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob04-ex">
+        <div class="inner-header" onclick="togI('prob04-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block"><div class="ex-label">Easy — Medical Test: Prior, Likelihood, Posterior</div>
+            <p>A disease affects 1% of the population. A test is 95% sensitive (P(+|disease)=0.95) and 95% specific (P(−|no disease)=0.95, so P(+|no disease)=0.05). A person tests positive. What is P(disease | positive test)?</p>
+            <p>P(H) = 0.01, P(H') = 0.99, P(E|H) = 0.95, P(E|H') = 0.05.</p>
+            <p>P(E) = 0.95×0.01 + 0.05×0.99 = 0.0095 + 0.0495 = 0.059</p>
+            <p>P(H|E) = 0.95×0.01 / 0.059 = 0.0095/0.059 = <strong>0.161 = 16.1%</strong></p>
+            <p>Despite a 95% accurate test, a positive result means only a 16% chance of actually having the disease. The low prior (1%) is what drives this — most positives are false positives from the healthy majority. This counterintuitive result is the base rate neglect problem that affects medical, forensic, and legal evidence interpretation.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Medium — DNA Evidence in Court</div>
+            <p>A random match probability for a DNA profile is 1 in 100,000 (P(match|innocent)=0.00001). A suspect is picked from a database of 500,000 people; police say the match "proves guilt." The prior probability of any random person in the database being guilty is 1/500,000. Compute the posterior probability of guilt given the match.</p>
+            <p>P(guilty) = 1/500,000 = 0.000002. P(innocent) = 0.999998.</p>
+            <p>P(match|guilty) ≈ 1.0 (DNA matches itself). P(match|innocent) = 0.00001.</p>
+            <p>P(match) = 1.0×0.000002 + 0.00001×0.999998 = 0.000002 + 0.000010 = 0.000012</p>
+            <p>P(guilty|match) = 1.0×0.000002 / 0.000012 = <strong>0.167 = 16.7%</strong></p>
+            <p>The "1 in 100,000" match probability does NOT translate to 99.999% certainty of guilt. Given the database search, the posterior probability of guilt is only 16.7%. The prosecutor would commit the prosecutor's fallacy by presenting 1-in-100,000 as near-certain guilt. The correct statement is: "Given this match in a database of 500,000, there is a 16.7% probability the matched person is guilty." Additional corroborating evidence is needed.</p>
+          </div>
+          <div class="example-block"><div class="ex-label">Hard — Sequential Updating with Multiple Evidence Items</div>
+            <p>A regulatory investigation starts with a prior of 10% probability that a firm committed fraud (P(fraud)=0.10). Two independent pieces of evidence are found: Evidence 1 — suspicious transaction pattern, P(E₁|fraud)=0.80, P(E₁|clean)=0.20. Evidence 2 — whistleblower report, P(E₂|fraud)=0.70, P(E₂|clean)=0.10. Update the probability sequentially.</p>
+            <p><strong>After Evidence 1:</strong> P(E₁) = 0.80×0.10 + 0.20×0.90 = 0.08 + 0.18 = 0.26. P(fraud|E₁) = 0.80×0.10/0.26 = 0.08/0.26 = 0.308.</p>
+            <p><strong>After Evidence 2</strong> (using P(fraud)=0.308 as new prior): P(E₂) = 0.70×0.308 + 0.10×0.692 = 0.2156 + 0.0692 = 0.2848. P(fraud|E₁,E₂) = 0.70×0.308/0.2848 = 0.2156/0.2848 = <strong>0.757 = 75.7%</strong></p>
+            <p>Starting from 10% prior: after suspicious transactions → 30.8%, after whistleblower report on top → 75.7%. Each piece of evidence substantially updates the probability. At 75.7%, the civil standard (balance of probabilities, >50%) is met but the criminal standard ("beyond reasonable doubt," typically ~95%+) is not. Bayes' theorem makes the evidence-to-conviction pathway explicit and quantifiable.</p>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob04-q">
+        <div class="inner-header" onclick="togI('prob04-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="question-block" id="qp04a">
+            <div class="q-header" onclick="togQ('qp04a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">State Bayes' Theorem in words and in formula. Define: prior probability, posterior probability, likelihood. Give a legal example of each term.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>In words:</strong> The probability of a hypothesis given evidence equals the probability of the evidence given the hypothesis, multiplied by the prior probability of the hypothesis, divided by the total probability of the evidence.</p><p><strong>Formula:</strong> P(H|E) = P(E|H)·P(H) / [P(E|H)·P(H) + P(E|H')·P(H')]</p><p><strong>Prior P(H):</strong> Your belief before seeing evidence. Legal example: 2% of firms in a sector commit tax fraud — this is the prior for any randomly selected firm. <strong>Likelihood P(E|H):</strong> How probable is the evidence if the hypothesis is true. Legal example: 85% of fraudulent firms have irregular transaction patterns. <strong>Posterior P(H|E):</strong> Updated belief after evidence. Legal example: given that a firm shows irregular transactions, the probability it committed fraud, computed via Bayes' theorem from the prior and likelihood.</p><div class="what-tests">Bayes' formula stated · three terms defined with legal examples · prior → posterior updating logic</div></div>
+          </div>
+          <div class="question-block" id="qp04b">
+            <div class="q-header" onclick="togQ('qp04b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">3% of a city's drivers are drunk at any moment. A breathalyser correctly identifies drunk drivers 95% of the time and gives a false positive 8% of the time. A driver tests positive. Find P(drunk | positive test). Interpret for a traffic court.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>P(D)=0.03, P(+|D)=0.95, P(+|D')=0.08.</p><p>P(+) = 0.95×0.03 + 0.08×0.97 = 0.0285 + 0.0776 = 0.1061.</p><p>P(D|+) = 0.95×0.03 / 0.1061 = 0.0285/0.1061 = <strong>0.2686 = 26.9%.</strong></p><p>Court interpretation: a positive breathalyser test gives only a 26.9% probability the driver is drunk — below the "balance of probabilities" standard (50%). The high false positive rate (8%) combined with the low base rate (3%) means most positive tests are false. A traffic court cannot rely solely on a positive breathalyser — it should require a confirmatory blood test. The test is useful as a screening tool to identify who to test further, not as standalone evidence.</p><div class="what-tests">Bayes computation · P(D|+)=26.9% · below balance of probabilities standard · screening vs conclusive test distinction</div></div>
+          </div>
+          <div class="question-block" id="qp04c">
+            <div class="q-header" onclick="togQ('qp04c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Explain the Prosecutor's Fallacy. Give a specific numerical example using DNA evidence where P(match|innocent)=1/50,000 in a city of 2 million people. Show why the prosecutor's conclusion is wrong.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>The Prosecutor's Fallacy:</strong> Confusing P(evidence | innocent) with P(innocent | evidence). A prosecutor presents P(match|innocent)=1/50,000 and implies P(innocent|match)=1/50,000, i.e. 99.998% probability of guilt. This is wrong.</p><p><strong>Correct calculation:</strong> In a city of 2 million, expected innocent matches = 2,000,000 × (1/50,000) = <strong>40 people</strong> would match by chance. If there is one guilty person, there are roughly 40+1=41 matches total. P(guilty|match) = 1/41 = <strong>2.4%.</strong></p><p>The prosecutor's "1 in 50,000" number describes how rare a match is for any one innocent person. But when you search 2 million people, rare events become common. The correct probabilistic statement is that, without other evidence, a DNA match from a citywide search gives only a 2.4% probability of guilt. Convicting on this basis alone would result in guilty verdicts for approximately 40 innocent people for every 1 truly guilty person identified.</p><div class="what-tests">P(guilty|match) vs P(match|innocent) · 40 expected false matches in 2M · P(guilty|match)=2.4% · population-level base rate · mass screening fallacy</div></div>
+          </div>
+          <div class="question-block" id="qp04d">
+            <div class="q-header" onclick="togQ('qp04d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Using Bayes' Theorem with the Odds Form: P(fraud)=0.05 prior. Evidence: financial irregularity found, P(irregularity|fraud)=0.90, P(irregularity|clean)=0.15. (a) Compute the likelihood ratio (LR). (b) Compute prior odds. (c) Compute posterior odds. (d) Convert to posterior probability. Verify using the standard Bayes' formula.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) LR = P(E|H)/P(E|H') = 0.90/0.15 = <strong>6.</strong> The evidence is 6× more likely under fraud than under non-fraud.</p><p>(b) Prior odds = P(H)/P(H') = 0.05/0.95 = <strong>1/19 ≈ 0.0526.</strong></p><p>(c) Posterior odds = Prior odds × LR = (1/19)×6 = 6/19 ≈ <strong>0.316.</strong></p><p>(d) Posterior probability = Posterior odds / (1 + Posterior odds) = 0.316/1.316 = <strong>0.240 = 24.0%.</strong></p><p>Verification: P(E)=0.90×0.05+0.15×0.95=0.045+0.1425=0.1875. P(H|E)=0.045/0.1875=0.240 ✓</p><p>The odds form is powerful for sequential updating: each new piece of evidence multiplies the odds by a new LR. LR>1 strengthens the case; LR&lt;1 weakens it.</p><div class="what-tests">Likelihood ratio LR=6 · prior odds 1/19 · posterior odds 6/19 · conversion to probability · verification with standard formula</div></div>
+          </div>
+          <div class="question-block" id="qp04e">
+            <div class="q-header" onclick="togQ('qp04e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A polygraph (lie detector) has 88% sensitivity (P(+|lying)=0.88) and 86% specificity (P(−|truthful)=0.86). In a suspect pool where 20% are estimated to be lying. (a) Find P(lying|test positive). (b) Find P(truthful|test negative). (c) A government agency proposes mandatory polygraph screening of 10,000 employees, expecting 500 spies. How many true positives, false positives, true negatives, and false negatives are expected? (d) Evaluate the agency's claim that "88% accuracy justifies mandatory screening."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) P(L)=0.20, P(+|L)=0.88, P(+|T)=0.14 (false positive rate). P(+)=0.88×0.20+0.14×0.80=0.176+0.112=0.288. P(L|+)=0.176/0.288=<strong>0.611=61.1%.</strong></p><p>(b) P(−|T)=0.86, P(−|L)=0.12. P(−)=0.12×0.20+0.86×0.80=0.024+0.688=0.712. P(T|−)=0.688/0.712=<strong>0.966=96.6%.</strong> A negative test strongly suggests truthfulness.</p><p>(c) 10,000 employees, 500 spies (P(spy)=0.05), 9,500 non-spies. True positives: 500×0.88=440. False negatives: 500×0.12=60 spies missed. False positives: 9,500×0.14=1,330 innocent employees flagged. True negatives: 9,500×0.86=8,170. Total positives: 440+1,330=1,770. P(spy|+)=440/1770=<strong>24.9%.</strong></p><p>(d) The "88% accurate" claim is seriously misleading. Among the 1,770 employees who test positive: only 440 (24.9%) are actual spies — 1,330 innocent employees will be falsely flagged. The screening creates 3 false accusations for every 1 true positive. Meanwhile, 60 actual spies escape detection. The policy will destroy 1,330 careers through false accusations while catching 440 of 500 spies. Whether this trade-off is acceptable is a policy question, but the claim that "88% accuracy justifies screening" ignores the base rate (5% prevalence) and the asymmetric harm of false positives vs false negatives in this context.</p><div class="what-tests">P(spy|+)=24.9% with 5% prevalence vs 20% prevalence giving 61.1% · 1330 false positives vs 440 true positives · 88% accuracy claim misleading · base rate drives policy consequences</div></div>
+          </div>
+          <div class="question-block" id="qp04f">
+            <div class="q-header" onclick="togQ('qp04f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Defence of innocence problem: A murder was committed in a city of 800,000 people. A suspect was identified by an eyewitness. Eyewitness identification accuracy is 80% (P(correct ID|truly guilty)=0.80) and the false ID rate is 0.001% per innocent person. (a) Compute P(suspect is guilty | identified by witness). (b) The prosecution adds fingerprint evidence: P(match|guilty)=0.99, P(match|innocent)=0.0002. Update the probability. (c) Is the combined evidence sufficient for "beyond reasonable doubt" (assume ≥95% threshold)? (d) What additional evidence would most efficiently raise the posterior?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Prior P(G)=1/800,000=0.00000125. P(ID|G)=0.80, P(ID|I)=0.00001 (0.001%). P(ID)=0.80×0.00000125+0.00001×0.999999=0.000001+0.00001=0.000011. P(G|ID)=0.80×0.00000125/0.000011=0.000001/0.000011=<strong>0.0909=9.1%.</strong> Eyewitness alone: 9.1% probability of guilt.</p><p>(b) New prior=0.0909. P(FP|G)=0.99, P(FP|I)=0.0002. P(FP)=0.99×0.0909+0.0002×0.9091=0.08999+0.0001818=0.09017. P(G|ID,FP)=0.99×0.0909/0.09017=0.08999/0.09017=<strong>0.998=99.8%.</strong></p><p>(c) Combined posterior: 99.8% — this exceeds the 95% threshold and would generally meet the "beyond reasonable doubt" standard. The fingerprint evidence has an extremely high likelihood ratio: LR=0.99/0.0002=4,950. This single piece of high-quality forensic evidence transformed 9.1% to 99.8%.</p><p>(d) Most efficient additional evidence: any evidence with a very high likelihood ratio. The LR for fingerprints (4,950) was transformative. Additional forensic evidence (CCTV footage, cell tower data, a second independent eyewitness) would each multiply the odds by their respective LR. Evidence that is only slightly more probable under guilt than innocence (LR close to 1 — e.g. character witnesses, motive alone) contributes little. The defence would look for evidence with LR &lt; 1 (more probable under innocence) to reduce the posterior below 95%.</p><div class="what-tests">Prior=1/800,000 · P(G|ID)=9.1% · P(G|ID+FP)=99.8% · LR=4,950 for fingerprint · exceeds 95% BRD threshold · LR framework for evidence efficiency</div></div>
+          </div>
+          <div class="question-block" id="qp04g">
+            <div class="q-header" onclick="togQ('qp04g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A judge receives expert testimony that "the probability of finding this blood stain pattern if the defendant were innocent is 1 in 10,000." The defendant's lawyer counters: "This figure tells you nothing about guilt." (a) Identify what probability is being stated and what probability is needed. (b) Demonstrate using numbers (assume 500,000 people could plausibly be the perpetrator) why the lawyer is substantially correct. (c) What information would need to be added for the expert's evidence to be legally meaningful? (d) If a second independent test also gives 1-in-10,000 for innocence, show the updated posterior — and explain why two weak items of evidence can together constitute strong evidence.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Stated: P(blood pattern | innocent) = 0.0001 — the likelihood of the evidence given innocence. Needed by the court: P(innocent | blood pattern) = the posterior probability of innocence given the evidence. The expert stated a likelihood; the court needs a posterior. These are entirely different probabilities separated by Bayes' theorem and the base rate.</p><p>(b) P(G)=1/500,000=0.000002. P(E|G)≈1 (blood pattern present if guilty). P(E|I)=0.0001. P(E)=1×0.000002+0.0001×0.999998≈0.000002+0.0001=0.000102. P(G|E)=0.000002/0.000102=<strong>0.0196=1.96%.</strong> The lawyer is substantially correct: even with a 1-in-10,000 random match, the posterior probability of guilt is only 1.96%. The expert's testimony, by itself, is almost meaningless without base rate information.</p><p>(c) For the evidence to be legally meaningful, the court needs: (i) the prior probability of the suspect's guilt (why was this person a suspect?); (ii) the complete population of possible perpetrators; (iii) the false positive rate (is 1-in-10,000 for this specific type of pattern, or for any blood pattern?). The expert should present a full Bayesian analysis, not just the random match probability.</p><p>(d) Two independent tests, each P(Eᵢ|I)=0.0001. Combined P(E₁∩E₂|I)=0.0001²=0.00000001 (if independent). P(E₁∩E₂|G)≈1. Updated: P(G)=0.000002. P(E₁∩E₂)≈0.00000001×0.999998+0.000002≈0.0000000100+0.000002≈0.00000201. P(G|both)≈0.000002/0.00000201=<strong>0.995=99.5%.</strong> Two pieces of evidence each giving 1-in-10,000 random match probabilities combine (via independent LRs of 10,000 each) for a combined LR of 10,000²=100,000,000 — completely overwhelming the prior. This is why corroborating evidence matters: each independent item multiplies the odds by its LR, and independent evidence stacks multiplicatively rather than additively.</p><div class="what-tests">Stated likelihood vs needed posterior · P(G|E)=1.96% despite 1-in-10,000 random match · lawyer substantially correct · needs prior and population size · two independent tests: LR=10,000²=10⁸ → P(G)=99.5% · multiplicative stacking of independent evidence</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section" id="prob04-bar">
+        <div class="inner-header" onclick="togI('prob04-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Bayes' Formula</div><div class="bar-content">P(H|E) = P(E|H)·P(H) / [P(E|H)·P(H) + P(E|H')·P(H')] · Prior × Likelihood → Posterior</div></div>
+          <div class="bar-lens"><div class="bar-label">Odds Form</div><div class="bar-content">Posterior odds = Prior odds × LR · LR = P(E|H)/P(E|H') · P(H)/(1−P(H)) = odds</div></div>
+          <div class="bar-lens"><div class="bar-label">Prosecutor's Fallacy</div><div class="bar-content">P(E|innocent) ≠ P(innocent|E) · Always need base rate · Low match probability ≠ high probability of guilt</div></div>
+          <div class="bar-lens"><div class="bar-label">Legal Standards as Posteriors</div><div class="bar-content">Balance of probabilities: P(H|E) &gt; 0.50 · Beyond reasonable doubt: P(H|E) ≥ ~0.95+ · Both require base rate + evidence</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part5-statistical-inference.html">← Part 5</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-reasoning-types.html">Reasoning →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+<footer class="site-footer">QR-II · Probability &amp; Distributions · Asian Institute of Law · LLB Sem II 2026</footer>
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size){var s=size/16;document.getElementById('fs-override').textContent=['body{font-size:'+size+'px !important;}','p{font-size:'+Math.round(15*s)+'px !important;}','.site-header h1{font-size:'+Math.round(22*s)+'px !important;}','.topic-title{font-size:'+Math.round(17*s)+'px !important;}','.inner-label{font-size:'+Math.round(11*s)+'px !important;}','.notation{font-size:'+Math.round(13*s)+'px !important;}','.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}','.q-text{font-size:'+Math.round(14*s)+'px !important;}','.q-body p{font-size:'+Math.round(14*s)+'px !important;}','.what-tests{font-size:'+Math.round(11*s)+'px !important;}'].join('');document.querySelectorAll('.fp-btn').forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.size)===size);});}
+  setFont(16);
+</script>
+</body>
+</html>

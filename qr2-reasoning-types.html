@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Reasoning Types &amp; Logic</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;}
+  .cg-card{background:#F7F5F0;border:1px solid var(--rule);border-radius:2px;padding:12px;}
+  .cg-card .cg-title{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;}
+  .cg-card p{font-size:13px;margin-top:6px;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens .bar-content{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:var(--ink);}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}.compare-grid{grid-template-columns:1fr;}}
+  @media(min-width:1024px) and (orientation:landscape){.container{max-width:1280px;padding:0 24px;}.site-header{padding:32px 32px 26px;}.site-header h1{font-size:26px;}.topic-header{padding:18px 22px;}.topic-title{font-size:19px;}.inner-header{padding:15px 22px;}.inner-body{padding:6px 24px 24px;}.notation{font-size:14px;}.example-block{padding:16px 18px;}.example-block p{font-size:15px;}.q-header{padding:14px 16px;}.q-text{font-size:15px;}.q-body{padding:0 16px 16px;}.q-body p{font-size:15px;}}
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}.fp-btn:nth-child(2){font-size:13px;}.fp-btn:nth-child(3){font-size:15px;}.fp-btn:nth-child(4){font-size:17px;}.fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Reasoning Types &amp; the Importance of Logic</h1>
+  <div class="subtitle">Section 1 Supplement · Dr. Tariq Ismaeel · 2 topics · Finals</div>
+</header>
+<div class="progress-strip">
+  <span class="ps-label">Finals Supplement</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">2 topics</span>
+</div>
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+  <div class="section-label">Section 1 · Logic Foundations</div>
+
+  <!-- RT01 -->
+  <div class="topic-card" id="rt01" style="border-left-color:#2E5C8A">
+    <div class="topic-header" onclick="tog('rt01')">
+      <span class="lec-tag" style="background:#2E5C8A">RT 01</span>
+      <div class="topic-title">Inductive, Deductive, and Abductive Reasoning — Definitions, Differences, and Legal Applications</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="rt01-l">
+        <div class="inner-header" onclick="togI('rt01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>All reasoning moves from what you know to conclusions you don't yet know — but the three types differ in <em>how certain</em> the conclusion is, and <em>which direction</em> the reasoning travels.</p>
+          <p><strong>Deductive reasoning</strong> moves from general principles to specific conclusions. If the premises are true and the argument is valid, the conclusion is <em>guaranteed</em>. This is the most logically powerful form. All of formal logic (truth tables, syllogisms, modus ponens) is deductive.</p>
+          <p><strong>Inductive reasoning</strong> moves from specific observations to general conclusions. The conclusion is <em>probable</em> but never certain — even a thousand confirming cases cannot rule out the next one being different. Science and statistical inference are inductive.</p>
+          <p><strong>Abductive reasoning</strong> — the most underappreciated of the three — selects the <em>best available explanation</em> for observed evidence. It does not guarantee its conclusion and does not derive it from a general rule. It asks: "Given what I observe, what is the most plausible explanation?" Sherlock Holmes's famous "deductions" are almost always abductive.</p>
+          <div class="pattern-warn"><div class="pw-label">All Three Live in a Courtroom Simultaneously</div><p>A criminal trial uses all three: Deductive — "All persons who commit murder are guilty of murder; the defendant committed murder; therefore the defendant is guilty" (applying law to fact). Inductive — "In 90% of similar cases, this pattern of behaviour preceded violence; therefore this defendant was likely to act violently." Abductive — "The most plausible explanation for the fingerprints, the motive, and the alibi gap is that the defendant was present." Lawyers and judges use all three constantly, often without naming them.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt01-m">
+        <div class="inner-header" onclick="togI('rt01-m')"><span class="inner-label">Mechanics &amp; Comparison</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Deductive:</span> General → Specific · Conclusion NECESSARILY follows · Certainty<br>
+            <span class="hl">Form:</span> All P are Q. X is P. ∴ X is Q. [Modus Ponens]<br>
+            <span class="hl">Keyword:</span> "therefore," "necessarily," "it follows that," "must be"<br><br>
+            <span class="hl">Inductive:</span> Specific → General · Conclusion PROBABLY follows · Probability<br>
+            <span class="hl">Form:</span> In all observed cases, X follows Y. ∴ X probably always follows Y.<br>
+            <span class="hl">Keyword:</span> "probably," "likely," "in general," "tends to," "suggests"<br><br>
+            <span class="hl">Abductive:</span> Evidence → Best Explanation · Conclusion is MOST PLAUSIBLE · Inference<br>
+            <span class="hl">Form:</span> E is observed. H best explains E. ∴ H is probably true.<br>
+            <span class="hl">Keyword:</span> "best explains," "most likely explanation," "simplest account," "most plausible"
+          </div>
+          <div class="compare-grid">
+            <div class="cg-card">
+              <div class="cg-title">Deductive</div>
+              <p><strong>Direction:</strong> General → Specific</p>
+              <p><strong>Certainty:</strong> Guaranteed (if valid)</p>
+              <p><strong>Can be wrong?</strong> Only if premises false</p>
+              <p><strong>Legal use:</strong> Applying statutory rules to facts</p>
+              <p><strong>Risk:</strong> Sound but irrelevant premises</p>
+            </div>
+            <div class="cg-card">
+              <div class="cg-title">Inductive</div>
+              <p><strong>Direction:</strong> Specific → General</p>
+              <p><strong>Certainty:</strong> Probable, defeasible</p>
+              <p><strong>Can be wrong?</strong> Yes — even with many cases</p>
+              <p><strong>Legal use:</strong> Statistical evidence, patterns</p>
+              <p><strong>Risk:</strong> Hasty generalisation</p>
+            </div>
+            <div class="cg-card">
+              <div class="cg-title">Abductive</div>
+              <p><strong>Direction:</strong> Evidence → Explanation</p>
+              <p><strong>Certainty:</strong> Most plausible, fallible</p>
+              <p><strong>Can be wrong?</strong> Yes — better explanation may exist</p>
+              <p><strong>Legal use:</strong> Investigation, narrative reconstruction</p>
+              <p><strong>Risk:</strong> Tunnel vision on one hypothesis</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt01-ex">
+        <div class="inner-header" onclick="togI('rt01-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="example-block"><div class="ex-label">Easy — Identify the Type of Reasoning</div>
+            <p>Classify each as deductive, inductive, or abductive and justify:</p>
+            <p><strong>(a)</strong> "The law states that any person who causes grievous hurt is liable under s.325 PPC. The defendant caused grievous hurt. Therefore, the defendant is liable under s.325."</p>
+            <p>→ <strong>Deductive.</strong> General rule (the law) applied to specific fact (defendant's act). Conclusion necessarily follows if both premises are accepted. No probability involved.</p>
+            <p><strong>(b)</strong> "In studies of 500 similar fraud cases, 87% resulted in reoffending within 5 years. This defendant committed fraud. Therefore, this defendant will probably reoffend."</p>
+            <p>→ <strong>Inductive.</strong> From specific observations (500 cases) to a general pattern (87% reoffend), then applying that pattern to a specific case. The conclusion is probable, not certain — the defendant could be in the 13%.</p>
+            <p><strong>(c)</strong> "The defendant's shoes match mud found at the crime scene, the victim's phone shows a call to the defendant 10 minutes before death, and the defendant has no alibi. The most plausible explanation for all of this is that the defendant was at the scene."</p>
+            <p>→ <strong>Abductive.</strong> The reasoning selects the best explanation for a collection of evidence. It does not follow necessarily (an innocent person could have all these features coincidentally) and is not derived from a frequency pattern. It is an inference to the most plausible overall account.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Medium — Reconstruct and Evaluate an Abductive Argument</div>
+            <p>A detective finds: (i) the safe was opened with the correct code (not forced), (ii) only three people knew the code, (iii) two have verified alibis, (iv) the third person (the suspect) has no alibi but denies involvement. Reconstruct the abductive reasoning and identify its key vulnerability.</p>
+            <p><strong>The abductive argument:</strong> Evidence E = {safe opened with code; only 3 knew code; 2 have alibis}. Hypothesis H = "Suspect opened the safe" best explains all of E, since the other two explanations (H₁: person with alibi did it, H₂: someone else knew the code) are either ruled out or require additional unexplained assumptions.</p>
+            <p><strong>Structure:</strong> The argument eliminates alternatives by attacking their explanatory power, leaving H as the survivor. This is sometimes called "inference by elimination" — a classic abductive strategy.</p>
+            <p><strong>Key vulnerability:</strong> The argument assumes the set of hypotheses considered is exhaustive. But H₂ has not been fully eliminated — it is merely not established. Someone could have observed the code being entered, a locksmith may have been bribed, or the code may have been shared without the three principals knowing. Abductive reasoning is only as strong as the completeness of the alternative hypotheses considered. <strong>Tunnel vision</strong> — premature commitment to the most obvious hypothesis — is the classical abductive error in criminal investigations.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Hard — A Single Legal Scenario Using All Three Types</div>
+            <p>A tax authority is investigating whether a company evaded taxes. Identify where each type of reasoning appears and evaluate the overall argument's strength.</p>
+            <p><strong>Step 1 — Abductive:</strong> The company's declared income dropped 40% in a year where sector revenue grew 15%. The authority's investigator concludes: "The most plausible explanation is underdeclaration of income." This is abductive — selecting the best explanation for the anomaly. Alternative explanations (genuine losses, accounting changes, extraordinary expenses) have not yet been ruled out.</p>
+            <p><strong>Step 2 — Inductive:</strong> A data analysis of 200 similar companies shows that a 40%+ income drop in a growth year is associated with tax evasion in 73% of cases. The investigator generalises: "Companies showing this pattern are likely evading." This is inductive — from observed frequency to a probabilistic generalisation applied to this company.</p>
+            <p><strong>Step 3 — Deductive:</strong> Tax law states: "Any company that files a return materially understating income by more than 20% shall be liable for penalty and back taxes." If the investigation establishes that income was understated by 40%, the deductive conclusion follows: the company is liable. The law is the major premise; the established fact is the minor premise; liability is the conclusion.</p>
+            <p><strong>Overall strength:</strong> The investigation starts abductively (hypothesis generation from anomaly), is supported inductively (statistical pattern), and if proven, concludes deductively (legal liability). The weakest link is the abductive step — an alternative explanation for the income drop would collapse the entire chain before it reaches the deductive conclusion. This illustrates why criminal investigations must disprove alternatives, not merely assert the most plausible one.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt01-q">
+        <div class="inner-header" onclick="togI('rt01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qrt01a">
+            <div class="q-header" onclick="togQ('qrt01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Define deductive, inductive, and abductive reasoning in one sentence each. For each, state whether the conclusion is certain, probable, or merely plausible.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Deductive:</strong> Reasoning from general premises to a specific conclusion that necessarily follows if the premises are true. Conclusion: <strong>certain</strong> (given true premises and valid form).</p>
+              <p><strong>Inductive:</strong> Reasoning from specific observations to a general conclusion that is supported but not guaranteed by the evidence. Conclusion: <strong>probable</strong> (stronger with more evidence, but never certain).</p>
+              <p><strong>Abductive:</strong> Reasoning from observed evidence to the most plausible explanation, without certainty that alternative explanations are impossible. Conclusion: <strong>plausible</strong> (best available, but defeasible if a better explanation is found).</p>
+              <div class="what-tests">Three definitions · three certainty levels · deductive = certain, inductive = probable, abductive = plausible</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt01b">
+            <div class="q-header" onclick="togQ('qrt01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Why is Sherlock Holmes's reasoning usually abductive rather than deductive, despite being called "deduction"? Give an example of a Holmes-style inference and show it is abductive.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Holmes's reasoning is called "deduction" colloquially but is structurally abductive. True deduction guarantees its conclusion from general premises. Holmes observes specific evidence and infers the most plausible explanation — he does not derive conclusions from universal laws.</p>
+              <p><strong>Example:</strong> Holmes observes a man's tan line, posture, and bearing and declares: "You have been in Afghanistan, I perceive." His reasoning: tan line on face but not hands (military service), upright posture (military bearing), recent injury (sling), and the pattern fits Afghanistan best. This is abduction — the most plausible explanation of the cluster of observations. It could be wrong (a different desert posting, a rugby injury, a posture disorder) — but Afghanistan is the most economical explanation. A true deductive argument would require a general premise like "All men with exactly these features were in Afghanistan" — which is false and which Holmes never claims.</p>
+              <div class="what-tests">Abduction = inference to best explanation · Holmes uses specific evidence not universal premises · could be wrong · contrast with deduction which requires universal major premise</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt01c">
+            <div class="q-header" onclick="togQ('qrt01c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Classify each argument and identify whether it is strong or weak, and why: (a) "Every time we increased police patrols in that district, crime fell. So police patrols reduce crime." (b) "Theft is defined as taking without consent with dishonest intent. The defendant took the item. Therefore the defendant committed theft." (c) "The witness is nervous and avoiding eye contact. The most likely explanation is that she is lying."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Inductive — Weak.</strong> From observed correlation (patrols up → crime down) to causal generalisation. Weak because: (i) correlation ≠ causation — crime may have fallen for other reasons (seasonality, economic improvement); (ii) there may be confounders; (iii) the pattern may not hold elsewhere. To strengthen: control for other variables, test in multiple districts, use randomised assignment of patrols.</p>
+              <p><strong>(b) Deductive — Appears valid but is incomplete.</strong> The argument only establishes one element of theft (taking without consent). The second element (dishonest intent) has not been established as a premise. A deductive argument is only as strong as the completeness and truth of its premises. If "defendant took with dishonest intent" is added, the conclusion follows necessarily.</p>
+              <p><strong>(c) Abductive — Weak.</strong> Nervousness and avoidance have many plausible explanations: being in an unfamiliar formal setting, fear of being misunderstood, having private information unrelated to the case, or personality. The "lying" explanation is not the only plausible one, and there is no evidence it is the best one. This is also an informal fallacy — reading demeanour as truth-indicator — which research shows humans do very poorly. Strong abductive arguments consider and eliminate alternative hypotheses; this one does not.</p>
+              <div class="what-tests">Inductive weak (correlation/causation) · deductive incomplete (missing premise) · abductive weak (many competing explanations) · how to strengthen each</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt01d">
+            <div class="q-header" onclick="togQ('qrt01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Explain how inductive reasoning can be strengthened. Give three criteria that make an inductive argument stronger. Apply them to: "Based on 10 interviews with convicted criminals, we conclude that childhood poverty causes crime."</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Three criteria for stronger inductive arguments:</strong></p>
+              <p><strong>1. Larger sample size.</strong> More observations reduce the likelihood of coincidental patterns. As n increases, the inductive conclusion approaches statistical stability.</p>
+              <p><strong>2. Representative sample.</strong> The observations must reflect the target population, not just convenient or available cases. Bias in sampling undermines the generalisation even with large n.</p>
+              <p><strong>3. Controlled for confounders.</strong> The observed association must survive controls for alternative explanations. "A causes B" is stronger when "A is associated with B even after controlling for C, D, E."</p>
+              <p><strong>Applied to the argument:</strong> This is an extremely weak inductive argument. (i) n=10 is far too small for a generalisation about a complex social phenomenon. (ii) Convicted criminals are not representative of all criminals, and self-reporting in interviews is unreliable. (iii) Childhood poverty correlates with many factors (neighbourhood effects, educational quality, family stability) — without controls, attributing causation to poverty alone is unjustified. (iv) There is no comparison group: we don't know the childhood poverty rate among non-criminals. To strengthen: use a large, representative longitudinal study with a control group, and employ multivariate analysis to control for confounders.</p>
+              <div class="what-tests">Three strengthening criteria: sample size, representativeness, confounder control · applied to a weak 10-interview argument · all three criteria violated</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt01e">
+            <div class="q-header" onclick="togQ('qrt01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A police investigator presents the following chain of reasoning in a murder case: (1) "Most murders in this city are committed by someone known to the victim." (2) "The victim knew the defendant." (3) "Therefore the defendant probably committed the murder." — Then adds: (4) "Defendants who are nervous during questioning are usually hiding something." (5) "The defendant was nervous during questioning." (6) "Therefore the defendant is hiding something." Identify the type of reasoning in steps 1-3 and 4-6, evaluate each argument's validity and strength, and explain what is logically wrong with the combined conclusion.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Steps 1–3 — Inductive reasoning.</strong> Premise 1 is a generalisation from observed cases ("most murders"). Premise 2 is a specific fact. Applying a probabilistic generalisation to a specific case is inductive inference, not deductive. The conclusion ("probably committed") acknowledges this explicitly.</p>
+              <p><strong>Evaluation of 1–3:</strong> The argument is weak for several reasons. (i) "Most murders" does not mean "this murder" — base rates do not apply directly to specific cases without additional evidence of guilt. (ii) "Knowing the victim" is so common (family, friends, colleagues, acquaintances) that it is almost never discriminating evidence — it applies to thousands of people who are not the murderer. (iii) The inference commits the fallacy of <strong>affirming a disjunct</strong> in probabilistic form — even if 70% of murderers knew the victim, that does not mean 70% of people who knew the victim are murderers.</p>
+              <p><strong>Steps 4–6 — Deductive in form but inductive in premise.</strong> Steps 4–6 have the structure of modus ponens (All A are B; X is A; therefore X is B). If accepted as stated, the conclusion follows deductively. But Premise 4 is not a universal truth — it is an empirical generalisation (at best inductive, and a weak one). Nervous people include innocent people in stressful situations, people with anxiety disorders, people afraid of being misunderstood, and people who have been wrongly arrested before.</p>
+              <p><strong>What is logically wrong with the combined argument:</strong> The investigator is stacking two independently weak arguments and treating the combination as strong. But two weak arguments do not make one strong argument — they remain independently fallible. Furthermore, the conclusion "the defendant is hiding something" does not specify <em>what</em> is hidden — it could be an unrelated personal matter, not guilt. The combined chain commits the <strong>conjunction fallacy</strong> implicitly: treating "known to victim AND nervous" as stronger evidence than either alone without demonstrating that both are independently associated with guilt. The appropriate response to these two arguments is to treat them as preliminary signals warranting investigation — not as a basis for arrest or prosecution.</p>
+              <div class="what-tests">Steps 1-3 inductive · steps 4-6 deductive in form but inductive premise · "knowing victim" is not discriminating · nervous ≠ guilty · two weak arguments don't become strong · what "hiding something" could mean</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt01f">
+            <div class="q-header" onclick="togQ('qrt01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Compare deductive and inductive reasoning in terms of: (a) truth-preservation, (b) ampliative vs non-ampliative character, (c) vulnerability to new evidence, (d) role in legal proof. Then explain why neither deductive nor inductive reasoning alone can drive a criminal investigation — and why abduction is the unavoidable starting point.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Truth-preservation:</strong> Deduction is truth-preserving — if the premises are true and the argument is valid, the conclusion cannot be false. Induction is not truth-preserving — even if all observed premises are true, the inductive conclusion could be false (the next case might break the pattern).</p>
+              <p><strong>(b) Ampliative vs non-ampliative:</strong> Induction is <em>ampliative</em> — it goes beyond the evidence and generates new information (a general rule). Deduction is <em>non-ampliative</em> — the conclusion is always already contained within the premises; deduction unpacks what is there but adds nothing new. This is why scientific discovery is inductive and mathematical proof is deductive.</p>
+              <p><strong>(c) Vulnerability to new evidence:</strong> Deductive conclusions are immune to refutation by new evidence unless a premise is shown false. Inductive conclusions can always be weakened or overturned by new cases that contradict the generalisation.</p>
+              <p><strong>(d) Role in legal proof:</strong> Deduction applies law to fact — once facts are established, legal consequences follow necessarily. Induction establishes facts and patterns from evidence — statistical and historical evidence is inductive. Both are essential; neither alone suffices.</p>
+              <p><strong>Why abduction is the unavoidable starting point:</strong> Before a criminal investigation can begin, someone must identify a <em>hypothesis worth investigating</em>. Deduction cannot generate hypotheses — it can only apply rules to given facts. Induction requires observations already collected. Abduction is the reasoning that looks at an unexpected event (a death, a missing asset, a suspicious pattern) and asks: "What happened here?" It generates candidate hypotheses from partial evidence. Without abduction, there is no hypothesis to test deductively or inductively. Investigations begin abductively, proceed inductively (collecting and testing evidence), and conclude deductively (applying law to established facts). The three types are not competitors — they are sequential phases of a complete legal reasoning process.</p>
+              <div class="what-tests">Truth-preservation · ampliative distinction · vulnerability to evidence · role in legal proof · abduction as hypothesis-generator · three types as sequential phases</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt01g">
+            <div class="q-header" onclick="togQ('qrt01g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A judge writes the following in a judgment: "We observe that the defendant was present at the scene (established by CCTV), had motive (established by financial records), and had opportunity (no alibi confirmed). The most plausible explanation for the victim's death, taken in conjunction with all the evidence, is that the defendant caused it. We therefore find the defendant guilty." (a) Identify the type(s) of reasoning in this judgment. (b) Is this reasoning legally sufficient? (c) What logical standard is being applied implicitly — and is it appropriate for a criminal conviction? (d) How would the argument need to be restructured to meet the "beyond reasonable doubt" standard?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Type of reasoning:</strong> The judgment is primarily <strong>abductive</strong> — "the most plausible explanation" is the explicit language of inference to the best explanation. It collects circumstantial evidence and selects guilt as the best account. The final step ("we therefore find guilty") appears deductive in form but is not — it lacks a universal major premise connecting presence+motive+opportunity to guilt with certainty.</p>
+              <p><strong>(b) Legal sufficiency:</strong> This reasoning is <strong>legally insufficient</strong> for a criminal conviction under most legal systems. Presence, motive, and opportunity are circumstantial evidence — they increase the probability of guilt but do not establish it. Many innocent people were present, had motive, and had opportunity in any given situation. The judgment does not eliminate the possibility of innocent explanations (the victim died by accident, another person committed the act, the defendant was present for an unrelated reason).</p>
+              <p><strong>(c) Implicit standard — "most plausible explanation":</strong> This is the civil standard (<em>balance of probabilities</em> — more likely than not). The court is applying what amounts to a Bayesian posterior above 50%. For a civil case, this may suffice. For a criminal conviction, the standard is <em>beyond reasonable doubt</em> — not merely "most plausible" but "no reasonable alternative explanation." The gap between "most plausible" and "beyond reasonable doubt" is precisely the space where innocent people are at risk of conviction from circumstantial evidence.</p>
+              <p><strong>(d) Restructured argument for BRD:</strong> The judgment would need to: (i) explicitly consider and eliminate alternative explanations (accident, another perpetrator, mistaken identity); (ii) establish that each alternative is not merely less plausible but unreasonable given the totality of evidence; (iii) add direct or forensic evidence linking the defendant causally to the death (not merely present, motivated, and available); (iv) convert from "most plausible explanation" to "the only reasonable explanation." The difference is between abductive sufficiency and abductive exclusivity — BRD requires not just that guilt is the best explanation, but that innocence is an unreasonable one.</p>
+              <div class="what-tests">Abductive judgment language "most plausible" · insufficient for criminal BRD standard · civil vs criminal threshold · BRD requires eliminating alternatives as unreasonable · abductive sufficiency vs exclusivity distinction</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt01-bar">
+        <div class="inner-header" onclick="togI('rt01-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Three Types at a Glance</div><div class="bar-content">Deductive: General→Specific · Certain · "Must be" · Applies law to fact · Modus ponens<br>Inductive: Specific→General · Probable · "Likely" · Statistics, patterns · Falsifiable<br>Abductive: Evidence→Explanation · Plausible · "Best explains" · Hypothesis generation · Defeasible</div></div>
+          <div class="bar-lens"><div class="bar-label">In a Criminal Trial</div><div class="bar-content">Abduction: investigate → form hypothesis · Induction: collect evidence → test pattern · Deduction: law + proven fact → verdict</div></div>
+          <div class="bar-lens"><div class="bar-label">Key Weaknesses</div><div class="bar-content">Deductive: only as good as premises · Inductive: hasty generalisation, confounders · Abductive: tunnel vision, incomplete alternatives</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RT02 -->
+  <div class="topic-card" id="rt02" style="border-left-color:#5C3A1A">
+    <div class="topic-header" onclick="tog('rt02')">
+      <span class="lec-tag" style="background:#5C3A1A">RT 02</span>
+      <div class="topic-title">Introduction to Logic — Definition, Importance, and Role in Legal Reasoning</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="rt02-l">
+        <div class="inner-header" onclick="togI('rt02-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p><strong>Logic</strong> is the systematic study of valid reasoning — the formal rules that determine when a conclusion correctly follows from premises, and when it doesn't. It is distinguished from persuasion (making people believe something) and from rhetoric (using language effectively). Logic is about the <em>structure</em> of arguments, independent of their emotional or rhetorical force.</p>
+          <p>The importance of logic in law is not merely academic. Every statute must be interpreted, every contract must be parsed, every verdict must be reasoned. When a judge writes a judgment, they are constructing a logical argument. When a lawyer challenges an argument, they are identifying logical flaws. Logic is the invisible architecture of legal reasoning.</p>
+          <div class="pattern-warn"><div class="pw-label">Logic Does Not Tell You What Is True — Only What Follows</div><p>Logic is about the relationship between premises and conclusions. It tells you: IF these premises are accepted, THEN this conclusion must follow. It cannot tell you whether the premises themselves are true — that is an empirical question. A logically valid argument can still reach a false conclusion if a premise is false. This is why legal arguments must be both logically valid AND have true (established) premises. A lawyer who spots a false premise has identified the weakest point of an argument, regardless of how valid its structure appears.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt02-m">
+        <div class="inner-header" onclick="togI('rt02-m')"><span class="inner-label">Mechanics &amp; Key Concepts</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Argument:</span> A set of statements (premises) offered as reasons for a conclusion<br>
+            <span class="hl">Valid argument:</span> If premises are true, conclusion MUST be true (form is correct)<br>
+            <span class="hl">Sound argument:</span> Valid AND all premises are actually true<br>
+            <span class="hl">Strong inductive argument:</span> Premises make conclusion probable (not certain)<br>
+            <span class="hl">Cogent argument:</span> Strong AND all premises true<br><br>
+            <span class="hl">Why logic matters in law:</span><br>
+            1. Statute interpretation: parsing multi-clause provisions<br>
+            2. Evidence evaluation: distinguishing correlation from causation<br>
+            3. Judgment writing: ensuring conclusions follow from findings<br>
+            4. Cross-examination: detecting logical fallacies in testimony<br>
+            5. Contract drafting: eliminating ambiguity and logical contradictions<br>
+            6. Constitutional interpretation: applying general rights to specific cases<br>
+            7. Burden of proof: formal threshold for logical acceptance of claims
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt02-ex">
+        <div class="inner-header" onclick="togI('rt02-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="example-block"><div class="ex-label">Easy — Valid vs Sound Arguments</div>
+            <p>Evaluate each argument as valid/invalid and sound/unsound:</p>
+            <p><strong>(a)</strong> "All murderers are criminals. The defendant is a murderer. Therefore the defendant is a criminal." → <strong>Valid and sound</strong> (assuming both premises established). The form is correct (modus ponens), and if the defendant is proven a murderer, the premises are true.</p>
+            <p><strong>(b)</strong> "All birds can fly. Penguins are birds. Therefore penguins can fly." → <strong>Valid but unsound.</strong> The form is correct — IF the premises were true, the conclusion would follow. But Premise 1 is false (not all birds can fly), making the argument unsound despite being valid.</p>
+            <p><strong>(c)</strong> "The defendant lied about his whereabouts. Therefore the defendant is guilty." → <strong>Invalid.</strong> The premise does not guarantee the conclusion — lying about whereabouts could have many explanations (embarrassing but innocent activities, protecting someone else, fear of being misunderstood). The argument form commits the <em>non sequitur</em> — the conclusion does not follow from the premise without additional reasoning.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Medium — Logic in Statute Interpretation</div>
+            <p>A statute reads: "No person shall operate a vehicle in a public park." A person rides a bicycle through a public park. Apply logical analysis to determine whether the statute covers this case.</p>
+            <p><strong>The logical structure:</strong> P1: No person shall operate a vehicle in a public park. P2: [Is a bicycle a vehicle?]. P3: X operated a bicycle in a public park. C: X violated the statute.</p>
+            <p><strong>The logical hinge:</strong> The argument's validity is not in question — if P2 is true (bicycle = vehicle under this statute), the conclusion follows necessarily. The entire legal dispute is about the truth of Premise 2 — a definitional/interpretive question, not a logical one.</p>
+            <p><strong>Narrowing vs broadening interpretation:</strong> Narrow reading: "vehicle" means motorised vehicles (legislative history; bicycles traditionally excluded). Broad reading: "vehicle" means any device for conveyance (literal text; bicycle is a conveyance). Logic itself cannot resolve this — logic only tells us what follows IF we accept P2. The choice of interpretation is a legal-political question. Once made, logic mechanically derives the conclusion.</p>
+            <p><strong>What logic contributes:</strong> It shows precisely where the dispute lies (P2), prevents spurious arguments (the conclusion does not follow unless P2 is established), and ensures the judgment's reasoning is internally consistent once a definition is chosen.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Hard — Logic as Instrument of Cross-Examination</div>
+            <p>An expert witness testifies: "In my experience of 20 years, defendants who show remorse are less likely to reoffend. This defendant showed no remorse. Therefore this defendant is likely to reoffend." Perform a logical analysis of this testimony and identify all the flaws a defence counsel should raise.</p>
+            <p><strong>Argument structure:</strong> P1 (inductive generalisation): In 20 years' experience, remorse correlates with lower reoffending. P2 (observation): this defendant showed no remorse. C: this defendant is likely to reoffend.</p>
+            <p><strong>Flaw 1 — Affirming the inverse:</strong> The argument uses the contrapositive of a probabilistic generalisation, not a universal law. Even if "remorse → lower reoffending" holds 80% of the time, "no remorse → higher reoffending" is not its logical equivalent in a probabilistic context. The percentages in each direction can differ enormously.</p>
+            <p><strong>Flaw 2 — Unquantified "experience":</strong> "20 years' experience" is anecdotal, not data. How many cases? What was the comparison group? Was the inference tested statistically? The inductive premise P1 is epistemically weak.</p>
+            <p><strong>Flaw 3 — Alternative explanations for no remorse:</strong> Defendants in legal proceedings are routinely advised by counsel not to make remorseful statements, as these can be treated as admissions. "No expressed remorse" does not equal "no remorse." The observation (P2) may not measure what it purports to.</p>
+            <p><strong>Flaw 4 — Ecological fallacy:</strong> Even if the group-level pattern holds, applying a group statistic to an individual is the ecological fallacy. The base rate of reoffending for the "no remorse" group (whatever it is) cannot be directly assigned as the individual defendant's probability of reoffending.</p>
+            <p><strong>Defence cross-examination questions:</strong> "Doctor, in how many of your 20 years' cases did defendants who showed no remorse actually reoffend?" "Did you control for offence type, sentence length, or post-release support?" "Were any of these defendants advised by counsel not to express remorse?" Each question attacks a logical flaw in the argument.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt02-q">
+        <div class="inner-header" onclick="togI('rt02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qrt02a">
+            <div class="q-header" onclick="togQ('qrt02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">What is logic? Distinguish between a valid argument and a sound argument. Give one example of each from a legal context.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Logic</strong> is the systematic study of the principles of valid reasoning — the formal rules that determine when a conclusion correctly follows from premises.</p>
+              <p><strong>Valid argument:</strong> The logical form is correct — if the premises were true, the conclusion could not be false. Legal example: "All persons convicted of theft under s.379 PPC are liable to imprisonment. The defendant was convicted under s.379. Therefore the defendant is liable to imprisonment." — Valid: if both premises are accepted, the conclusion follows necessarily.</p>
+              <p><strong>Sound argument:</strong> Valid AND all premises are actually true. The valid argument above becomes sound when we add that both premises are established facts in the case. A valid argument with a false premise is not sound — it may still produce a false conclusion.</p>
+              <div class="what-tests">Logic defined · valid = correct form · sound = valid + true premises · one legal example each</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt02b">
+            <div class="q-header" onclick="togQ('qrt02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Give five specific ways in which logic is important in legal practice. For each, give a concrete legal example of what goes wrong when logic is absent.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>1. Statute interpretation:</strong> A statute says "no vehicles in the park." Without logical parsing of what "vehicle" entails, the law cannot be applied consistently. Without logic: a judge applies the statute to bicycles in one case and not another, creating contradictory precedents.</p>
+              <p><strong>2. Evidence evaluation:</strong> Logic distinguishes correlation from causation, identifies fallacies in expert testimony. Without logic: a jury convicts based on post hoc reasoning ("defendant was nearby → defendant is guilty") — a non sequitur.</p>
+              <p><strong>3. Judgment writing:</strong> A judgment must show that its conclusion follows from its findings of fact and the applicable law. Without logic: an appellate court overturns the judgment because the conclusion does not follow from the stated reasons.</p>
+              <p><strong>4. Cross-examination:</strong> Detecting contradictions in witness testimony requires logical analysis — if a witness says X in direct and ¬X in cross, logic identifies the contradiction. Without logic: inconsistencies go undetected, allowing unreliable testimony to stand.</p>
+              <p><strong>5. Burden of proof:</strong> Logic defines the threshold at which evidence is sufficient to establish a fact — "beyond reasonable doubt" is a logical standard about the strength of the inferential chain. Without logic: the standard becomes subjective and inconsistently applied across cases.</p>
+              <div class="what-tests">Five roles of logic in law · statute interpretation · evidence evaluation · judgment writing · cross-examination · burden of proof · consequence of absence for each</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt02c">
+            <div class="q-header" onclick="togQ('qrt02c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Explain the difference between an argument being logically valid and it being persuasive. Why can a logically invalid argument be persuasive and a valid argument be unconvincing? What does this tell us about the role of logic in advocacy versus adjudication?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Validity vs persuasion:</strong> A valid argument is one where the conclusion necessarily follows from the premises — it is a property of logical form. Persuasion is a psychological effect — making a person believe something, regardless of whether the argument is valid. They are independent: an argument can have either without the other.</p>
+              <p><strong>Invalid but persuasive:</strong> "This defendant is a bad person — look at his criminal history." This commits the <em>ad hominem</em> fallacy (attacking character, not the specific charge). But juries find it highly persuasive because character is psychologically salient. Logic says it is irrelevant to whether the defendant committed this particular act; human psychology says otherwise.</p>
+              <p><strong>Valid but unconvincing:</strong> A technically correct statistical argument about base rates — say, "DNA evidence alone has a 16.7% posterior probability of guilt" — is logically sound but may fail to persuade a jury emotionally committed to the intuitive weight of DNA evidence. The valid argument loses to the emotionally compelling but logically weaker presentation of "one in a million chance".</p>
+              <p><strong>Advocacy vs adjudication:</strong> Advocacy (lawyers) legitimately combines logical and rhetorical tools — a lawyer's role is to present their client's position as persuasively as possible within ethical limits. Adjudication (judges, arbiters) must be governed by logic — the judgment must be legally valid regardless of which argument was more emotionally compelling. Logic is the adjudicator's constraint; rhetoric is the advocate's tool. A well-functioning legal system requires both: advocates to generate arguments and adjudicators to filter them through logic.</p>
+              <div class="what-tests">Validity = form · persuasion = psychological effect · invalid but persuasive examples · valid but unconvincing examples · advocacy (rhetorical) vs adjudication (logical) distinction</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt02d">
+            <div class="q-header" onclick="togQ('qrt02d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">What is the "burden of proof" and how is it a logical concept? Distinguish between the criminal standard (beyond reasonable doubt) and the civil standard (balance of probabilities) using logical language. How does the standard of proof relate to the risk of logical errors (Type I and Type II)?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Burden of proof as a logical concept:</strong> The burden of proof specifies the inferential threshold at which evidence is sufficient to accept a claim as established. It is the point at which the logical chain from evidence to conclusion is considered strong enough to act upon. Without a specified threshold, courts would have no principled way to decide when evidence is "enough."</p>
+              <p><strong>Criminal standard (BRD):</strong> Logically, "beyond reasonable doubt" means the prosecution's argument must be so strong that no reasonable alternative explanation of innocence remains. The conclusion (guilt) must be the only reasonable inference from the evidence. In probabilistic terms, P(guilty|evidence) must be high enough that P(innocent|evidence) is not reasonably maintainable — often interpreted as 95%+.</p>
+              <p><strong>Civil standard (BOP):</strong> Logically, "balance of probabilities" means the plaintiff's account is more likely to be true than the defendant's — P(plaintiff's claim|evidence) > 0.50. The winning argument needs only to be more probable than its negation.</p>
+              <p><strong>Logical errors:</strong> Type I error = convicting an innocent person (false positive). Type II error = acquitting a guilty person (false negative). The criminal standard is set high (BRD) to minimise Type I errors at the cost of more Type II errors — the law accepts more guilty acquittals to avoid innocent convictions. The civil standard balances the two more equally. Changing the standard of proof is a policy decision about the acceptable trade-off between these two logical error types.</p>
+              <div class="what-tests">Burden of proof as inferential threshold · BRD = only reasonable inference · BOP = more probable than not · Type I (wrongful conviction) vs Type II (wrongful acquittal) · standard of proof as error-rate policy</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt02e">
+            <div class="q-header" onclick="togQ('qrt02e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A contract clause reads: "The supplier shall deliver goods within 30 days, unless prevented by circumstances beyond its control, including but not limited to natural disasters, government actions, or labour disputes, provided that the supplier notifies the buyer within 48 hours of the occurrence of such circumstances." Parse this clause logically: (a) identify the main obligation and its conditions, (b) identify all exceptions and their conditions, (c) express the full logical structure in IF-THEN form, (d) identify two situations the clause does not clearly resolve.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Main obligation:</strong> Supplier must deliver within 30 days. Condition for obligation to arise: a valid contract exists (implicit). The obligation is categorical — no conditions are stated on the obligation itself except the exceptions below.</p>
+              <p><strong>(b) Exceptions and their conditions:</strong> Exception E: supplier is excused from 30-day delivery if (i) prevented by circumstances beyond its control AND (ii) those circumstances include or are like natural disasters, government actions, or labour disputes AND (iii) supplier notified buyer within 48 hours of occurrence. All three sub-conditions must hold for the exception to apply.</p>
+              <p><strong>(c) Full logical structure:</strong> IF [contract exists] AND [30 days have passed] AND NOT [E holds] THEN [supplier is in breach]. Where E = [prevention by force majeure event of listed type] AND [notification within 48 hours]. Equivalently: Supplier is NOT in breach IF AND ONLY IF [delivered within 30 days] OR [force majeure + 48hr notice].</p>
+              <p><strong>(d) Two unresolved situations:</strong> (i) What if the force majeure event prevented notification within 48 hours (e.g. communication infrastructure destroyed by the natural disaster)? The clause requires notification as a condition of the exception, but the same event that triggers the exception may prevent the notification. This is a logical circularity that the clause does not resolve. (ii) The list "including but not limited to" creates ambiguity — how similar must an unlisted event be to qualify? A sudden extreme exchange rate movement, a pandemic, or a supplier's own major fire — are these "circumstances beyond control"? The clause's "including but not limited to" language is intentionally open-ended but creates logical indeterminacy in borderline cases. Courts resolve this through purposive interpretation, but the clause itself does not provide a logical decision rule.</p>
+              <div class="what-tests">Main obligation parsing · three-part exception conditions · IF-THEN logical form · force majeure notification circularity · "including but not limited to" indeterminacy</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt02f">
+            <div class="q-header" onclick="togQ('qrt02f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A senior advocate argues: "Logic is necessary but not sufficient for good legal reasoning. Law requires judgment, wisdom, and contextual sensitivity that pure logic cannot supply." Write a response that (a) defends the necessity of logic in law, (b) concedes the advocate's point about sufficiency, and (c) explains precisely where logic ends and legal judgment begins.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Defence of necessity:</strong> Logic is necessary in law for at least three reasons. First, consistency: if courts could reach conclusions that did not follow from their stated reasons, precedent would be meaningless — any outcome could be dressed in any reasoning. Second, detectability of error: only because legal reasoning is required to be logical can appellate courts identify and correct errors in lower court reasoning. Third, constraint against arbitrariness: the requirement that a conclusion follow from established premises prevents judges from reaching desired conclusions without showing their reasoning chain. Without logic, law becomes power — whoever wears the gown decides, unchecked.</p>
+              <p><strong>(b) Concession on sufficiency:</strong> The advocate is entirely correct that logic alone cannot produce good legal judgments. Logic determines whether a conclusion follows from premises — it cannot select the premises. It cannot determine: which legal principle applies when multiple principles point in different directions; how to weigh competing values (liberty vs security, individual rights vs public interest); what "reasonable" means in context; when a statute should be interpreted narrowly vs broadly for policy reasons; how to handle genuinely novel situations not contemplated by existing rules. These require judgment, which is a form of practical wisdom not reducible to formal logical rules.</p>
+              <p><strong>(c) Where logic ends and judgment begins:</strong> Logic operates within a closed system of given premises. Legal judgment is required to: (i) choose between competing applicable rules (choosing the premises); (ii) interpret ambiguous terms (establishing what the premises mean); (iii) weigh proportionality between legal rules and justice in context (deciding whether the premises should be applied strictly or with equity); (iv) handle hard cases where established rules produce outcomes that seem inconsistent with their purpose. The best legal reasoning uses logic to ensure consistency and coherence within a chosen interpretive framework, and uses judgment to choose the framework. The two are not in competition — they are complementary facets of a complete reasoning process. A logically impeccable argument built on the wrong premises is a legally wrong judgment; a practically wise intuition that cannot be given logical form cannot stand as binding precedent.</p>
+              <div class="what-tests">Logic necessary for consistency, error detection, anti-arbitrariness · logic insufficient for premise selection, value weighing, interpretation, novel cases · logic within a framework + judgment to choose framework · complementary not competing</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qrt02g">
+            <div class="q-header" onclick="togQ('qrt02g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">Analyse the following judgment excerpt for logical structure and identify any errors: "The defendant was found in possession of stolen goods. Persons who are found in possession of stolen goods are generally thieves. The defendant had no reasonable explanation for possession. It is therefore established beyond reasonable doubt that the defendant stole the goods." (a) What type of reasoning is being used? (b) Reconstruct the argument formally. (c) Identify all logical problems. (d) What would need to be established to make this argument legally sound?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Type of reasoning:</strong> The argument is primarily <strong>inductive</strong> in its major premise ("generally thieves") but attempts to reach a deductive conclusion ("established beyond reasonable doubt"). This category error — using a probabilistic premise to reach a certainty-level conclusion — is the central logical flaw.</p>
+              <p><strong>(b) Formal reconstruction:</strong> P1: Persons found in possession of stolen goods are generally thieves. [Inductive generalisation — not a universal] P2: The defendant was found in possession of stolen goods. P3: The defendant gave no reasonable explanation. C: The defendant stole the goods. [BRD — certainty level required]</p>
+              <p><strong>(c) Logical problems:</strong></p>
+              <p>Problem 1 — <em>Non-universal major premise:</em> "Generally" thieves is not "are" thieves. The inductive premise (P1) cannot support a deductive conclusion (C at BRD level). Receiving stolen goods, unknowing possession, possession by a third party, being framed — all are consistent with P1 and P2 without guilt for theft.</p>
+              <p>Problem 2 — <em>Reversal of burden:</em> P3 ("no reasonable explanation") effectively requires the defendant to disprove innocence. The absence of an explanation is not evidence of guilt — it is the absence of evidence of innocence, which is not the same thing. The prosecution must prove guilt; the defendant need not explain.</p>
+              <p>Problem 3 — <em>Theft ≠ possession of stolen goods:</em> Even if we established possession of stolen goods with certainty, "theft" requires the defendant to have <em>taken</em> the goods — possession alone proves receipt, not taking. The conclusion exceeds what the premises establish.</p>
+              <p>Problem 4 — <em>BRD language unjustified:</em> The argument concludes "established beyond reasonable doubt" when the premises only establish probability. The conclusion level exceeds what the premises can support.</p>
+              <p><strong>(d) What would make it sound:</strong> (i) Replace P1 with specific evidence that the defendant was seen taking the goods, or had the goods immediately after the theft from a location linking them to the scene; (ii) Add evidence ruling out innocent receipt (no bill of sale, no explanation from third party); (iii) Establish a complete chain of possession from the scene of theft to the defendant; (iv) Remove reliance on no-explanation as positive evidence of guilt — instead, let the established evidence affirmatively exclude innocent possession. Only then can the BRD conclusion be logically supported.</p>
+              <div class="what-tests">Inductive-to-deductive category error · "generally" cannot support BRD · burden reversal in P3 · possession ≠ theft · BRD unjustified · four steps to fix the argument</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="rt02-bar">
+        <div class="inner-header" onclick="togI('rt02-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Core Definitions</div><div class="bar-content">Valid: conclusion necessarily follows from premises (correct form) · Sound: valid + all premises true · Logic ≠ persuasion</div></div>
+          <div class="bar-lens"><div class="bar-label">Logic's Role in Law</div><div class="bar-content">Statute parsing · evidence evaluation · judgment consistency · cross-examination · burden of proof as threshold</div></div>
+          <div class="bar-lens"><div class="bar-label">Standards as Logic</div><div class="bar-content">BRD: guilt = only reasonable inference · BOP: claim more probable than not · Type I (convict innocent) vs Type II (acquit guilty) · standard = error-rate policy</div></div>
+          <div class="bar-lens"><div class="bar-label">Logic's Limit</div><div class="bar-content">Logic operates within chosen premises · cannot select premises · judgment needed for interpretation, weighing, hard cases · necessary but not sufficient</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part1-logic-foundations.html">← Part 1</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-probability-distributions.html">Probability →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+<footer class="site-footer">QR-II · Reasoning Types &amp; Logic · Asian Institute of Law · LLB Sem II 2026</footer>
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size){var s=size/16;document.getElementById('fs-override').textContent=['body{font-size:'+size+'px !important;}','p{font-size:'+Math.round(15*s)+'px !important;}','.site-header h1{font-size:'+Math.round(22*s)+'px !important;}','.topic-title{font-size:'+Math.round(17*s)+'px !important;}','.inner-label{font-size:'+Math.round(11*s)+'px !important;}','.notation{font-size:'+Math.round(13*s)+'px !important;}','.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}','.q-text{font-size:'+Math.round(14*s)+'px !important;}','.q-body p{font-size:'+Math.round(14*s)+'px !important;}','.what-tests{font-size:'+Math.round(11*s)+'px !important;}'].join('');document.querySelectorAll('.fp-btn').forEach(function(b){b.classList.toggle('active',parseInt(b.dataset.size)===size);});}
+  setFont(16);
+</script>
+</body>
+</html>
