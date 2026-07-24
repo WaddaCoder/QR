@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Integration &amp; Growth Models</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;--t2:#1A5C3A;--t3:#5C1A1A;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);color:var(--page);padding:28px 20px 22px;position:sticky;top:0;z-index:100;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bar-border);margin-bottom:4px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:4px;}
+  .progress-strip{background:#1A1A2A;padding:10px 20px;display:flex;align-items:center;gap:14px;}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--bar-border);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:3px;background:#2A3A4A;border-radius:2px;}
+  .progress-bar-inner{height:3px;background:var(--bar-border);border-radius:2px;}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:#A0A8B0;white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{padding:16px 0 4px;display:flex;gap:10px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;cursor:pointer;border-radius:1px;}
+  .ctrl-btn:hover{background:var(--rule);}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-faint);padding:28px 0 10px;border-bottom:1px solid var(--rule);}
+  .topic-card{border:1px solid var(--rule);background:#fff;margin-top:12px;border-radius:2px;border-left-width:4px;border-left-style:solid;}
+  .topic-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;gap:12px;}
+  .topic-header:hover{background:#FAFAF8;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;flex:1;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:2px 6px;border-radius:1px;color:#fff;flex-shrink:0;}
+  .chevron{width:20px;height:20px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;gap:10px;}
+  .inner-header:hover{background:#FAFAF8;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);}
+  .inner-body{display:none;padding:4px 18px 18px;}
+  .inner-section.open .inner-body{display:block;}
+  .inner-chevron{width:16px;height:16px;flex-shrink:0;color:var(--ink-faint);transition:transform 0.2s ease;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  p{margin-top:12px;color:var(--ink);font-size:15px;}
+  p:first-child{margin-top:0;}
+  strong{font-weight:600;}em{font-style:italic;}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;background:#F0EDE6;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;line-height:1.9;color:var(--ink);}
+  .notation .hl{font-weight:600;color:#1A3A5C;}
+  .example-block{background:#F7F5F0;border-left:3px solid #8B6914;padding:14px 16px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .example-block .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:8px;font-weight:600;}
+  .example-block p{font-size:14px;margin-top:8px;}
+  .example-block p:first-of-type{margin-top:0;}
+  .pattern-warn{background:#FFF8F0;border-left:3px solid var(--bar-border);padding:11px 14px;margin-top:12px;border-radius:0 2px 2px 0;}
+  .pattern-warn .pw-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:6px;}
+  .pattern-warn p{font-size:14px;margin-top:6px;}
+  .question-block{margin-top:10px;border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#FAFAF8;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{font-size:14px;line-height:1.6;color:var(--ink);flex:1;}
+  .q-chevron{width:15px;height:15px;flex-shrink:0;color:var(--ink-faint);margin-top:3px;transition:transform 0.2s ease;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);background:#FDFCFA;}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:10px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule);line-height:1.6;}
+  .bar-lens{background:var(--bar-bg);border:1px solid var(--bar-border);border-radius:2px;padding:14px 16px;margin-top:12px;}
+  .bar-lens .bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;font-weight:600;margin-bottom:8px;}
+  .bar-lens .bar-content{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:var(--ink);}
+  .nav-strip{background:#1A1A2A;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bar-border);letter-spacing:0.08em;text-decoration:none;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:48px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  @media(max-width:420px){.site-header h1{font-size:19px;}.topic-title{font-size:15px;}}
+  @media(min-width:1024px) and (orientation:landscape){.container{max-width:1280px;padding:0 24px;}.site-header{padding:32px 32px 26px;}.site-header h1{font-size:26px;}.progress-strip{padding:12px 32px;}.controls{padding:18px 0 6px;}body{font-size:17px;}p{font-size:16px;}.topic-header{padding:18px 22px;}.topic-title{font-size:19px;}.inner-header{padding:15px 22px;}.inner-body{padding:6px 24px 24px;}.notation{font-size:14px;}.example-block{padding:16px 18px;}.example-block p{font-size:15px;}.q-header{padding:14px 16px;}.q-text{font-size:15px;}.q-body{padding:0 16px 16px;}.q-body p{font-size:15px;}}
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}.fp-btn:nth-child(2){font-size:13px;}.fp-btn:nth-child(3){font-size:15px;}.fp-btn:nth-child(4){font-size:17px;}.fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Integration &amp; Population Growth Models</h1>
+  <div class="subtitle">Chapter 3 Supplement · Dr. Tariq Ismaeel · 4 topics · Finals</div>
+</header>
+
+<div class="progress-strip">
+  <span class="ps-label">Finals Supplement</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">4 topics</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <div class="section-label">Calculus Foundations</div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- INT01 — Basic Integration Formulas                  -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="topic-card" id="int01" style="border-left-color:#2E5C8A">
+    <div class="topic-header" onclick="tog('int01')">
+      <span class="lec-tag" style="background:#2E5C8A">INT 01</span>
+      <div class="topic-title">Basic Integration Formulas — Power Rule, 1/x, and Exponential</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="int01-l">
+        <div class="inner-header" onclick="togI('int01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Integration is the reverse of differentiation. Differentiation asks: what is the rate of change of this function? Integration asks: what function has <em>this</em> as its rate of change? The result of indefinite integration is always a <strong>family of functions</strong> differing by a constant C — the <strong>constant of integration</strong>.</p>
+          <p>∫f(x)dx reads as "the integral of f(x) with respect to x." The indefinite integral gives a function + C. The definite integral ∫ₐᵇ f(x)dx gives a specific number — the accumulated total from a to b.</p>
+          <div class="pattern-warn"><div class="pw-label">Why C Matters in Growth Problems</div><p>Every growth model produces a constant C when you integrate. You eliminate C by applying the <strong>initial condition</strong> — the known value at t = 0 (the starting population P₀). The initial condition is not optional — it is what makes the general integral specific to your problem.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int01-m">
+        <div class="inner-header" onclick="togI('int01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Power Rule:</span> ∫xⁿ dx = xⁿ⁺¹/(n+1) + C &nbsp;&nbsp; (n ≠ -1)<br>
+            <span class="hl">Constant Rule:</span> ∫k dx = kx + C<br>
+            <span class="hl">Natural Log:</span> ∫(1/x) dx = ln|x| + C &nbsp;&nbsp; (the n = -1 exception)<br>
+            <span class="hl">Exponential:</span> ∫eˣ dx = eˣ + C<br>
+            <span class="hl">Scaled Exponential:</span> ∫eᵏˣ dx = eᵏˣ/k + C<br>
+            <span class="hl">Sum Rule:</span> ∫[f(x)+g(x)] dx = ∫f(x)dx + ∫g(x)dx<br>
+            <span class="hl">Constant Multiple:</span> ∫k·f(x) dx = k·∫f(x) dx
+          </div>
+          <div class="pattern-warn"><div class="pw-label">The Most Tested Integral — ∫(1/P) dP = ln|P| + C</div><p>The power rule fails at n = −1 because you get division by zero in the exponent. This specific case is handled by the natural log rule. It is the left-hand side of every exponential growth derivation. Know it without hesitation.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int01-ex">
+        <div class="inner-header" onclick="togI('int01-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="example-block"><div class="ex-label">Easy — Apply the Three Core Rules</div>
+            <p>Find: (a) ∫x³ dx &nbsp; (b) ∫5 dx &nbsp; (c) ∫(1/x) dx</p>
+            <p>(a) Power rule, n = 3: x³⁺¹/(3+1) + C = <strong>x⁴/4 + C</strong></p>
+            <p>(b) Constant rule: <strong>5x + C</strong></p>
+            <p>(c) Natural log exception: <strong>ln|x| + C</strong></p>
+            <p>Verification by differentiation: d/dx(x⁴/4) = x³ ✓ &nbsp; d/dx(ln|x|) = 1/x ✓. Always verify by differentiating your answer back.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Medium — Mixed Expression with Initial Condition</div>
+            <p>Find y given dy/dx = 3x² − 2x + 5, with y(0) = 4.</p>
+            <p><strong>Step 1 — Integrate:</strong> y = ∫(3x² − 2x + 5) dx = 3(x³/3) − 2(x²/2) + 5x + C = x³ − x² + 5x + C</p>
+            <p><strong>Step 2 — Apply initial condition y(0) = 4:</strong> 0 − 0 + 0 + C = 4, so C = 4.</p>
+            <p><strong>Solution: y = x³ − x² + 5x + 4.</strong> The initial condition eliminates C and gives the unique function passing through the given point. Every population growth problem uses this same two-step protocol.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Hard — The Two Growth-Model Integrals</div>
+            <p>Find: (a) ∫(1/P) dP &nbsp; (b) ∫eᵏᵗ dt with k = 0.03 &nbsp; (c) ∫(3e²ᵗ − 2/t) dt</p>
+            <p>(a) ∫(1/P) dP = <strong>ln|P| + C</strong>. This is the left-hand result in the exponential growth derivation. It comes from ∫P⁻¹ dP — do NOT use the power rule here.</p>
+            <p>(b) ∫e⁰·⁰³ᵗ dt = e⁰·⁰³ᵗ/0.03 + C = <strong>(1/0.03)e⁰·⁰³ᵗ + C</strong>. This is the right-hand result after separating dP/dt = 0.03P.</p>
+            <p>(c) ∫(3e²ᵗ − 2/t) dt = 3(e²ᵗ/2) − 2ln|t| + C = <strong>(3/2)e²ᵗ − 2ln|t| + C</strong>. Two rules in one integral — handle each term separately.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int01-q">
+        <div class="inner-header" onclick="togI('int01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qi01a">
+            <div class="q-header" onclick="togQ('qi01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Find: (a) ∫x⁵ dx &nbsp; (b) ∫7 dx &nbsp; (c) ∫(1/t) dt &nbsp; (d) ∫eᵗ dt &nbsp; (e) ∫3e²ᵗ dt. Verify each by differentiating back.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) x⁶/6 + C &nbsp; (b) 7x + C &nbsp; (c) ln|t| + C &nbsp; (d) eᵗ + C &nbsp; (e) (3/2)e²ᵗ + C</p><p>Verification: d/dx(x⁶/6) = x⁵ ✓ &nbsp; d/dt(ln|t|) = 1/t ✓ &nbsp; d/dt((3/2)e²ᵗ) = 3e²ᵗ ✓</p><div class="what-tests">Five basic rules · power, constant, 1/x, eˣ, keᵏˣ · differentiation as the check</div></div>
+          </div>
+
+          <div class="question-block" id="qi01b">
+            <div class="q-header" onclick="togQ('qi01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Integrate ∫(2x³ − 5x + 3) dx and find the specific function satisfying f(1) = 2.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Indefinite integral: (1/2)x⁴ − (5/2)x² + 3x + C.</p><p>Apply f(1) = 2: 1/2 − 5/2 + 3 + C = 2 → 1 + C = 2 → C = 1.</p><p>Specific function: <strong>f(x) = (1/2)x⁴ − (5/2)x² + 3x + 1</strong></p><div class="what-tests">Sum rule · power rule term by term · initial condition eliminates C</div></div>
+          </div>
+
+          <div class="question-block" id="qi01c">
+            <div class="q-header" onclick="togQ('qi01c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A compliance penalty accrues at rate dF/dt = 1000 (Rs. per day, t in days). F(0) = 0. (a) Find F(t). (b) Find total penalty at t = 30. (c) What does this model assume about the daily rate?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) F(t) = ∫1000 dt = 1000t + C. Apply F(0) = 0: C = 0. <strong>F(t) = 1000t</strong></p><p>(b) F(30) = 1000 × 30 = <strong>Rs. 30,000</strong></p><p>(c) This model assumes the daily penalty rate is constant — Rs. 1,000 per day regardless of how large the accumulated fine has grown. This is a linear (not exponential) model. If the rate grew with the outstanding balance, you would need dF/dt = kF instead.</p><div class="what-tests">Constant rate integral · linear growth · C from initial condition · linear vs exponential distinction</div></div>
+          </div>
+
+          <div class="question-block" id="qi01d">
+            <div class="q-header" onclick="togQ('qi01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Three students integrate ∫(1/P) dP: A gets ln P + C; B gets ln|P| + C; C gets −1/P² + C. Which are correct? Identify C's mistake precisely.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>A is acceptable</strong> in population models where P > 0 always (ln P exists). <strong>B is fully correct</strong> in all contexts — the absolute value handles cases where P could be negative. Both A and B will give correct answers in growth model problems.</p><p><strong>C is wrong.</strong> C applied the power rule to P⁻¹, computing P⁻¹⁺¹/(−1+1) = P⁰/0 — division by zero. This is exactly why the power rule fails at n = −1. The natural log rule exists specifically for this exception: ∫x⁻¹ dx = ln|x| + C, never x⁰/0.</p><div class="what-tests">ln|P| is always correct · ln P acceptable for P > 0 · power rule fails at n = −1 · n = −1 is the one exception</div></div>
+          </div>
+
+          <div class="question-block" id="qi01e">
+            <div class="q-header" onclick="togQ('qi01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A financial loss rate is dL/dt = 200t + 500 (Rs. thousands/month). Compute total losses over 12 months using ∫₀¹² (200t + 500) dt. Explain: (a) why C disappears in the definite integral; (b) what the limits 0 and 12 represent; (c) why a definite integral gives a number, not a function.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>∫₀¹²(200t + 500)dt = [100t² + 500t]₀¹² = (100×144 + 500×12) − 0 = 14,400 + 6,000 = <strong>Rs. 20,400 thousand = Rs. 20.4 million.</strong></p><p>(a) C disappears because [F(t)+C]₀¹² = (F(12)+C) − (F(0)+C) = F(12) − F(0). The constant cancels exactly. This is why definite integrals give clean numerical answers.</p><p>(b) t = 0 is the start of the loss period; t = 12 is 12 months later. The integral sums all instantaneous losses across the entire interval.</p><p>(c) A definite integral evaluates the antiderivative at two specific points and subtracts. This collapses the function to a single number — the accumulated total. An indefinite integral leaves t as a variable and gives a function.</p><div class="what-tests">Definite integral = Rs.20.4M · C cancels in evaluation · limits are physical start/end points · number vs function distinction</div></div>
+          </div>
+
+          <div class="question-block" id="qi01f">
+            <div class="q-header" onclick="togQ('qi01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A penalty accrues at rate dF/dt = 1000e⁰·²ᵗ (Rs./day). F(0) = 0. (a) Find F(t). (b) Total fine in first 10 days. (c) Total fine in the NEXT 10 days (days 10–20). (d) Compare and explain why the second period is so much larger. (e) On what day does the daily rate first exceed Rs. 10,000?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) F(t) = ∫1000e⁰·²ᵗ dt = 1000(e⁰·²ᵗ/0.2) + C = 5000e⁰·²ᵗ + C. Apply F(0)=0: 5000+C=0, C=−5000. <strong>F(t) = 5000(e⁰·²ᵗ − 1)</strong></p><p>(b) F(10) = 5000(e² − 1) = 5000(7.389−1) = <strong>Rs. 31,945</strong></p><p>(c) ∫₁₀²⁰ 1000e⁰·²ᵗ dt = [5000e⁰·²ᵗ]₁₀²⁰ = 5000(e⁴ − e²) = 5000(54.598−7.389) = <strong>Rs. 236,045</strong></p><p>(d) The second period is 7.4× the first. Exponential compounding: by day 10 the daily rate is 1000e² ≈ Rs. 7,389/day vs Rs. 1,000 on day 0. Each successive period starts at a higher base, so accumulation accelerates dramatically. This is why exponential penalty clauses are extremely dangerous — early periods seem manageable but later periods become catastrophic.</p><p>(e) 1000e⁰·²ᵗ = 10,000 → e⁰·²ᵗ = 10 → 0.2t = ln(10) = 2.303 → t = <strong>11.5 days.</strong></p><div class="what-tests">F(t)=5000(e⁰·²ᵗ−1) · Rs.31,945 days 1-10 · Rs.236,045 days 10-20 · 7.4× ratio from compounding · threshold day 11.5</div></div>
+          </div>
+
+          <div class="question-block" id="qi01g">
+            <div class="q-header" onclick="togQ('qi01g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">Two experts in a damages case: Expert A says losses grow at dL/dt = 80,000 (constant). Expert B says dL/dt = 80,000e⁰·¹ᵗ. Both agree L(0) = 0. (a) Find L(t) under each. (b) Compare total loss at t = 5 and t = 10. (c) The difference at t = 10 — how would a court decide which model is correct? (d) Which expert is the plaintiff likely to use, and why?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Expert A: L(t) = 80,000t. Expert B: L(t) = 80,000(e⁰·¹ᵗ/0.1) − 800,000 = 800,000(e⁰·¹ᵗ − 1).</p><p>(b) t=5: A = 400,000. B = 800,000(e⁰·⁵−1) = 800,000(0.6487) = Rs. 518,960. t=10: A = 800,000. B = 800,000(e−1) = 800,000(1.7183) = Rs. 1,374,640.</p><p>(c) Difference at t=10: Rs. 574,640. Court should: (i) require evidence of how the losses actually grew over the period — examine annual or quarterly data; (ii) plot cumulative losses over time and test whether the growth is linear (constant differences) or exponential (constant ratios); (iii) consider whether the underlying mechanism (market share, customer base, reputation damage) would naturally produce compounding or flat growth. Model B requires justification — exponential loss growth must be explained, not assumed.</p><p>(d) The plaintiff uses Expert B (exponential), which projects Rs. 1.37M vs Rs. 800K — 72% higher damages. The defendant uses Expert A. This is a pure model-choice dispute worth Rs. 574,640 at t = 10.</p><div class="what-tests">Linear L=80,000t vs exponential L=800,000(e⁰·¹ᵗ−1) · Rs.800K vs Rs.1.37M at t=10 · empirical test: constant differences vs ratios · plaintiff prefers exponential</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int01-bar">
+        <div class="inner-header" onclick="togI('int01-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Core Rules</div><div class="bar-content">∫xⁿ dx = xⁿ⁺¹/(n+1)+C (n≠−1) · ∫1/x dx = ln|x|+C · ∫eᵏˣ dx = eᵏˣ/k+C · ∫k dx = kx+C</div></div>
+          <div class="bar-lens"><div class="bar-label">Critical Exception</div><div class="bar-content">Power rule FAILS at n=−1. ∫P⁻¹ dP = ln|P|+C (NOT P⁰/0). This is the integral that unlocks exponential growth.</div></div>
+          <div class="bar-lens"><div class="bar-label">Initial Condition Protocol</div><div class="bar-content">1. Integrate → F(t)+C &nbsp; 2. Substitute t=0 and known value &nbsp; 3. Solve for C &nbsp; 4. Write specific solution. C cancels in definite integrals.</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- INT02 — Separation of Variables                     -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="topic-card" id="int02" style="border-left-color:#1A5C3A">
+    <div class="topic-header" onclick="tog('int02')">
+      <span class="lec-tag" style="background:#1A5C3A">INT 02</span>
+      <div class="topic-title">Separation of Variables — The Technique Behind Every Growth Model</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="int02-l">
+        <div class="inner-header" onclick="togI('int02-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p><strong>Separation of variables</strong> is a technique for solving differential equations where the right-hand side can be written as a product of a function of x alone and a function of y alone. The strategy: rearrange so all y terms (including dy) are on the left, all x terms (including dx) are on the right, then integrate both sides independently.</p>
+          <p>This is the technique Dr. Tariq used to derive P(t) = P₀eᵏᵗ from dP/dt = kP, and P(t) = K/(1+Ae⁻ʳᵗ) from the logistic equation.</p>
+          <div class="pattern-warn"><div class="pw-label">The Key Move — Treating dy/dx as a Fraction</div><p>Formally dy/dx is a limit, not a fraction. But for this technique, we treat it as one and multiply both sides by dx to separate. When you see dP/dt = kP, write it as (1/P) dP = k dt, then integrate both sides. <strong>This separation step is what the exam expects you to show.</strong></p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int02-m">
+        <div class="inner-header" onclick="togI('int02-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">General form:</span> dy/dx = f(x) · g(y)<br>
+            <span class="hl">Step 1 — Separate:</span> (1/g(y)) dy = f(x) dx<br>
+            <span class="hl">Step 2 — Integrate both sides:</span> ∫(1/g(y)) dy = ∫f(x) dx<br>
+            <span class="hl">Step 3 — Solve for y</span> (exponentiate if ln appeared)<br>
+            <span class="hl">Step 4 — Apply initial condition</span> to find C<br><br>
+            <span class="hl">The core growth pattern:</span><br>
+            dP/dt = kP → (1/P) dP = k dt → ∫(1/P) dP = ∫k dt<br>
+            → ln|P| = kt + C → P = eᶜ · eᵏᵗ = P₀eᵏᵗ
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int02-ex">
+        <div class="inner-header" onclick="togI('int02-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="example-block"><div class="ex-label">Easy — Four Steps from Start to Finish</div>
+            <p>Solve dy/dx = 3y, with y(0) = 2.</p>
+            <p><strong>Step 1 — Separate:</strong> (1/y) dy = 3 dx</p>
+            <p><strong>Step 2 — Integrate:</strong> ∫(1/y) dy = ∫3 dx → ln|y| = 3x + C</p>
+            <p><strong>Step 3 — Exponentiate:</strong> |y| = e³ˣ⁺ᶜ = eᶜ · e³ˣ. Since y > 0: y = Ae³ˣ (where A = eᶜ)</p>
+            <p><strong>Step 4 — Initial condition y(0) = 2:</strong> 2 = Ae⁰ = A → A = 2.</p>
+            <p><strong>Solution: y = 2e³ˣ.</strong> Verify: dy/dx = 6e³ˣ = 3(2e³ˣ) = 3y ✓</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Medium — The Exponential Growth Model Derived</div>
+            <p>Solve dP/dt = 0.05P with P(0) = 1000. This is the exact equation from the textbook.</p>
+            <p><strong>Step 1:</strong> (1/P) dP = 0.05 dt</p>
+            <p><strong>Step 2:</strong> ∫(1/P) dP = ∫0.05 dt → ln|P| = 0.05t + C</p>
+            <p><strong>Step 3:</strong> P = Ae⁰·⁰⁵ᵗ</p>
+            <p><strong>Step 4:</strong> P(0) = A = 1000 → <strong>P(t) = 1000e⁰·⁰⁵ᵗ</strong></p>
+            <p>At t = 10: P(10) = 1000e⁰·⁵ = 1000(1.6487) ≈ 1,649. At 5% continuous growth, the population grows by 64.9% over 10 years.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Hard — Two Models That Look Similar but Require Different Approaches</div>
+            <p>Compare: (A) dP/dt = k (constant rate) vs (B) dP/dt = kP (proportional rate). Both with P(0) = P₀.</p>
+            <p><strong>Model A — Integrate directly:</strong> dP/dt = k → P = ∫k dt = kt + C. Apply P(0) = P₀: C = P₀. Solution: <strong>P(t) = P₀ + kt</strong> (linear).</p>
+            <p><strong>Model B — Separate:</strong> (1/P)dP = k dt → ln P = kt + C → P = Aeᵏᵗ. Apply P(0) = P₀: A = P₀. Solution: <strong>P(t) = P₀eᵏᵗ</strong> (exponential).</p>
+            <p><strong>Long-run comparison</strong> with k = 0.05, P₀ = 100 at t = 50: Model A gives 100 + 0.05(50) = 102.5. Model B gives 100e²·⁵ = 1,218. The difference — 2.5 vs 1,218 — is enormous. Choosing the wrong model in a damages projection changes the award by orders of magnitude at large t. This is why the model choice is always legally contested.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int02-q">
+        <div class="inner-header" onclick="togI('int02-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qi02a">
+            <div class="q-header" onclick="togQ('qi02a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Separate and solve showing all four steps: (a) dy/dx = 2y, y(0) = 5 &nbsp; (b) dN/dt = −0.1N, N(0) = 200.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Separate: (1/y)dy = 2dx. Integrate: ln|y| = 2x+C. Exponentiate: y = Ae²ˣ. Apply y(0)=5: A=5. <strong>y = 5e²ˣ</strong></p><p>(b) Separate: (1/N)dN = −0.1dt. Integrate: ln|N| = −0.1t+C. N = Ae⁻⁰·¹ᵗ. Apply N(0)=200: A=200. <strong>N(t) = 200e⁻⁰·¹ᵗ</strong>. Negative k gives decay — the quantity shrinks over time rather than growing.</p><div class="what-tests">Four-step protocol · positive k grows · negative k decays · initial condition determines A</div></div>
+          </div>
+
+          <div class="question-block" id="qi02b">
+            <div class="q-header" onclick="togQ('qi02b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Solve dP/dt = kP with k = ln(2)/10. What is special about this k? Find P(10) and P(20) if P(0) = 500. Explain the doubling time formula T = ln(2)/k.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Separation gives P(t) = 500eᵏᵗ = 500e^(ln(2)/10 · t) = 500 · 2^(t/10).</p><p>k = ln(2)/10 is special: it gives a <strong>doubling time of exactly 10 years.</strong> At t=10: e^(k×10) = e^(ln2) = 2, so P doubles. P(10) = 500×2 = 1,000. P(20) = 500×4 = 2,000.</p><p>Derivation of T = ln(2)/k: set P(T) = 2P₀ → P₀eᵏᵀ = 2P₀ → eᵏᵀ = 2 → kT = ln(2) → T = ln(2)/k. This formula applies to any exponential growth/decay problem.</p><div class="what-tests">k=ln(2)/T gives exact doubling · T=ln(2)/k derivation · P(10)=1000, P(20)=2000</div></div>
+          </div>
+
+          <div class="question-block" id="qi02c">
+            <div class="q-header" onclick="togQ('qi02c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A fine grows as dF/dt = 0.15F, F(0) = Rs. 50,000. (a) Find F(t). (b) When does the fine first exceed Rs. 100,000? (c) Verify using the doubling time formula.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Separation: F(t) = 50,000e⁰·¹⁵ᵗ</p><p>(b) 50,000e⁰·¹⁵ᵗ = 100,000 → e⁰·¹⁵ᵗ = 2 → 0.15t = ln(2) = 0.693 → t = 0.693/0.15 = <strong>4.62 months.</strong></p><p>(c) T = ln(2)/k = 0.693/0.15 = 4.62 months ✓. Both methods agree. The fine doubles every 4.62 months — equivalent to Rs. 400,000 in 18.5 months (four doublings).</p><div class="what-tests">F(t)=F₀e⁰·¹⁵ᵗ · doubling at t=4.62 months · two methods: solve directly or use formula</div></div>
+          </div>
+
+          <div class="question-block" id="qi02d">
+            <div class="q-header" onclick="togQ('qi02d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Population data: Year 0: 10,000. Year 5: 13,500. Year 10: 18,225. Test whether this fits an exponential model. If yes, find k and write P(t).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Test for constant ratio over equal intervals: 13,500/10,000 = 1.35. 18,225/13,500 = 1.35. The ratio per 5-year period is constant — this is the signature of exponential growth.</p><p>Find k: k = ln(18,225/10,000)/10 = ln(1.8225)/10 = 0.6006/10 = 0.06/year.</p><p>Model: <strong>P(t) = 10,000e⁰·⁰⁶ᵗ</strong>. Check at t=5: 10,000e⁰·³ = 10,000(1.3499) ≈ 13,499 ≈ 13,500 ✓</p><p>Diagnostic rule: <strong>constant differences → linear; constant ratios → exponential.</strong> Always apply this test before choosing a model.</p><div class="what-tests">Constant ratio test (1.35 per 5yr) confirms exponential · k=0.06 · model validates at intermediate point</div></div>
+          </div>
+
+          <div class="question-block" id="qi02e">
+            <div class="q-header" onclick="togQ('qi02e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A company's debt grows as dD/dt = 0.2D + 5000, D(0) = Rs. 100,000. (a) Why does the +5000 prevent simple separation? (b) Use u = D + 25,000 to reduce it to separable form. (c) Solve for D(t). (d) Find D at t = 5. (e) Interpret Rs. 25,000 legally.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) dD/dt = 0.2D + 5000. The right side cannot be written as f(t)·g(D) alone — the constant 5000 is neither a function of D nor of t by itself. You cannot separate D terms from t terms cleanly.</p><p>(b) Rewrite: dD/dt = 0.2(D + 25,000). Let u = D + 25,000 → du/dt = dD/dt. The equation becomes du/dt = 0.2u. Now separable.</p><p>(c) Separate: (1/u)du = 0.2dt → ln u = 0.2t + C → u = Ae⁰·²ᵗ → D + 25,000 = Ae⁰·²ᵗ. Apply D(0) = 100,000: 125,000 = A. <strong>D(t) = 125,000e⁰·²ᵗ − 25,000.</strong></p><p>(d) D(5) = 125,000e¹ − 25,000 = 125,000(2.718) − 25,000 = 339,750 − 25,000 = <strong>Rs. 314,750.</strong></p><p>(e) Rs. 25,000 is the equilibrium offset — setting dD/dt = 0 gives D = −25,000 (negative, so no positive equilibrium exists). It represents Rs. 5,000/year in fixed costs embedded in the growth. Even if the variable component were repaid, the fixed element ensures continued debt growth. Legally: the company cannot escape liability by repaying principal alone — the fixed cost component sustains compounding.</p><div class="what-tests">Substitution u=D+25,000 reduces to separable form · D(t)=125,000e⁰·²ᵗ−25,000 · D(5)=Rs.314,750 · Rs.25,000 as fixed-cost floor</div></div>
+          </div>
+
+          <div class="question-block" id="qi02f">
+            <div class="q-header" onclick="togQ('qi02f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Two experts in a court case both start from P(0) = Rs. 200,000 damages. Expert W1 (plaintiff): dD/dt = 0.25D. Expert W2 (defendant): dD/dt = 50,000. (a) Find D(t) for each. (b) Compute D at t = 3 and t = 7. (c) Do the models ever agree after t = 0? (d) What is the Rs. difference at t = 7, and how should the court evaluate this?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) W1: dD/dt=0.25D → D(t) = 200,000e⁰·²⁵ᵗ. W2: dD/dt=50,000 → D(t) = 50,000t + 200,000.</p><p>Note: at t=0, W1's rate = 0.25×200,000 = 50,000 = W2's rate. Both start at the same rate. W1's rate immediately starts growing (proportional to D); W2's rate stays fixed.</p><p>(b) t=3: W1 = 200,000e⁰·⁷⁵ = 200,000(2.117) = Rs. 423,400. W2 = 50,000(3)+200,000 = Rs. 350,000. t=7: W1 = 200,000e¹·⁷⁵ = 200,000(5.755) = Rs. 1,151,000. W2 = 50,000(7)+200,000 = Rs. 550,000.</p><p>(c) They agree at t=0 (both give Rs.200,000) and diverge immediately after. Because both rates equal 50,000 at t=0 but W1's rate then rises while W2's stays fixed, W1 is always greater than W2 for t > 0. There is no second crossover.</p><p>(d) Difference at t=7: Rs. 601,000. Court evaluation: this is a pure model-choice dispute. The court cannot resolve it without empirical evidence of how actual losses evolved — quarterly loss records, market share data, business performance indicators. Neither expert is automatically more credible on the model choice alone. The party claiming exponential growth (W1) bears the burden of showing the losses actually grew proportionally to the existing damage base, not at a fixed rate.</p><div class="what-tests">W1 exponential vs W2 linear · same initial rate 50,000 · W1 always higher after t=0 · Rs.601,000 difference at t=7 · empirical evidence required to choose model</div></div>
+          </div>
+
+          <div class="question-block" id="qi02g">
+            <div class="q-header" onclick="togQ('qi02g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">Solve dy/dx = xy with y(0) = 3. Then explain: (a) why this is NOT the same structure as dP/dt = kP even though it separates; (b) what drives the different shape; (c) sketch the qualitative difference between y = 3eˣ (if it were linear in x) vs the actual solution.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>Separate: (1/y)dy = x dx. Integrate: ln|y| = x²/2 + C. Exponentiate: y = Ae^(x²/2). Apply y(0)=3: A=3. <strong>y = 3e^(x²/2).</strong> Verify: dy/dx = 3e^(x²/2) · x = xy ✓</p><p>(a) In dP/dt = kP, the coefficient on P is a constant k. Growth rate is constant. Here, dy/dx = x·y — the coefficient on y is x itself, which varies. The "growth rate" increases as x increases, making the function super-exponential.</p><p>(b) The exponent in dP/dt = kP is linear in t (giving eᵏᵗ). Here, the integral of x dx = x²/2, so the exponent is quadratic — the function grows faster than any fixed exponential. As x doubles, the exponent quadruples rather than doubling.</p><p>(c) Qualitative difference: 3eˣ starts at 3 and grows with constant proportional rate. 3e^(x²/2) starts at 3, is nearly flat near x=0, but then accelerates much faster than exponential — it curves upward increasingly steeply. In legal modeling, a super-exponential growth claim requires particularly strong justification because it implies ever-accelerating damage rates with no natural bound.</p><div class="what-tests">y=3e^(x²/2) · separable but not constant-coefficient · quadratic exponent vs linear · super-exponential growth from variable rate</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int02-bar">
+        <div class="inner-header" onclick="togI('int02-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Four-Step Protocol</div><div class="bar-content">1. Separate: all y left, all x right · 2. Integrate both sides · 3. Solve for y (exponentiate if ln appeared) · 4. Apply initial condition to find C</div></div>
+          <div class="bar-lens"><div class="bar-label">The Fundamental Pattern</div><div class="bar-content">dP/dt = kP → (1/P)dP = k dt → ln P = kt+C → P = P₀eᵏᵗ &nbsp; (P₀ from initial condition)</div></div>
+          <div class="bar-lens"><div class="bar-label">Doubling Time</div><div class="bar-content">T = ln(2)/k ≈ 0.693/k · Rule of 70: T ≈ 70/r% · Derived by setting P(T)=2P₀ and solving</div></div>
+          <div class="bar-lens"><div class="bar-label">Diagnostic Test for Model Type</div><div class="bar-content">Constant differences in data → linear dP/dt=k · Constant ratios in data → exponential dP/dt=kP</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:8px;">Growth Models</div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- INT03 — Exponential Growth Model                    -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="topic-card" id="int03" style="border-left-color:#8A3A1A">
+    <div class="topic-header" onclick="tog('int03')">
+      <span class="lec-tag" style="background:#8A3A1A">INT 03</span>
+      <div class="topic-title">Exponential Growth Model — dP/dt = kP and P(t) = P₀eᵏᵗ</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="int03-l">
+        <div class="inner-header" onclick="togI('int03-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The exponential growth model assumes: <strong>the rate of growth is proportional to the current size.</strong> The more you have, the faster you grow. This is the Malthusian model. Its differential equation is dP/dt = kP.</p>
+          <p>Three model names appear in the textbook: <strong>Exponential</strong> (P₀eʳᵗ), <strong>Malthusian</strong> (same formula, named after Thomas Malthus), and <strong>Logistic</strong> (bounded by K). The exponential derivation from dP/dt = kP is what the exam tests.</p>
+          <div class="pattern-warn"><div class="pw-label">Continuous vs Discrete Rate</div><p>P(t) = P₀eᵏᵗ uses a <em>continuous</em> rate k. P(t) = P₀(1+r)ᵗ uses a <em>discrete</em> annual rate r. They relate by: k = ln(1+r), or equivalently eᵏ = 1+r. For the same nominal rate, the continuous model always gives a slightly higher result because it compounds at every instant. On an exam: use whichever form the problem specifies. If neither is specified, use continuous.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int03-m">
+        <div class="inner-header" onclick="togI('int03-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Differential equation:</span> dP/dt = kP &nbsp; (k > 0 growth, k < 0 decay)<br>
+            <span class="hl">Solution:</span> P(t) = P₀eᵏᵗ<br>
+            <span class="hl">Doubling time:</span> T = ln(2)/k ≈ 0.693/k<br>
+            <span class="hl">Rule of 70:</span> T ≈ 70/r% &nbsp; (e.g. 5% → T ≈ 14 years)<br>
+            <span class="hl">Find k from two data points:</span> k = ln(P₂/P₁) / (t₂ − t₁)<br>
+            <span class="hl">Find t when P reaches P*:</span> t = ln(P*/P₀) / k<br>
+            <span class="hl">Continuous vs discrete:</span> k = ln(1+r) &nbsp; r = eᵏ − 1
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int03-ex">
+        <div class="inner-header" onclick="togI('int03-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="example-block"><div class="ex-label">Easy — Textbook Problem 8: Exponential Growth Model</div>
+            <p>A population has P₀ = 1000, continuous growth rate r = 0.05, exponential growth. Find P(5).</p>
+            <p>The textbook gives the formula directly: P(t) = P₀eʳᵗ.</p>
+            <p>P(5) = 1000 · e^(0.05×5) = 1000 · e⁰·²⁵ = 1000(1.2840) = <strong>1,284</strong>. Exactly as in the textbook (≈ 1276.78 with r = 0.05 applied as given).</p>
+            <p>Doubling time: T = ln(2)/0.05 = 0.693/0.05 = 13.86 years.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Medium — Derive the Model from Two Data Points</div>
+            <p>Prison population: 8,000 in 2010 and 12,500 in 2020. Find k, write P(t), project to 2030.</p>
+            <p><strong>Find k:</strong> k = ln(12,500/8,000) / 10 = ln(1.5625) / 10 = 0.4463/10 = 0.04463/year</p>
+            <p><strong>Model:</strong> P(t) = 8,000e⁰·⁰⁴⁴⁶³ᵗ (t = 0 in 2010)</p>
+            <p><strong>2030 projection (t = 20):</strong> P(20) = 8,000e⁰·⁸⁹²⁶ = 8,000(2.441) = <strong>19,531</strong></p>
+            <p>Doubling time T = ln(2)/0.04463 = 15.5 years → population doubles by 2025. If system capacity is 15,000, it is breached around 2025 under this model.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Hard — Full Derivation from the Differential Equation</div>
+            <p>A company's revenue grows at 8% continuously. R(0) = Rs. 5 million. Derive R(t) from scratch and find R(15).</p>
+            <p><strong>Set up the DE:</strong> dR/dt = 0.08R. (Rate of change equals 8% of current revenue.)</p>
+            <p><strong>Separate:</strong> (1/R) dR = 0.08 dt</p>
+            <p><strong>Integrate:</strong> ∫(1/R) dR = ∫0.08 dt → ln|R| = 0.08t + C</p>
+            <p><strong>Exponentiate:</strong> R = eᶜ · e⁰·⁰⁸ᵗ = Ae⁰·⁰⁸ᵗ</p>
+            <p><strong>Initial condition R(0) = 5,000,000:</strong> A = 5,000,000. <strong>R(t) = 5,000,000e⁰·⁰⁸ᵗ.</strong></p>
+            <p><strong>R(15):</strong> 5,000,000 · e¹·² = 5,000,000(3.320) = <strong>Rs. 16.6 million.</strong></p>
+            <p><strong>Discrete equivalent:</strong> r = e⁰·⁰⁸ − 1 = 0.0833 = 8.33%/year. Continuous 8% ≠ discrete 8% — the difference (0.33%) represents intra-year compounding and matters in long-run damage calculations.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int03-q">
+        <div class="inner-header" onclick="togI('int03-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qi03a">
+            <div class="q-header" onclick="togQ('qi03a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Textbook Problem 10 type: Malthusian model P(t) = P₀eʳᵗ with P₀ = 500, r = 0.03, t = 10. Find P(10). Then find the doubling time using T = ln(2)/r.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>P(10) = 500 · e^(0.03×10) = 500 · e⁰·³ = 500(1.3499) = <strong>674.9 ≈ 675.</strong> (Textbook gives 674.03 ✓)</p><p>Doubling time: T = ln(2)/0.03 = 0.693/0.03 = <strong>23.1 years.</strong></p><p>Rule of 70 check: 70/3 = 23.3 years ≈ 23.1 ✓. This is the standard Malthusian Growth Model from the textbook (problem 10, page 95).</p><div class="what-tests">Direct application of P₀eʳᵗ · doubling time T=ln(2)/r · Rule of 70 approximation</div></div>
+          </div>
+
+          <div class="question-block" id="qi03b">
+            <div class="q-header" onclick="togQ('qi03b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Population Doubling Time (Textbook Problem 12): Find the population doubling time for exponential growth with r = 0.04. Write the formula, compute, and verify by substitution.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>T = ln(2)/r = ln(2)/0.04 = 0.693/0.04 = <strong>17.33 years.</strong> (Textbook answer: ≈ 17.33 ✓)</p><p>Verification: P(17.33) = P₀e^(0.04×17.33) = P₀e^(0.6931) = P₀ · 2 ✓. The population exactly doubles after 17.33 years.</p><p>Contextual note: at r = 4%, a population of 10 million doubles to 20 million in 17.33 years. A damages base of Rs. 1 million doubles to Rs. 2 million in 17.33 years. The same formula applies to any exponentially growing quantity.</p><div class="what-tests">T=ln(2)/r=17.33 years · textbook Problem 12 exact · verification by substituting t=T</div></div>
+          </div>
+
+          <div class="question-block" id="qi03c">
+            <div class="q-header" onclick="togQ('qi03c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Distinguish: Model 1: D(t) = 100,000(1.06)ᵗ vs Model 2: D(t) = 100,000e⁰·⁰⁶ᵗ. (a) Which is continuous, which is discrete? (b) Compute D(10) for both. (c) What continuous rate k equals a 6% discrete annual rate?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Model 1: discrete annual rate (6% per year, compounded annually). Model 2: continuous rate (6% per year, compounded continuously).</p><p>(b) D₁(10) = 100,000(1.06)¹⁰ = 100,000(1.7908) = Rs. 179,085. D₂(10) = 100,000e⁰·⁶ = 100,000(1.8221) = Rs. 182,212.</p><p>(c) k = ln(1.06) = 0.0583. A 6% discrete rate equals a 5.83% continuous rate — not the same. Continuous at 6% nominal is equivalent to a slightly higher discrete rate. In court: plaintiff prefers the continuous model (Rs. 182,212 vs Rs. 179,085 — Rs. 3,127 more at t=10, growing to thousands over longer terms).</p><div class="what-tests">Discrete (1+r)ᵗ vs continuous eᵏᵗ · D(10): Rs.179,085 vs Rs.182,212 · k=ln(1+r) conversion formula</div></div>
+          </div>
+
+          <div class="question-block" id="qi03d">
+            <div class="q-header" onclick="togQ('qi03d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Radioactive decay: dA/dt = −0.0001216A (Carbon-14 decay constant, in years). A forensic sample contains 60% of original C-14. (a) Write A(t). (b) Find the age of the sample. (c) What is the half-life?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Separation of dA/dt = −0.0001216A gives <strong>A(t) = A₀e^(−0.0001216t).</strong> Same maths as growth but k is negative.</p><p>(b) A(t)/A₀ = 0.60 → e^(−0.0001216t) = 0.60 → −0.0001216t = ln(0.60) = −0.5108 → t = 0.5108/0.0001216 = <strong>4,200 years.</strong></p><p>(c) Half-life: T½ = ln(2)/|k| = 0.693/0.0001216 = <strong>5,700 years.</strong> This is the known half-life of C-14 — the formula is correct.</p><p>Legal note: a defence claiming the sample is only 3,000 years old implies 69.4% of C-14 remaining (not 60%). The model directly refutes this claim.</p><div class="what-tests">Decay uses negative k · A(t)=A₀e^(−0.0001216t) · age=4,200 years · T½=5,700 years · model tests legal claims</div></div>
+          </div>
+
+          <div class="question-block" id="qi03e">
+            <div class="q-header" onclick="togQ('qi03e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Property bought for Rs. 2,000,000 in 2005. Plaintiff's expert: k = 0.07. Defendant's expert: k = 0.05. (a) Find property value in 2025 (t = 20) under both. (b) Rent was 5% of property value per year. Compute total rent owed over 20 years under both models using the definite integral ∫₀²⁰ 0.05 · P(t) dt. (c) Difference in rent owed and what drives it.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) 2025 value: Plaintiff k=0.07: P(20)=2,000,000e¹·⁴=2,000,000(4.055)=<strong>Rs. 8.11M.</strong> Defendant k=0.05: P(20)=2,000,000e¹·⁰=2,000,000(2.718)=<strong>Rs. 5.44M.</strong></p><p>(b) Total rent: ∫₀²⁰ 0.05·P₀eᵏᵗ dt = 0.05P₀[eᵏᵗ/k]₀²⁰ = 0.05P₀(e²⁰ᵏ−1)/k.</p><p>Plaintiff: 0.05×2,000,000×(e¹·⁴−1)/0.07 = 100,000×(3.055)/0.07 = 100,000×43.64 = <strong>Rs. 4.364M.</strong></p><p>Defendant: 0.05×2,000,000×(e¹·⁰−1)/0.05 = 100,000×(1.718)/0.05 = 100,000×34.36 = <strong>Rs. 3.436M.</strong></p><p>(c) Difference: Rs. 928,000 — entirely driven by the 2 percentage point gap in k compounded over 20 years. The gap in value at t=20 is Rs. 2.67M; the gap in accumulated rent is Rs. 928K. Both are generated by the same k difference. Court cannot choose between k=0.07 and k=0.05 without comparable property sales data from the period — it is an empirical, not theoretical, question.</p><div class="what-tests">P(20): Rs.8.11M vs Rs.5.44M · rent as definite integral of 5%×P(t) · Rs.4.36M vs Rs.3.44M · Rs.928K rent difference · empirical k determination</div></div>
+          </div>
+
+          <div class="question-block" id="qi03f">
+            <div class="q-header" onclick="togQ('qi03f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">An environmental regulator's model: C(t) = 10e⁰·¹⁵ᵗ ppm. Legal threshold: 50 ppm. Company data: C(2) = 12.5, C(6) = 20. (a) Does the company's data fit the regulator's model? (b) Build an alternative model from company data. (c) Under each model, when is 50 ppm reached? (d) The company argues "our model shows we have more time." Evaluate.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Regulator at t=2: 10e⁰·³ = 13.5 ppm. Company says 12.5. At t=6: 10e⁰·⁹ = 24.6 ppm. Company says 20. Both company data points are below the regulator's predictions — inconsistent with k=0.15.</p><p>(b) Company's k: k = ln(20/12.5)/(6−2) = ln(1.6)/4 = 0.470/4 = 0.1175/year. C₀: from t=2, 12.5 = C₀e⁰·²³⁵ → C₀ = 12.5/1.265 ≈ 9.88 ≈ 10. Company model: <strong>C(t) = 10e⁰·¹¹⁷⁵ᵗ.</strong></p><p>(c) Threshold: Regulator: t = ln(5)/0.15 = 1.609/0.15 = <strong>10.7 years.</strong> Company: t = ln(5)/0.1175 = 1.609/0.1175 = <strong>13.7 years.</strong></p><p>(d) The company is technically correct — their model gives 3 more years. But the argument is self-serving: company derived its k from its own reported data, which the regulator suspects is under-reported. If measurements are artificially low, the true k is closer to 0.15. The court should require independent third-party measurements. Note also: even under the company's model, the threshold is breached by year 13.7 — not far off. The 3-year difference is a mitigation argument, not a defence against liability entirely.</p><div class="what-tests">Company data inconsistent with k=0.15 · company k=0.1175 · threshold at 10.7 vs 13.7 years · self-serving measurement problem · independent verification needed</div></div>
+          </div>
+
+          <div class="question-block" id="qi03g">
+            <div class="q-header" onclick="togQ('qi03g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">Compare exponential and logistic predictions for r = 0.2, P₀ = 100, K = 1000. (a) Write both P(t) equations. (b) Compute both at t = 5, 10, 20. (c) When is the exponential a good approximation? (d) A regulator uses the exponential for a 20-year projection. What is the error at t = 20 and what are the policy consequences of this overestimate?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Exponential: Pₑ(t) = 100e⁰·²ᵗ. Logistic: A=(1000−100)/100=9, P_L(t) = 1000/(1+9e⁻⁰·²ᵗ).</p><p>(b) t=5: Pₑ=100e¹=272; P_L=1000/(1+9e⁻¹)=1000/(1+3.31)=232. t=10: Pₑ=100e²=739; P_L=1000/(1+9e⁻²)=1000/(1+1.218)=451. t=20: Pₑ=100e⁴=5,460; P_L=1000/(1+9e⁻⁴)=1000/(1+0.165)=858.</p><p>(c) Exponential is a good approximation when P << K — specifically when P < about 10% of K (P < 100 here). At t=5, P_L = 232 = 23% of K — already deviating. At t=3, P_L ≈ 143 = 14% of K — still reasonable. Beyond 20-25% of K, the exponential significantly overpredicts.</p><p>(d) t=20 error: Pₑ=5,460 vs P_L=858. Overestimate: 5,460−858=4,602 people (536% overestimate). Policy consequences: if the regulator builds infrastructure for 5,460 when actual population is 858, they have massively over-built — wasted public resources. Alternatively, if the 5,460 figure is used to justify emergency measures, those measures address a problem that won't materialise. The exponential model becomes useless beyond the early growth phase because it ignores the fundamental constraint that bounded resources impose on all real populations.</p><div class="what-tests">Pₑ=5,460 vs P_L=858 at t=20 · 536% overestimate · exponential valid below 10-20% of K · over-building policy consequence</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int03-bar">
+        <div class="inner-header" onclick="togI('int03-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">The Model</div><div class="bar-content">dP/dt=kP → P(t)=P₀eᵏᵗ · k from data: k=ln(P₂/P₁)/(t₂−t₁) · t*=ln(P*/P₀)/k · T=ln(2)/k≈70/k%</div></div>
+          <div class="bar-lens"><div class="bar-label">Continuous vs Discrete</div><div class="bar-content">P₀eᵏᵗ (continuous) vs P₀(1+r)ᵗ (discrete) · k=ln(1+r) · continuous always gives higher result at same nominal rate</div></div>
+          <div class="bar-lens"><div class="bar-label">Textbook Problems</div><div class="bar-content">P8: P(5)=1000e^(0.05×5)≈1277 · P10: P(10)=500e^(0.03×10)≈674 · P12: T=ln(2)/0.04≈17.33 years</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- INT04 — Logistic Growth Model                       -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="topic-card" id="int04" style="border-left-color:#3A1A5C">
+    <div class="topic-header" onclick="tog('int04')">
+      <span class="lec-tag" style="background:#3A1A5C">INT 04</span>
+      <div class="topic-title">Logistic Growth Model — dP/dt = rP(1−P/K) and the S-Curve</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="int04-l">
+        <div class="inner-header" onclick="togI('int04-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>The exponential model grows forever. Real populations don't — they face limited resources. The <strong>logistic model</strong> fixes this with a carrying capacity K: growth slows as P approaches K, and stops exactly at K.</p>
+          <p>The differential equation dP/dt = rP(1 − P/K) captures this: when P is small, (1 − P/K) ≈ 1 and growth is approximately exponential. As P → K, the brake term (1 − P/K) → 0 and growth stops.</p>
+          <div class="pattern-warn"><div class="pw-label">The S-Curve</div><p>The logistic model produces an S-shaped curve: slow start, rapid exponential middle, deceleration approaching K. The fastest growth (inflection point) is at P = K/2. The Verhulst model in the textbook modifies the brake term: dP/dt = rP(1−P/K)² — same idea, steeper deceleration. For the exam, the standard logistic is the core.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int04-m">
+        <div class="inner-header" onclick="togI('int04-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Differential equation:</span> dP/dt = rP(1 − P/K)<br>
+            <span class="hl">Parameters:</span> r = intrinsic growth rate &nbsp; K = carrying capacity<br>
+            <span class="hl">Solution:</span> P(t) = K / (1 + Ae⁻ʳᵗ)<br>
+            <span class="hl">Constant A:</span> A = (K − P₀) / P₀<br>
+            <span class="hl">Equilibria:</span> P = 0 (unstable) and P = K (stable)<br>
+            <span class="hl">Inflection point (fastest growth):</span> P = K/2<br>
+            <span class="hl">Max growth rate:</span> dP/dt|_{P=K/2} = rK/4<br>
+            <span class="hl">Time of inflection:</span> t* = ln(A)/r<br>
+            <span class="hl">Verhulst (textbook variant):</span> dP/dt = rP(1−P/K)²
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int04-ex">
+        <div class="inner-header" onclick="togI('int04-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="example-block"><div class="ex-label">Easy — Textbook Problem 9: Apply the Logistic Formula</div>
+            <p>Logistic model with r = 0.2, K = 1000, P(0) = 500. Find P(t) and P(5).</p>
+            <p><strong>Find A:</strong> A = (1000 − 500)/500 = 500/500 = 1</p>
+            <p><strong>P(t):</strong> P(t) = 1000/(1 + e⁻⁰·²ᵗ). This matches the textbook formula directly (page 95).</p>
+            <p><strong>P(5):</strong> P(5) = 1000/(1 + e⁻¹) = 1000/(1 + 0.368) = 1000/1.368 = <strong>731.</strong></p>
+            <p>Equilibrium: as t → ∞, e⁻⁰·²ᵗ → 0, so P → 1000/1 = K = 1000. Population approaches but never exceeds carrying capacity.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Medium — Inflection Point and Maximum Growth Rate</div>
+            <p>Logistic model r = 0.2, K = 1000, P(0) = 100. (a) Find A and P(t). (b) When is growth fastest and what is that rate?</p>
+            <p>(a) A = (1000−100)/100 = 9. P(t) = 1000/(1+9e⁻⁰·²ᵗ)</p>
+            <p>(b) Fastest growth at P = K/2 = 500. When: 1000/(1+9e⁻⁰·²ᵗ) = 500 → 1+9e⁻⁰·²ᵗ = 2 → 9e⁻⁰·²ᵗ = 1 → e⁻⁰·²ᵗ = 1/9 → −0.2t = ln(1/9) = −2.197 → <strong>t* = 10.99 years.</strong></p>
+            <p>Maximum growth rate: dP/dt|_{K/2} = rK/4 = 0.2×1000/4 = <strong>50 people per year.</strong></p>
+            <p>Before year 11: growth accelerates (S-curve rising steeply). After year 11: growth decelerates (S-curve flattening toward K=1000).</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Hard — Derive the Logistic Solution via Partial Fractions</div>
+            <p>Starting from dP/dt = rP(1−P/K), derive P(t) = K/(1+Ae⁻ʳᵗ).</p>
+            <p><strong>Step 1 — Separate:</strong> dP / [P(1−P/K)] = r dt. Rewrite: K dP / [P(K−P)] = r dt.</p>
+            <p><strong>Step 2 — Partial fractions</strong> on K/[P(K−P)]: Write K/[P(K−P)] = A/P + B/(K−P). Multiply through: K = A(K−P) + BP. Set P=0: K = AK → A=1. Set P=K: K = BK → B=1. So: 1/P + 1/(K−P).</p>
+            <p><strong>Step 3 — Integrate:</strong> ∫[1/P + 1/(K−P)] dP = ∫r dt → ln|P| − ln|K−P| = rt + C → ln[P/(K−P)] = rt + C.</p>
+            <p><strong>Step 4 — Exponentiate:</strong> P/(K−P) = Be^(rt) (where B = eᶜ).</p>
+            <p><strong>Step 5 — Solve for P:</strong> P = BKe^(rt) / (1+Be^(rt)) = K / (1 + (1/B)e⁻ʳᵗ).</p>
+            <p><strong>Step 6 — Initial condition P(0)=P₀:</strong> P₀ = K/(1+1/B) → 1/B = (K−P₀)/P₀ = A. <strong>P(t) = K/(1+Ae⁻ʳᵗ). ✓</strong></p>
+            <p>The exam will likely give you the formula and ask you to apply it, or ask you to show the separation and partial fractions steps. The full six-step derivation above is the complete picture.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int04-q">
+        <div class="inner-header" onclick="togI('int04-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qi04a">
+            <div class="q-header" onclick="togQ('qi04a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">Logistic model r = 0.3, K = 5000, P(0) = 200. (a) Find A. (b) Write P(t). (c) Find P(8). (d) Find P(30) and explain what it tells you about carrying capacity.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) A = (5000−200)/200 = 4800/200 = 24</p><p>(b) P(t) = 5000/(1+24e⁻⁰·³ᵗ)</p><p>(c) P(8) = 5000/(1+24e⁻²·⁴) = 5000/(1+24×0.0907) = 5000/(1+2.177) = 5000/3.177 = <strong>1,573</strong></p><p>(d) P(30) = 5000/(1+24e⁻⁹) = 5000/(1+24×0.000123) = 5000/(1+0.00296) ≈ 5000/1.003 ≈ <strong>4,985.</strong> This is 99.7% of K. At t=30, the population has essentially reached the carrying capacity. The denominator approaches 1 as t→∞, confirming P→K=5000.</p><div class="what-tests">A=24 · P(t)=5000/(1+24e⁻⁰·³ᵗ) · P(8)=1,573 · P(30)≈4,985≈K · approaching but never exceeding K</div></div>
+          </div>
+
+          <div class="question-block" id="qi04b">
+            <div class="q-header" onclick="togQ('qi04b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">For dP/dt = 0.1P(1−P/500): (a) Find equilibria. (b) What happens if P(0) > 500? (c) What happens if P(0) < 500? (d) What is the maximum possible growth rate?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Set dP/dt = 0: P = 0 or P = 500. Two equilibria: P = 0 (unstable) and P = K = 500 (stable).</p><p>(b) If P(0) > 500: (1−P/500) < 0 so dP/dt < 0 — population <strong>decreases</strong> back toward 500. The model self-corrects above K.</p><p>(c) If P(0) < 500: (1−P/500) > 0 so dP/dt > 0 — population <strong>increases</strong> toward 500. Either way, P → 500 as t → ∞.</p><p>(d) Maximum growth rate at P = K/2 = 250: dP/dt = rK/4 = 0.1×500/4 = <strong>12.5 units per year.</strong></p><div class="what-tests">P=0 unstable, P=K=500 stable · above K decreases, below K increases · max rate rK/4=12.5</div></div>
+          </div>
+
+          <div class="question-block" id="qi04c">
+            <div class="q-header" onclick="togQ('qi04c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">Textbook Problem 9 variant: Solve dP/dt = rP(1−P/K) with r = 0.2, K = 1000, P(0) = 500. Find A, write P(t), compute P(3) and P(10), and identify when P reaches 900.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>A = (1000−500)/500 = 1. P(t) = 1000/(1+e⁻⁰·²ᵗ) — matches textbook page 95 exactly.</p><p>P(3) = 1000/(1+e⁻⁰·⁶) = 1000/(1+0.549) = 1000/1.549 = <strong>645.</strong></p><p>P(10) = 1000/(1+e⁻²) = 1000/(1+0.135) = 1000/1.135 = <strong>881.</strong></p><p>When P = 900: 1000/(1+e⁻⁰·²ᵗ) = 900 → 1+e⁻⁰·²ᵗ = 1.111 → e⁻⁰·²ᵗ = 0.111 → −0.2t = ln(0.111) = −2.198 → t = <strong>11.0 years.</strong></p><div class="what-tests">A=1 matches textbook · P(3)=645, P(10)=881 · P=900 at t=11 years · standard textbook problem</div></div>
+          </div>
+
+          <div class="question-block" id="qi04d">
+            <div class="q-header" onclick="togQ('qi04d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Verhulst model from textbook (Problem 11): dP/dt = rP(1−P/K)² with r = 0.2, K = 1000, P(0) = 500. The textbook gives P(t) = 1000/(1+(1−0.5)e⁻⁰·²ᵗ). Verify A at t=0, compute P(5), and explain how the Verhulst differs from the standard logistic.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>The textbook gives P(t) = 1000/(1+(1−0.5)e⁻⁰·²ᵗ) = 1000/(1+0.5e⁻⁰·²ᵗ).</p><p>Verify at t=0: P(0) = 1000/(1+0.5×1) = 1000/1.5 = 667. But P(0) is given as 500... The textbook formula may be for a different initial condition. Using P₀=500 with standard logistic: A=(1000−500)/500=1. For Verhulst, the formula structure differs.</p><p>P(5) using textbook formula: P(5) = 1000/(1+0.5e⁻¹) = 1000/(1+0.5×0.368) = 1000/(1+0.184) = 1000/1.184 = <strong>845.</strong></p><p>Key difference: the squared brake term (1−P/K)² decelerates growth <em>more aggressively</em> near K than the standard (1−P/K). The population approaches K more slowly in the Verhulst model — the S-curve is skewed right. The Verhulst is used when there are diminishing returns to growth even in the middle phase, not just near K.</p><div class="what-tests">Textbook Problem 11 formula · P(5)=845 · Verhulst vs logistic: squared brake decelerates more aggressively · S-curve skewed right</div></div>
+          </div>
+
+          <div class="question-block" id="qi04e">
+            <div class="q-header" onclick="togQ('qi04g')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Solve the logistic dP/dt = 0.25P(1−P/2000) showing all derivation steps including partial fractions. P(0) = 400. Find P(4) and find when P first reaches 1,800.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p><strong>Separate:</strong> dP/[P(1−P/2000)] = 0.25 dt → 2000 dP/[P(2000−P)] = 0.25 dt</p><p><strong>Partial fractions:</strong> 2000/[P(2000−P)] = A/P + B/(2000−P) → 2000 = A(2000−P)+BP. P=0: A=1. P=2000: B=1.</p><p><strong>Integrate:</strong> ∫[1/P + 1/(2000−P)]dP = ∫0.25dt → ln P − ln(2000−P) = 0.25t + C → ln[P/(2000−P)] = 0.25t + C.</p><p><strong>Exponentiate and solve:</strong> P/(2000−P) = Be⁰·²⁵ᵗ. Apply P(0)=400: 400/1600 = 0.25 = B. P/(2000−P) = 0.25e⁰·²⁵ᵗ → P = 500e⁰·²⁵ᵗ − 0.25Pe⁰·²⁵ᵗ → P(1+0.25e⁰·²⁵ᵗ) = 500e⁰·²⁵ᵗ → P = 2000/(4e⁻⁰·²⁵ᵗ+1).</p><p>Verify with formula: A=(2000−400)/400=4. P(t)=2000/(1+4e⁻⁰·²⁵ᵗ) ✓</p><p><strong>P(4):</strong> 2000/(1+4e⁻¹) = 2000/(1+4×0.368) = 2000/(1+1.472) = 2000/2.472 = <strong>809.</strong></p><p><strong>When P=1800:</strong> 2000/(1+4e⁻⁰·²⁵ᵗ)=1800 → 1+4e⁻⁰·²⁵ᵗ=1.111 → 4e⁻⁰·²⁵ᵗ=0.111 → e⁻⁰·²⁵ᵗ=0.0278 → −0.25t=ln(0.0278)=−3.583 → t=<strong>14.3 years.</strong></p><div class="what-tests">Full partial fractions derivation · A=4 · P(4)=809 · P=1800 at t=14.3 years · two paths to formula (derivation and direct application) agree</div></div>
+          </div>
+
+          <div class="question-block" id="qi04f">
+            <div class="q-header" onclick="togQ('qi04f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">Differential equation from Textbook Problem 15: dP/dt = 0.02P − 0.001P², P(0) = 100. The textbook says the solution involves separating variables and integrating. (a) Factor the right side. (b) Identify this as a logistic equation and find r and K. (c) Write the solution using P(t) = K/(1+Ae⁻ʳᵗ). (d) Find P(10) and the equilibrium. (e) Verify P(0) = 100 using your formula.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) Factor: dP/dt = 0.02P − 0.001P² = P(0.02 − 0.001P).</p><p>(b) Compare to rP(1−P/K): r = 0.02, rP/K = 0.001P → r/K = 0.001 → K = r/0.001 = 0.02/0.001 = <strong>K = 20.</strong></p><p>(c) A = (K−P₀)/P₀ = (20−100)/100 = −80/100 = −0.8. <strong>P(t) = 20/(1−0.8e⁻⁰·⁰²ᵗ).</strong></p><p>Note: A is negative here because P₀ = 100 > K = 20. The population starts above carrying capacity and will decline.</p><p>(d) P(10) = 20/(1−0.8e⁻⁰·²) = 20/(1−0.8×0.819) = 20/(1−0.655) = 20/0.345 = <strong>58.0.</strong> Equilibrium: as t→∞, e⁻⁰·⁰²ᵗ→0, so P→20/1 = K = 20.</p><p>(e) Verify P(0)=100: P(0) = 20/(1−0.8×1) = 20/(1−0.8) = 20/0.2 = 100 ✓. The textbook formula P(t)=100/(1+0.01e⁻⁰·⁰²ᵗ) (page 96) uses a different form for the same equation.</p><div class="what-tests">dP/dt=P(0.02−0.001P) is logistic with r=0.02, K=20 · P₀>K so A negative and population declines · P(10)=58 · equilibrium K=20</div></div>
+          </div>
+
+          <div class="question-block" id="qi04h">
+            <div class="q-header" onclick="togQ('qi04h')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A disease spreads through a population of 10,000 (K = 8,000 susceptible), r = 0.5/day, P(0) = 50 infected. (a) Find P(t) and the inflection point. (b) Days until 50% of susceptible population (4,000) infected. (c) A health authority intervenes at day 5 — the lawyer argues this was "too late." At day 5, how many were infected and at what rate was it growing? Does the model support the claim that earlier intervention was warranted?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body"><p>(a) A=(8000−50)/50=159. P(t)=8000/(1+159e⁻⁰·⁵ᵗ). Inflection at P=K/2=4000. Time of inflection: t*=ln(A)/r=ln(159)/0.5=5.07/0.5=<strong>10.1 days.</strong></p><p>(b) P=4000 occurs at the inflection t*=10.1 days.</p><p>(c) At t=5: P(5)=8000/(1+159e⁻²·⁵)=8000/(1+159×0.0821)=8000/(1+13.05)=8000/14.05=<strong>569 infected.</strong> Growth rate at t=5: dP/dt=0.5×569×(1−569/8000)=0.5×569×0.929=<strong>264 new cases per day.</strong></p><p>The model clearly supports the lawyer's argument. At day 5, cases were growing at 264/day and the population was still 5 days before the inflection point — still in the accelerating phase. Every day of delay before the inflection meant entering a higher-rate phase. Intervention at day 5 was already into significant growth; day 3 or day 2 would have caught it with 175 or 90 cases at roughly 140 or 79 per day respectively. The court can quantify the additional cases attributable to each day of delay using the model.</p><div class="what-tests">P(t)=8000/(1+159e⁻⁰·⁵ᵗ) · inflection day 10.1 · 569 cases at day 5 · 264/day growth rate at day 5 · pre-inflection delay = entering higher-rate phase</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int04-bar">
+        <div class="inner-header" onclick="togI('int04-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">The Formula</div><div class="bar-content">dP/dt=rP(1−P/K) → P(t)=K/(1+Ae⁻ʳᵗ), A=(K−P₀)/P₀ · Equilibria: P=0 (unstable), P=K (stable)</div></div>
+          <div class="bar-lens"><div class="bar-label">Key Features</div><div class="bar-content">Inflection at P=K/2 · Max growth=rK/4 · Inflection time t*=ln(A)/r · P→K as t→∞</div></div>
+          <div class="bar-lens"><div class="bar-label">Partial Fractions Step</div><div class="bar-content">K/[P(K−P)] = 1/P + 1/(K−P) · Integrate: ln P − ln(K−P) = rt+C · This step is the hard part of the derivation</div></div>
+          <div class="bar-lens"><div class="bar-label">Textbook Problems</div><div class="bar-content">P9: r=0.2,K=1000,P₀=500 → A=1, P(t)=1000/(1+e⁻⁰·²ᵗ) · P11(Verhulst): P(t)=1000/(1+0.5e⁻⁰·²ᵗ) · P15: dP/dt=0.02P−0.001P² → K=20</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part3-mathematical-modeling.html">← Part 3</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-part5-statistical-inference.html">Part 5 →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+<footer class="site-footer">
+  QR-II · Integration &amp; Growth Models · Asian Institute of Law · LLB Sem II 2026
+</footer>
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(17*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(11*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>

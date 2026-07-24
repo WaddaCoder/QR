@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="QR-II">
+<meta name="theme-color" content="#0E0E1A">
+<title>QR-II · Study Navigator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;
+    --bar-border:#C9A84C;--bar-bg:#F0EDE6;
+    --qr:   #1AADAD;
+    /* QR cluster colours */
+    --c1:#3A7FD4;--c2:#2EAD6E;--c3:#E05A28;--c4:#1AADAD;--c5:#8A4FD4;--c6:#D4941A;--c7:#D4316A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;color:var(--ink);background:var(--page);padding-bottom:80px;}
+
+  /* ── HEADER ── */
+  .site-header{background:var(--ink);padding:32px 20px 24px;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--bar-border);margin-bottom:6px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#F9F8F5;line-height:1.2;}
+  .site-header .meta{font-size:13px;color:#A0A8B0;margin-top:6px;}
+
+  /* ── CONTAINER ── */
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+
+  /* ── SUBJECT BLOCK ── */
+  .subject-block{margin-top:32px;}
+
+  /* ── PART CARDS ── */
+  .parts-grid{margin-top:10px;display:flex;flex-direction:column;gap:8px;}
+
+  .part-card{border:1px solid var(--rule);border-left:4px solid transparent;background:#fff;border-radius:2px;text-decoration:none;display:block;transition:background 0.15s;}
+  .part-card:hover{background:#FAFAF8;}
+  .part-card.live{cursor:pointer;}
+  .part-card.soon{opacity:0.55;cursor:default;pointer-events:none;}
+
+  .part-card-inner{display:flex;align-items:center;gap:12px;padding:13px 16px;}
+  .part-icon{width:32px;height:32px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .part-icon svg{width:16px;height:16px;}
+
+  .part-info{flex:1;min-width:0;}
+  .part-title{font-size:14px;font-weight:600;color:var(--ink);line-height:1.3;}
+  .part-subtitle{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);margin-top:2px;letter-spacing:0.04em;}
+
+  .part-badge{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.1em;padding:3px 7px;border-radius:1px;flex-shrink:0;}
+  .badge-live{background:var(--ink);color:#F9F8F5;}
+  .badge-mid{background:#1A5C3A;color:#fff;}
+  .badge-soon{background:var(--rule);color:var(--ink-faint);}
+  .badge-final{background:#5C1A1A;color:#fff;}
+
+  /* ── CLUSTER LABELS inside QR ── */
+  .cluster-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);padding:14px 0 4px;}
+
+  /* ── PROGRESS BAR ── */
+  .progress-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+  .prog-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);white-space:nowrap;}
+  .prog-outer{flex:1;height:3px;background:var(--rule);border-radius:2px;}
+  .prog-inner{height:3px;border-radius:2px;}
+  .prog-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);white-space:nowrap;}
+
+  /* ── FOOTER ── */
+  .site-footer{margin-top:56px;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);letter-spacing:0.08em;line-height:1.8;}
+
+  @media(max-width:420px){
+    .site-header h1{font-size:20px;}
+  }
+
+  /* iPad Pro 12.9" 3rd gen · landscape · 1366×1024 CSS viewport */
+  @media (min-width: 1024px) and (orientation: landscape) {
+    .container { max-width: 1280px; padding: 0 24px; }
+    .site-header { padding: 32px 32px 26px; }
+    .site-header h1 { font-size: 26px; }
+    .site-header .subtitle { font-size: 14px; }
+    .progress-strip { padding: 12px 32px; }
+    .controls { padding: 18px 0 6px; }
+    body { font-size: 17px; }
+    p { font-size: 16px; }
+    .topic-header { padding: 18px 22px; }
+    .topic-title { font-size: 19px; }
+    .inner-header { padding: 15px 22px; }
+    .inner-body { padding: 6px 24px 24px; }
+    .part-card-inner { padding: 16px 20px; }
+    .part-title { font-size: 16px; }
+    .part-subtitle { font-size: 11px; }
+    .section-label { font-size: 11px; }
+    .nav-strip { padding: 14px 32px; }
+  }
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}
+  .fp-btn:nth-child(2){font-size:13px;}
+  .fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}
+  .fp-btn:nth-child(5){font-size:19px;}
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">Asian Institute of Law · University of the Punjab Affiliate</div>
+  <h1>LLB Semester II · Study Navigator</h1>
+  <div class="meta">GQR-201 · Dr. Tariq Ismaeel</div>
+</header>
+
+<div class="container">
+
+  <div class="subject-block">
+
+    <div class="progress-row">
+      <span class="prog-label">Mid-term scope</span>
+      <div class="prog-outer"><div class="prog-inner" style="width:55%;background:var(--qr)"></div></div>
+      <span class="prog-count">Lec. 10 / 18</span>
+    </div>
+
+    <!-- MID-TERM SCOPE (note: per official AIL coverage plan, mid-term = Lec 1-18 only;
+         per the instructor's actual mid-term topics list and model paper, bivariate/scatter/
+         correlation/regression are also examinable at mid-term, hence Part 4 sits here too
+         even though those lectures are numbered post-18 in the official plan) -->
+    <div class="cluster-label">Mid-term Scope</div>
+    <div class="parts-grid">
+
+      <a class="part-card live" href="qr2-part1-logic-foundations.html" style="border-left-color:var(--c1)">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#EEF4FC;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3A7FD4" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Part 1 — Logic Foundations</div>
+            <div class="part-subtitle">Lec. 1–10 · 13 topics · Propositions · Quantifiers · Fallacies · Venn</div>
+          </div>
+          <span class="part-badge badge-mid">MID-TERM</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-part2-logic-in-action.html" style="border-left-color:var(--c3)">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#FEF2EC;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#E05A28" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Part 2 — Logic in Action</div>
+            <div class="part-subtitle">Lec. 8–10 extension · 6 legal scenarios · Applied reasoning</div>
+          </div>
+          <span class="part-badge badge-mid">MID-TERM</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-part3-mathematical-modeling.html" style="border-left-color:var(--c4)">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#E8F8F8;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1AADAD" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Part 3 — Mathematical Modeling</div>
+            <div class="part-subtitle">Lec. 11–18 · 10 topics · Linear · Systems · Exponential · Derivatives</div>
+          </div>
+          <span class="part-badge badge-mid">MID-TERM</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-part4-bivariate-regression.html" style="border-left-color:#D4316A">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#FBE7EE;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D4316A" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Part 4 — Bivariate Analysis &amp; Regression</div>
+            <div class="part-subtitle">Scatter plots · Pearson correlation · Simple linear regression</div>
+          </div>
+          <span class="part-badge badge-mid">MID-TERM</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-predicates.html" style="border-left-color:#7A3FA0">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#F3EDF8;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7A3FA0" stroke-width="2"><text x="3" y="17" font-size="14" font-family="monospace">P(x)</text></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Predicates — Deep Treatment</div>
+            <div class="part-subtitle">Unary · Binary · Predicates with Quantifiers · 3-phase build</div>
+          </div>
+          <span class="part-badge badge-mid">FINALS</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-quantifiers.html" style="border-left-color:#1B6B72">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#E8F5F6;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1B6B72" stroke-width="2"><text x="2" y="17" font-size="13" font-family="monospace">∀∃¬</text></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Quantifiers &amp; Negation — Deep Treatment</div>
+            <div class="part-subtitle">∀ · ∃ · Negation rules · Universal Conditionals · 3-phase build</div>
+          </div>
+          <span class="part-badge badge-mid">FINALS</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-correlation-regression.html" style="border-left-color:#1A7A5E">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#E6F4F0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1A7A5E" stroke-width="2"><circle cx="7" cy="17" r="1.5"/><circle cx="11" cy="13" r="1.5"/><circle cx="15" cy="9" r="1.5"/><circle cx="19" cy="5" r="1.5"/><line x1="4" y1="20" x2="20" y2="20"/><line x1="4" y1="4" x2="4" y2="20"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Correlation &amp; Regression — Deep Treatment</div>
+            <div class="part-subtitle">Pearson r · r² · Residuals · Output tables · Multiple regression</div>
+          </div>
+          <span class="part-badge badge-mid">FINALS</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-derivatives.html" style="border-left-color:#4B6BCC">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#ECF0FB;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4B6BCC" stroke-width="2"><path d="M4 19 L8 5 M8 5 L12 15 M12 15 L16 8 M16 8 L20 19"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Derivatives — Complete Rule Set</div>
+            <div class="part-subtitle">8 rules · Power · Product · Quotient · Chain · Exponential · ln · log</div>
+          </div>
+          <span class="part-badge badge-mid">FINALS</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- POST-MIDTERM -->
+    <div class="cluster-label" style="margin-top:8px;">Post-Midterm · Remaining Lec. 19–30</div>
+    <div class="parts-grid">
+
+      <a class="part-card live" href="qr2-part5-statistical-inference.html" style="border-left-color:var(--c6)">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#FDF3E3;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D4941A" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Part 5 — Statistical Inference</div>
+            <div class="part-subtitle">Lec. 25–30 · 7 topics · Estimation · Confidence intervals · Hypothesis testing · Chi-square</div>
+          </div>
+          <span class="part-badge badge-final">FINALS</span>
+        </div>
+      </a>
+
+      <a class="part-card live" href="qr2-integration-growth-models.html" style="border-left-color:#5C3A1A">
+        <div class="part-card-inner">
+          <div class="part-icon" style="background:#F5EFE8;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#5C3A1A" stroke-width="2"><path d="M6 20 Q5 12 9 8 Q13 4 12 2"/><path d="M12 2 Q14 6 18 8"/><path d="M8 20h10"/><path d="M10 16 Q12 10 15 8"/></svg>
+          </div>
+          <div class="part-info">
+            <div class="part-title">Integration &amp; Population Growth Models</div>
+            <div class="part-subtitle">Ch. 3 Supplement · 4 topics · ∫ Rules · Separation of Variables · Exponential · Logistic</div>
+          </div>
+          <span class="part-badge badge-final">FINALS</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  Quantitative Reasoning II · Asian Institute of Law · LLB Sem II 2026<br>
+  waddacoder.github.io/llb-sem2-notes
+</footer>
+
+<script>
+  function setFont(size) {
+    var s = size / 16;
+    document.getElementById('fs-override').textContent = [
+      'body{font-size:'+size+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(24*s)+'px !important;}',
+      '.site-header .meta{font-size:'+Math.round(13*s)+'px !important;}',
+      '.subject-name{font-size:'+Math.round(18*s)+'px !important;}',
+      '.part-title{font-size:'+Math.round(14*s)+'px !important;}',
+      '.part-subtitle{font-size:'+Math.round(10*s)+'px !important;}',
+      '.tl-date{font-size:'+Math.round(13*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active', parseInt(b.dataset.size) === size);
+    });
+  }
+  setFont(16);
+</script>
+
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg){ console.log('SW registered', reg.scope); })
+      .catch(function(err){ console.log('SW error', err); });
+  }
+</script>
+</body>
+</html>
