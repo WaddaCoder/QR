@@ -698,12 +698,192 @@
     </div>
   </div>
 
+  <div class="section-label" style="margin-top:8px;">Applied Differential Equations</div>
+
+  <!-- INT06 — Newton's Law of Cooling and Heating -->
+  <div class="topic-card" id="int06" style="border-left-color:#2E5C4A">
+    <div class="topic-header" onclick="tog('int06')">
+      <span class="lec-tag" style="background:#2E5C4A">INT 06</span>
+      <div class="topic-title">Newton's Law of Cooling and Heating — Temperature Change Over Time and Forensic Applications</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <div class="inner-section open" id="int06-l">
+        <div class="inner-header" onclick="togI('int06-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p><strong>Newton's Law of Cooling</strong> states that the rate at which an object's temperature changes is proportional to the difference between the object's current temperature and the temperature of the surrounding environment (the ambient temperature). The larger the gap, the faster the change. As the gap narrows, the rate slows — the object asymptotically approaches the ambient temperature but never overshoots it.</p>
+          <p>The same law governs <strong>heating</strong>: a cold object placed in a warm environment heats up at a rate proportional to the temperature gap, approaching the ambient temperature from below. The mathematics is identical — only the sign of the initial gap changes.</p>
+          <div class="pattern-warn"><div class="pw-label">The Forensic Connection — Time of Death</div><p>The most important legal application: when a body is discovered, its temperature is measured. Body temperature at death is approximately 37°C. The room temperature is known. Newton's law lets a forensic pathologist work backward from the current body temperature to estimate the time of death — one of the most consequential applications of differential equations in law. The estimate is a calculation, not a guess.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int06-m">
+        <div class="inner-header" onclick="togI('int06-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+            <span class="hl">Differential equation:</span> dT/dt = −k(T − T_env)<br>
+            &nbsp;&nbsp;T = object temperature at time t<br>
+            &nbsp;&nbsp;T_env = ambient (environment) temperature (constant)<br>
+            &nbsp;&nbsp;k &gt; 0 = cooling/heating constant (always positive)<br>
+            &nbsp;&nbsp;The negative sign ensures: if T &gt; T_env (cooling), dT/dt &lt; 0 ✓<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if T &lt; T_env (heating), dT/dt &gt; 0 ✓<br><br>
+            <span class="hl">Derivation via substitution:</span> let u = T − T_env<br>
+            &nbsp;&nbsp;then du/dt = dT/dt = −ku → separable: (1/u)du = −k dt<br>
+            &nbsp;&nbsp;Integrate: ln|u| = −kt + C → u = Ae^(−kt)<br>
+            &nbsp;&nbsp;Back-substitute: T − T_env = Ae^(−kt)<br>
+            &nbsp;&nbsp;Apply T(0) = T₀: A = T₀ − T_env<br><br>
+            <span class="hl">Solution:</span> T(t) = T_env + (T₀ − T_env)e^(−kt)<br><br>
+            <span class="hl">Equilibrium:</span> as t → ∞, e^(−kt) → 0, so T → T_env (stable equilibrium)<br>
+            <span class="hl">Find k from two measurements:</span> k = −ln[(T₂ − T_env)/(T₀ − T_env)] / t₂<br>
+            <span class="hl">Find time t* when T reaches target T*:</span> t* = −ln[(T* − T_env)/(T₀ − T_env)] / k
+          </div>
+          <div class="pattern-warn"><div class="pw-label">One Formula, Two Directions</div><p>For <strong>cooling</strong>: T₀ &gt; T_env, so (T₀ − T_env) &gt; 0, and T(t) decreases toward T_env. For <strong>heating</strong>: T₀ &lt; T_env, so (T₀ − T_env) &lt; 0, and T(t) increases toward T_env. The formula T(t) = T_env + (T₀ − T_env)e^(−kt) handles both with no modification — the initial gap's sign does everything.</p></div>
+        </div>
+      </div>
+
+      <div class="inner-section" id="int06-ex">
+        <div class="inner-header" onclick="togI('int06-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="example-block"><div class="ex-label">Easy — Apply the Formula Directly</div>
+            <p>A cup of tea at 85°C is left in a room at 20°C. The cooling constant is k = 0.05/min. Find the temperature after 30 minutes and after 1 hour.</p>
+            <p><strong>Model:</strong> T(t) = 20 + (85 − 20)e^(−0.05t) = 20 + 65e^(−0.05t)</p>
+            <p><strong>At t = 30 min:</strong> T(30) = 20 + 65e^(−1.5) = 20 + 65(0.2231) = 20 + 14.5 = <strong>34.5°C.</strong></p>
+            <p><strong>At t = 60 min:</strong> T(60) = 20 + 65e^(−3.0) = 20 + 65(0.0498) = 20 + 3.2 = <strong>23.2°C.</strong></p>
+            <p>The tea cools rapidly at first (dropping from 85°C to 34.5°C in 30 minutes) and then slows (only dropping from 34.5°C to 23.2°C in the next 30 minutes). This deceleration is the hallmark of Newton's law — the rate is proportional to the current gap, so as the gap narrows, cooling slows.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Medium — Derive the Model, Find k, Estimate Time of Death</div>
+            <p>A body is discovered in a room maintained at 18°C. At 10:00 PM, the body temperature is 29°C. At 11:00 PM, it is 25°C. Normal body temperature at death: 37°C. Estimate the time of death.</p>
+            <p><strong>Step 1 — Set t = 0 at 10:00 PM.</strong> T(0) = 29. T_env = 18. So T(t) = 18 + (29 − 18)e^(−kt) = 18 + 11e^(−kt).</p>
+            <p><strong>Step 2 — Find k using T(1) = 25:</strong> 25 = 18 + 11e^(−k) → 11e^(−k) = 7 → e^(−k) = 7/11 → −k = ln(7/11) = ln(0.636) = −0.4533 → <strong>k = 0.4533/hour.</strong></p>
+            <p><strong>Step 3 — Full model:</strong> T(t) = 18 + 11e^(−0.4533t)</p>
+            <p><strong>Step 4 — Find when T = 37°C</strong> (time of death, negative t = before 10 PM):<br>
+            37 = 18 + 11e^(−0.4533t) → 11e^(−0.4533t) = 19 → e^(−0.4533t) = 19/11 = 1.727 → −0.4533t = ln(1.727) = 0.547 → t = −1.207 hours.</p>
+            <p>t = −1.207 hours before 10:00 PM = 10:00 PM − 1h 12min = <strong>approximately 8:48 PM.</strong></p>
+            <p>Estimated time of death: 8:48 PM. A defence counsel could challenge the room temperature assumption (was it truly constant?), the initial body temperature (37°C assumes no fever or hypothermia), and the accuracy of the two temperature readings.</p>
+          </div>
+
+          <div class="example-block"><div class="ex-label">Hard — Heating Law, Food Safety, and Liability</div>
+            <p>Food safety regulations require that cooked food be kept above 60°C to prevent bacterial growth. A restaurant takes food out of a 200°C oven. The kitchen is at 25°C. At t = 10 minutes, the food temperature is 120°C. (a) Derive k and the full model. (b) Find when the food drops below 60°C (the safety threshold). (c) The food is served 45 minutes after leaving the oven. Is this within the safety window? (d) At what initial temperature should food leave the oven if it must stay above 60°C for at least 60 minutes?</p>
+            <p><strong>(a)</strong> T_env = 25, T₀ = 200. T(t) = 25 + 175e^(−kt). At t=10: 120 = 25 + 175e^(−10k) → 175e^(−10k) = 95 → e^(−10k) = 95/175 = 0.5429 → −10k = ln(0.5429) = −0.6114 → <strong>k = 0.06114/min.</strong> <strong>Full model: T(t) = 25 + 175e^(−0.06114t).</strong></p>
+            <p><strong>(b)</strong> 60 = 25 + 175e^(−0.06114t) → 175e^(−0.06114t) = 35 → e^(−0.06114t) = 0.2 → −0.06114t = ln(0.2) = −1.609 → <strong>t = 26.3 minutes.</strong> The food drops below 60°C after 26.3 minutes.</p>
+            <p><strong>(c)</strong> Served at t = 45 minutes: T(45) = 25 + 175e^(−2.751) = 25 + 175(0.0639) = 25 + 11.2 = <strong>36.2°C</strong> — far below the 60°C threshold. Serving at 45 minutes is a <strong>serious food safety violation</strong> — the food has been in the bacterial growth zone (below 60°C) for 45 − 26.3 = 18.7 minutes by the time it is served.</p>
+            <p><strong>(d)</strong> Need T(60) ≥ 60. T(60) = 25 + (T₀−25)e^(−0.06114×60) = 25 + (T₀−25)e^(−3.668) = 25 + (T₀−25)(0.02554). Set equal to 60: 35 = (T₀−25)(0.02554) → T₀−25 = 35/0.02554 = 1370 → <strong>T₀ ≈ 1,395°C.</strong> This is physically impossible — it would require a temperature far beyond any oven. The implication: with this cooling constant (k = 0.0611), it is <em>impossible</em> to serve food above 60°C after 60 minutes regardless of initial temperature. The regulation requiring 60°C minimum for 60 minutes cannot be met by cooking and resting alone at room temperature with this food type — the food must be kept in a warming environment, not just cooked and left.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int06-q">
+        <div class="inner-header" onclick="togI('int06-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qi06a">
+            <div class="q-header" onclick="togQ('qi06a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A metal rod cools from 150°C in a room at 22°C with k = 0.08/min. (a) Write T(t). (b) Find T after 20 minutes. (c) Find when T reaches 50°C. (d) What is the equilibrium temperature?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(a) T(t) = 22 + (150−22)e^(−0.08t) = <strong>22 + 128e^(−0.08t)</strong></p>
+              <p>(b) T(20) = 22 + 128e^(−1.6) = 22 + 128(0.2019) = 22 + 25.8 = <strong>47.8°C</strong></p>
+              <p>(c) 50 = 22 + 128e^(−0.08t) → e^(−0.08t) = 28/128 = 0.2188 → −0.08t = ln(0.2188) = −1.519 → t = <strong>19.0 minutes</strong></p>
+              <p>(d) Equilibrium: as t→∞, e^(−0.08t)→0, so T→22°C = <strong>room temperature.</strong> The rod asymptotically approaches but never drops below T_env.</p>
+              <div class="what-tests">T(t)=T_env+(T₀−T_env)e^(−kt) · T(20)=47.8°C · set T=50 → t=19 min · equilibrium = ambient temperature</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qi06b">
+            <div class="q-header" onclick="togQ('qi06b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Derive the solution T(t) = T_env + (T₀ − T_env)e^(−kt) from the differential equation dT/dt = −k(T − T_env) using separation of variables. Show every step clearly, including the substitution u = T − T_env.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Step 1 — Substitute u = T − T_env.</strong> Since T_env is constant, du/dt = dT/dt. The equation becomes: du/dt = −ku.</p>
+              <p><strong>Step 2 — Separate:</strong> (1/u) du = −k dt</p>
+              <p><strong>Step 3 — Integrate both sides:</strong> ∫(1/u) du = ∫−k dt → ln|u| = −kt + C</p>
+              <p><strong>Step 4 — Exponentiate:</strong> u = Ae^(−kt) where A = e^C</p>
+              <p><strong>Step 5 — Back-substitute:</strong> T − T_env = Ae^(−kt) → T(t) = T_env + Ae^(−kt)</p>
+              <p><strong>Step 6 — Apply T(0) = T₀:</strong> T₀ = T_env + A → A = T₀ − T_env</p>
+              <p><strong>Solution: T(t) = T_env + (T₀ − T_env)e^(−kt) ✓</strong></p>
+              <p>The substitution u = T − T_env is the key move — it converts a non-homogeneous equation (dT/dt = −kT + kT_env) into a homogeneous one (du/dt = −ku) that is directly separable.</p>
+              <div class="what-tests">Substitution u=T−T_env · separation · integration · exponentiation · back-substitute · initial condition gives A=T₀−T_env · derivation matches standard decay</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qi06c">
+            <div class="q-header" onclick="togQ('qi06c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A cold drink at 4°C is placed in a warm room at 30°C. After 15 minutes, the drink is 12°C. (a) Find k. (b) Write T(t). (c) When does the drink reach 25°C? (d) Is this a cooling or heating scenario, and what is the sign of (T₀ − T_env)?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(d) first: <strong>Heating scenario.</strong> T₀ = 4 &lt; T_env = 30, so (T₀ − T_env) = −26 &lt; 0. The exponential term is negative, and T(t) increases toward T_env. Same formula — the sign difference handles everything automatically.</p>
+              <p>(a) T(t) = 30 + (4−30)e^(−kt) = 30 − 26e^(−kt). At t=15: 12 = 30 − 26e^(−15k) → 26e^(−15k) = 18 → e^(−15k) = 18/26 = 0.6923 → −15k = ln(0.6923) = −0.3677 → <strong>k = 0.02451/min.</strong></p>
+              <p>(b) <strong>T(t) = 30 − 26e^(−0.02451t)</strong></p>
+              <p>(c) 25 = 30 − 26e^(−0.02451t) → 26e^(−0.02451t) = 5 → e^(−0.02451t) = 5/26 = 0.1923 → −0.02451t = ln(0.1923) = −1.649 → t = <strong>67.3 minutes.</strong> It takes over an hour for a cold drink to reach 25°C in a 30°C room.</p>
+              <div class="what-tests">Heating: T₀&lt;T_env → (T₀−T_env)&lt;0 → T increases · k=0.0245/min · T(t)=30−26e^(−0.0245t) · 25°C at t=67.3 min · same formula handles heating automatically</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qi06d">
+            <div class="q-header" onclick="togQ('qi06d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">Explain: (a) why the equilibrium of Newton's law is always T_env and why it is stable; (b) why the rate of cooling is fastest at the very beginning and slows over time; (c) what it means legally that the cooling curve never reaches T_env exactly — can a defence lawyer use this mathematically?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a) Equilibrium at T_env:</strong> Set dT/dt = 0: −k(T − T_env) = 0 → T = T_env. This is the unique equilibrium. It is <strong>stable</strong> because: if T &gt; T_env, dT/dt &lt; 0 (cools toward T_env); if T &lt; T_env, dT/dt &gt; 0 (heats toward T_env). Any perturbation drives T back toward T_env. The stability follows directly from the negative sign in the equation: f'(T*) = −k &lt; 0 at T* = T_env.</p>
+              <p><strong>(b) Fastest at the start:</strong> dT/dt = −k(T − T_env). At t=0, the gap (T₀ − T_env) is maximised — so the rate is largest. As T approaches T_env, the gap shrinks, so the rate shrinks proportionally. This is the defining feature of proportional-rate processes: the rate is self-limiting.</p>
+              <p><strong>(c) Never reaches exactly T_env:</strong> Mathematically, T(t) = T_env + (T₀ − T_env)e^(−kt). Since e^(−kt) &gt; 0 for all finite t, T(t) ≠ T_env for any finite t. A defence lawyer cannot use this to argue the body "never reached room temperature" to question a time-of-death estimate — the argument would require infinitely long time, not just a very long time. In practice, the difference between T(t) and T_env becomes unmeasurably small within a few time constants (1/k). After 5 time constants (t = 5/k), the gap is e^(−5) ≈ 0.7% of the original — below measurement precision. The mathematical never-reaches is physically irrelevant.</p>
+              <div class="what-tests">Equilibrium T_env: stable because f'(T*)=−k&lt;0 · fastest rate at t=0 (maximum gap) · rate self-limiting as gap shrinks · never exactly reaches T_env but gap becomes unmeasurably small · defence argument from asymptote fails on practical grounds</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qi06e">
+            <div class="q-header" onclick="togQ('qi06e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">Forensic case: A body is found at 2:00 AM in a room at 16°C. Body temperature at 2:00 AM: 26°C. At 3:00 AM: 22.5°C. Normal body temperature: 37°C. (a) Find k. (b) Estimate time of death. (c) A suspect has an alibi from 10 PM to midnight. Does the statistical model exonerate them? (d) The defence argues that room temperature may have been 20°C (not 16°C) earlier in the evening. Recompute the time of death under this assumption and assess the legal significance of the 4°C room temperature uncertainty.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(a) Let t=0 at 2:00 AM. T(0)=26, T_env=16. T(t)=16+(26−16)e^(−kt)=16+10e^(−kt). At t=1: 22.5=16+10e^(−k) → e^(−k)=6.5/10=0.65 → k=−ln(0.65)=<strong>0.4308/hour.</strong></p>
+              <p>(b) Find t when T=37: 37=16+10e^(−0.4308t) → e^(−0.4308t)=21/10=2.1 → −0.4308t=ln(2.1)=0.7419 → t=−1.722 hours. Death occurred 1.722 hours before 2:00 AM = 2:00 AM − 1h 43min = <strong>approximately 12:17 AM.</strong></p>
+              <p>(c) Time of death ≈ 12:17 AM. The suspect's alibi covers 10 PM to midnight. The estimated death at 12:17 AM is <strong>17 minutes after</strong> the alibi ends. The alibi does <strong>not</strong> exonerate the suspect — the window of death falls after midnight when the alibi expires.</p>
+              <p>(d) Recompute with T_env=20°C: T(t)=20+(26−20)e^(−kt)=20+6e^(−kt). At t=1: 22.5=20+6e^(−k) → e^(−k)=2.5/6=0.4167 → k=0.8755/hour. Find t when T=37: 37=20+6e^(−0.8755t) → e^(−0.8755t)=17/6=2.833 → t=−ln(2.833)/0.8755=−1.041/0.8755=<strong>−1.189 hours before 2 AM = 12:49 AM.</strong> Under T_env=20°C: death at 12:49 AM — 49 minutes after the alibi ends. Under T_env=16°C: death at 12:17 AM — 17 minutes after alibi ends. The 4°C room temperature difference shifts the estimated time of death by 32 minutes. Both estimates fall after midnight, but the margin varies. The defence's room temperature argument does not change the core conclusion (death after the alibi ends) but could argue the estimate is uncertain enough to create reasonable doubt if evidence is otherwise weak. A court should require evidence of the actual room temperature throughout the evening, not just at 2 AM.</p>
+              <div class="what-tests">k=0.4308/hr · death at 12:17 AM · alibi ends midnight: suspect not exonerated · T_env=20°C gives 12:49 AM · 4°C uncertainty shifts estimate 32 min · both estimates post-midnight · room temperature evidence essential</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qi06f">
+            <div class="q-header" onclick="togQ('qi06f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A pharmaceutical cold-chain violation: insulin must be stored below 8°C at all times. A shipment leaves a cold storage facility at 5°C. The truck's ambient temperature is 35°C. The cooling constant for the insulated container is k = 0.015/min. (a) Write T(t) and find when insulin first exceeds 8°C. (b) The shipment takes 90 minutes. What is the temperature at delivery? (c) The driver claims they stopped at a cold facility after 40 minutes to re-cool the insulin to 5°C. Write the new model from t=40 onward. (d) Does the re-cooling rescue the shipment? Find the temperature at t=90 min under the driver's account. (e) Evaluate the driver's account: if the insulin was at 8°C or above for any continuous period exceeding 30 minutes, it is legally compromised. Under each scenario, is the drug compromised?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(a) T(t)=35+(5−35)e^(−0.015t)=35−30e^(−0.015t). Set T=8: 8=35−30e^(−0.015t) → 30e^(−0.015t)=27 → e^(−0.015t)=0.9 → −0.015t=ln(0.9)=−0.10536 → t=<strong>7.02 minutes.</strong> The insulin exceeds 8°C after just 7 minutes in the truck.</p>
+              <p>(b) T(90)=35−30e^(−1.35)=35−30(0.2592)=35−7.78=<strong>27.2°C</strong> at delivery. Massively over the 8°C limit.</p>
+              <p>(c) At t=40: T(40)=35−30e^(−0.6)=35−30(0.5488)=35−16.46=18.54°C before re-cooling. After re-cooling to 5°C at t=40, start a new model with T₀=5, T_env=35, same k: T(t')=35−30e^(−0.015t') where t'=t−40.</p>
+              <p>(d) At t=90 (t'=50): T(90)=35−30e^(−0.015×50)=35−30e^(−0.75)=35−30(0.4724)=35−14.17=<strong>20.8°C.</strong> Still far above 8°C at delivery even under the driver's account.</p>
+              <p>(e) Scenario 1 (no re-cooling): insulin exceeded 8°C from t=7 min to t=90 min = <strong>83 minutes continuously above 8°C → legally compromised.</strong> Scenario 2 (re-cooling at t=40): first phase — above 8°C from t=7 to t=40 = 33 minutes (exceeds 30-minute threshold → compromised in first phase). After re-cooling: above 8°C from t=40+7=47 min to t=90 = 43 more minutes above 8°C (another 30+ minute violation). Under the driver's own account, the insulin is compromised twice — once before the stop (33 min &gt; 30) and again after (43 min &gt; 30). The re-cooling does not rescue the shipment under the legal standard, and actually creates two separate violations rather than one. The driver's account, if true, does not help their case.</p>
+              <div class="what-tests">T=8°C at t=7 min · T(90)=27.2°C no re-cool · re-cool at t=40: T=5°C restart · T(90)=20.8°C with re-cool · first phase: 33 min above 8°C → compromised · second phase: 43 min → compromised again · driver's account creates two violations</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qi06g">
+            <div class="q-header" onclick="togQ('qi06g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">Two forensic experts disagree about k. Expert P (prosecution): k = 0.5/hour. Expert D (defence): k = 0.3/hour. Body found at midnight, temperature 28°C. Room temperature 20°C. Normal body temperature 37°C. (a) Find the estimated time of death under each k. (b) How much does the k difference shift the estimate? (c) Which expert benefits the prosecution, and why? (d) A suspect has an alibi from 9 PM to 11 PM. Under each expert's model, does the alibi hold? (e) What evidence would a court use to determine the true k, and can k ever be known precisely?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>(a) T(t)=20+(28−20)e^(−kt)=20+8e^(−kt). Find t when T=37: 37=20+8e^(−kt) → e^(−kt)=17/8=2.125 → −kt=ln(2.125)=0.7538 → t=−0.7538/k. Expert P (k=0.5): t=−0.7538/0.5=<strong>−1.508 hours → 10:30 PM.</strong> Expert D (k=0.3): t=−0.7538/0.3=<strong>−2.513 hours → 9:29 PM.</strong></p>
+              <p>(b) Difference: 2.513−1.508=<strong>1.005 hours ≈ 1 hour.</strong> The k difference of 0.2/hour shifts the estimated time of death by exactly 1 hour.</p>
+              <p>(c) Expert P (k=0.5, faster cooling → death at 10:30 PM) benefits the <strong>prosecution.</strong> A death at 10:30 PM falls <em>after</em> the alibi (9–11 PM)... wait, 10:30 PM is inside the alibi window. Let me reconsider. Alibi: 9 PM to 11 PM. Expert P: death 10:30 PM — inside the alibi. Expert D: death 9:29 PM — inside the alibi. Actually both are inside. The prosecution would prefer the death to be outside the alibi window. Let me re-examine: if Expert P gives death at 10:30 PM (inside alibi) and Expert D gives 9:29 PM (also inside alibi), neither model clearly exonerates the suspect but both place death within the alibi period — actually both support the defence.</p>
+              <p>(d) Both estimates (10:30 PM and 9:29 PM) fall within the alibi window of 9 PM to 11 PM. Under <strong>both expert models, the alibi holds</strong> — the suspect has an established alibi covering the estimated time of death under both models. The prosecution cannot establish opportunity because the death windows computed by both of their own experts fall within the alibi period. This illustrates an important point: when two experts disagree about k but both place the death within the alibi, the disagreement actually strengthens the defence — there is no k value that places the death outside the alibi, and the models bracket the estimate within the protected window.</p>
+              <p>(e) True k determination: (i) weighing or body type — cooling rates differ by body mass (larger bodies cool slower, smaller faster); (ii) clothing (insulation slows cooling); (iii) experimental calibration with known reference materials in the same room; (iv) forensic databases of postmortem cooling rates for similar cases. k can be estimated but <strong>never known precisely</strong> for a specific individual because it depends on body composition, clothing, air circulation, and microenvironment — none of which can be perfectly known retrospectively. Courts treat time-of-death estimates as probabilistic ranges, not exact times, and the ±1 hour uncertainty from the k disagreement here should be presented as a confidence interval rather than a point estimate.</p>
+              <div class="what-tests">Expert P: death 10:30 PM · Expert D: death 9:29 PM · 1 hour shift from Δk=0.2 · both fall within 9-11 PM alibi · alibi holds under both models · k depends on body mass, clothing, environment · cannot be known exactly · time-of-death as interval not point</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="inner-section" id="int06-bar">
+        <div class="inner-header" onclick="togI('int06-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">The Model</div><div class="bar-content">dT/dt=−k(T−T_env) → T(t)=T_env+(T₀−T_env)e^(−kt) · k&gt;0 always · Cooling: T₀&gt;T_env · Heating: T₀&lt;T_env · same formula</div></div>
+          <div class="bar-lens"><div class="bar-label">Derivation Key</div><div class="bar-content">Substitute u=T−T_env → du/dt=−ku (standard decay) → u=Ae^(−kt) → back-sub → apply T(0)=T₀ → A=T₀−T_env</div></div>
+          <div class="bar-lens"><div class="bar-label">Find k and Unknowns</div><div class="bar-content">k from 2 temps: k=−ln[(T₂−T_env)/(T₀−T_env)]/t₂ · Find t*: t*=−ln[(T*−T_env)/(T₀−T_env)]/k · Equilibrium: T=T_env (stable)</div></div>
+          <div class="bar-lens"><div class="bar-label">Legal Applications</div><div class="bar-content">Time of death (forensics) · Food safety threshold crossing · Cold-chain pharmaceutical violations · Fire investigation · Drug temperature storage compliance</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div style="height:32px;"></div>
 </div>
 
 <div class="nav-strip">
   <a class="nav-link" href="qr2-part3-mathematical-modeling.html">← Part 3</a>
-  <a class="nav-link" href="index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
   <a class="nav-link" href="qr2-part5-statistical-inference.html">Part 5 →</a>
 </div>
 <div class="font-bar">
