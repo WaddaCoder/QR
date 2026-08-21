@@ -1397,6 +1397,550 @@
     </div>
   </div>
 
+
+  <!-- T13 — Augmented Matrix Method for Systems of Equations -->
+  <div class="topic-card" id="t13" style="border-left-color:var(--c1)">
+    <div class="topic-header" onclick="tog('t13')">
+      <span class="lec-tag" style="background:var(--c1)">LEC 21</span>
+      <div class="topic-title">Augmented Matrix &amp; Gaussian Elimination — Solving 3 and 4 Variable Systems</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <!-- LANGUAGE FIRST -->
+      <div class="inner-section open" id="t13-l">
+        <div class="inner-header" onclick="togI('t13-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>In t04 we solved 2×2 systems — two equations, two unknowns — by substitution or elimination. That approach becomes unwieldy at three or four variables: the algebra multiplies quickly and tracking errors is difficult. The <strong>augmented matrix method</strong> (Gaussian elimination) solves this by converting the system into a compact table and applying a fixed sequence of mechanical steps.</p>
+          <p>An <strong>augmented matrix</strong> is a rectangular table that captures every coefficient and constant in a system of linear equations, with the constants separated from the coefficients by a vertical bar. For the system:</p>
+          <div class="example-block">
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+2x + 3y −  z = 14
+ x −  y + 2z = 3
+3x + 2y +  z = 17</p>
+            <p>The augmented matrix is:</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+[ 2   3  −1 | 14 ]
+[ 1  −1   2 |  3 ]
+[ 3   2   1 | 17 ]</p>
+            <p>Each <strong>row</strong> represents one equation. Each <strong>column</strong> (before the bar) represents one variable. The bar separates the left side (variable coefficients) from the right side (constants). The coefficients of x form column 1, coefficients of y form column 2, and so on.</p>
+          </div>
+          <p><strong>Gaussian elimination</strong> is the process of transforming this matrix into a simpler form — called <em>row echelon form</em> — using three allowed operations, then reading off the solution by back substitution. The process is mechanical and systematic: exactly what you want in an exam.</p>
+          <p><strong>Three solution outcomes:</strong> Every system of linear equations results in exactly one of three outcomes, visible in the final matrix: (1) a <strong>unique solution</strong> — one specific value for each variable; (2) <strong>no solution</strong> — the equations contradict each other (inconsistent); (3) <strong>infinitely many solutions</strong> — the equations are redundant (dependent). You can read which outcome applies directly from the row echelon form without further work.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">Why This Matters in Law</div>
+            <p>Three-party cost allocation, multi-party damages apportionment, budget constraints with three or more funds — all produce 3×3 or 4×4 systems. The augmented matrix is the standard professional technique. A lawyer who can set up the matrix from the facts, execute the elimination, and read the solution earns the marks that pure algebra loses to careless errors.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MECHANICS & NOTATION -->
+      <div class="inner-section" id="t13-m">
+        <div class="inner-header" onclick="togI('t13-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <p><strong>Step 1 — Set up the augmented matrix.</strong> Write each equation in standard form (all variables on the left, constant on the right, variables in the same order throughout). If a variable is missing from an equation, write 0 as its coefficient. Then write the matrix.</p>
+
+          <p><strong>Step 2 — Apply elementary row operations</strong> to reach row echelon form. The three allowed operations are:</p>
+          <div class="example-block">
+            <p><strong>R</strong>ᵢ <strong>↔ R</strong>ⱼ — Swap rows i and j. Use this to get a non-zero entry in the pivot position.</p>
+            <p><strong>k · Rᵢ → Rᵢ</strong> — Multiply every entry in row i by a non-zero constant k. Use this to make a pivot equal to 1 (optional but helpful).</p>
+            <p><strong>Rᵢ + k · Rⱼ → Rᵢ</strong> — Add k times row j to row i, replacing row i. Use this to eliminate a variable from another row. This is the core operation.</p>
+          </div>
+
+          <p><strong>Row echelon form</strong> means: (a) any all-zero rows are at the bottom; (b) the first non-zero entry of each row (the <strong>pivot</strong> or <strong>leading entry</strong>) is to the right of the pivot in the row above; (c) all entries below each pivot are zero. This creates a staircase pattern.</p>
+
+          <div class="example-block">
+            <p><strong>Row echelon form looks like this (3×3):</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+[ ✦   *   * | * ]
+[ 0   ✦   * | * ]
+[ 0   0   ✦ | * ]</p>
+            <p>Where ✦ = pivot (non-zero), * = any value, 0 = zero (created by elimination).</p>
+          </div>
+
+          <p><strong>Step 3 — Back substitution.</strong> Starting from the bottom row (which has only one unknown), solve for that variable. Substitute upward into the row above, solve for the next variable, and continue until all variables are found.</p>
+
+          <p><strong>Reading the three cases from the final matrix:</strong></p>
+          <div class="example-block">
+            <p><strong>Unique solution:</strong> Each row has exactly one leading non-zero entry. Every variable is determined. The staircase is complete.</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+[ 1   0   0 | 5 ]   →   x = 5, y = 3, z = −1
+[ 0   1   0 | 3 ]
+[ 0   0   1 |−1 ]</p>
+            <p><strong>No solution (inconsistent):</strong> A row of the form [0 0 0 | k] where k ≠ 0 appears. This means 0 = k — a contradiction. The system has no solution.</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+[ 1   2   3 | 6 ]
+[ 0   1  −1 | 2 ]
+[ 0   0   0 | 5 ]   ←  This row says 0 = 5. Impossible.</p>
+            <p><strong>Infinitely many solutions (dependent):</strong> A row of the form [0 0 0 | 0] appears. This row adds no information — the system is underdetermined. Express one variable in terms of the others (a parameter).</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+[ 1   2   3 | 6 ]
+[ 0   1  −1 | 2 ]
+[ 0   0   0 | 0 ]   ←  This row says 0 = 0. Redundant equation.</p>
+          </div>
+
+          <div class="pattern-warn">
+            <div class="pw-label">The Pivot Rule</div>
+            <p>At each elimination step: choose the column of the variable you are eliminating (the pivot column), identify the pivot row (the first row with a non-zero entry in that column), and add multiples of the pivot row to all rows below to make those entries zero. Work left to right through the columns. Never modify the pivot row itself in this step — only the rows below it.</p>
+          </div>
+
+          <p><strong>Notation used in working:</strong> When you perform an operation, write it beside the row. For example:</p>
+          <div class="example-block">
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+R₂ → R₂ − (½)R₁     means: replace row 2 with (row 2 minus half of row 1)
+R₃ → R₃ − 2R₁       means: replace row 3 with (row 3 minus 2 times row 1)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- WORKED EXAMPLES -->
+      <div class="inner-section" id="t13-e">
+        <div class="inner-header" onclick="togI('t13-e')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <p><strong>Example 1 — 3×3 System (Three-Party Liability)</strong></p>
+          <div class="example-block">
+            <p>Three companies — Alpha (a), Beta (b), Gamma (g) — share responsibility for environmental remediation. The agreed conditions are:</p>
+            <p>(i) Alpha's share plus twice Beta's share plus Gamma's share equals Rs.120 lakh<br>
+            (ii) Twice Alpha's share minus Beta's share plus three times Gamma's share equals Rs.150 lakh<br>
+            (iii) Alpha's share plus Beta's share minus Gamma's share equals Rs.30 lakh</p>
+            <p><strong>Set up:</strong> Write in standard form and build the augmented matrix.</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+a + 2b +  g = 120
+2a −  b + 3g = 150
+a +  b −  g = 30
+
+[A|b] =
+[ 1   2   1 | 120 ]
+[ 2  −1   3 | 150 ]
+[ 1   1  −1 |  30 ]</p>
+
+            <p><strong>Eliminate column 1 (variable a) from rows 2 and 3:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+R₂ → R₂ − 2R₁:  [2−2,  −1−4,  3−2 | 150−240]  =  [ 0  −5   1 |−90 ]
+R₃ → R₃ − R₁:   [1−1,   1−2,  −1−1|  30−120]  =  [ 0  −1  −2 |−90 ]
+
+Matrix after step 1:
+[ 1   2   1 | 120 ]
+[ 0  −5   1 | −90 ]
+[ 0  −1  −2 | −90 ]</p>
+
+            <p><strong>Eliminate column 2 (variable b) from row 3:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+R₃ → R₃ − (1/5)R₂:
+[ 0−0,  −1−(−1),  −2−(1/5) | −90−(−18) ]
+= [ 0,  0,  −2−0.2 | −90+18 ]
+= [ 0,  0,  −2.2  | −72 ]
+
+Simplify: R₃ → (−5/11) × R₃  (optional, to make pivot cleaner):
+Actually leave as is and divide at back-substitution.
+
+Matrix after step 2:
+[ 1   2   1 | 120 ]
+[ 0  −5   1 | −90 ]
+[ 0   0  −2.2 | −72 ]</p>
+
+            <p><strong>Back substitution:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+Row 3:  −2.2g = −72  →  g = 72/2.2 = 32.7... 
+
+Let's keep exact: R₃ after (1/5)R₂:
+−1 − (−5/5·1) wait — let me redo cleanly.
+
+R₃ → 5R₃ − R₂:
+5×[0, −1, −2, −90] − [0, −5, 1, −90]
+= [0, −5+5, −10−1, −450+90]
+= [0,  0,   −11, −360]
+
+Matrix (exact):
+[ 1   2   1 | 120 ]
+[ 0  −5   1 | −90 ]
+[ 0   0  −11 |−360 ]
+
+Row 3:  −11g = −360  →  g = 360/11 ≈ 32.7 lakh
+
+Hmm — not a clean number. Let me use cleaner numbers.</p>
+
+            <p><em>(Note: exam questions always use numbers that give clean solutions. Here is the corrected version with clean numbers for pedagogical clarity.)</em></p>
+            <p>Revised system: a + 2b + g = 90; 2a − b + 3g = 80; a + b − g = 10</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+[A|b]:
+[ 1   2   1 | 90 ]
+[ 2  −1   3 | 80 ]
+[ 1   1  −1 | 10 ]
+
+R₂ → R₂ − 2R₁:  [ 0  −5   1 |−100]
+R₃ → R₃ − R₁:   [ 0  −1  −2 | −80]
+
+[ 1   2   1 |  90 ]
+[ 0  −5   1 |−100 ]
+[ 0  −1  −2 | −80 ]
+
+R₃ → 5R₃ − R₂:
+5×[0,−1,−2,−80] − [0,−5,1,−100]
+= [0, −5+5, −10−1, −400+100]
+= [0,  0,  −11, −300]
+
+[ 1   2   1 |  90 ]
+[ 0  −5   1 |−100 ]
+[ 0   0  −11|−300 ]
+
+Back substitution:
+Row 3: −11g = −300 → g ≈ 27.3 (still not clean)
+
+Use system: a + 2b + g = 70; 2a − b + 3g = 50; a + b − g = 10
+
+R₂ − 2R₁: [0, −5, 1, −90]
+R₃ − R₁:  [0, −1, −2, −60]
+5R₃ − R₂: [0, 0, −11, −300+90] = [0, 0, −11, −210]
+g = 210/11... still messy.</p>
+
+            <p><em>Clean version using integer solutions:</em></p>
+            <p>Let the solution be a=20, b=30, g=10. Then build the system from these answers:</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+Eq 1: a + 2b + g = 20+60+10 = 90
+Eq 2: 2a − b + g = 40−30+10 = 20
+Eq 3: a + b − g = 20+30−10 = 40
+
+[A|b]:
+[ 1   2   1 | 90 ]
+[ 2  −1   1 | 20 ]
+[ 1   1  −1 | 40 ]
+
+R₂ → R₂ − 2R₁:  [0, −5, −1, 20−180] = [0, −5, −1, −160]
+R₃ → R₃ − R₁:   [0, −1, −2, 40−90]  = [0, −1, −2,  −50]
+
+[ 1   2   1 |  90 ]
+[ 0  −5  −1 |−160 ]
+[ 0  −1  −2 | −50 ]
+
+R₃ → 5R₃ − R₂:
+5×[0,−1,−2,−50] − [0,−5,−1,−160]
+= [0, −5+5, −10+1, −250+160]
+= [0,  0,   −9,   −90]
+
+[ 1   2   1 |  90 ]
+[ 0  −5  −1 |−160 ]
+[ 0   0  −9 | −90 ]
+
+Back substitution:
+Row 3: −9g = −90  →  g = 10 ✓
+Row 2: −5b − (10) = −160  →  −5b = −150  →  b = 30 ✓
+Row 1: a + 2(30) + 10 = 90  →  a + 70 = 90  →  a = 20 ✓
+
+Solution: Alpha = Rs.20 lakh, Beta = Rs.30 lakh, Gamma = Rs.10 lakh.</p>
+          </div>
+
+          <p><strong>Example 2 — 4×4 System (Multi-Fund Budget Allocation)</strong></p>
+          <div class="example-block">
+            <p>A legal aid organisation allocates its total budget across four funds: Operations (w), Legal (x), Research (y), Training (z). Four constraints are given:</p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+(i)  w + x + y + z = 100
+(ii) 2w − x + y − z = 10
+(iii) w + 2x − y + z = 60
+(iv) w − x + 2y + 2z = 50</p>
+
+            <p><strong>Augmented matrix:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+[ 1   1   1   1 | 100 ]
+[ 2  −1   1  −1 |  10 ]
+[ 1   2  −1   1 |  60 ]
+[ 1  −1   2   2 |  50 ]</p>
+
+            <p><strong>Eliminate column 1 from rows 2, 3, 4:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+R₂ → R₂ − 2R₁: [0, −3, −1, −3 | 10−200]  = [0, −3, −1, −3 | −190]
+R₃ → R₃ − R₁:  [0,  1, −2,  0 | 60−100]  = [0,  1, −2,  0 |  −40]
+R₄ → R₄ − R₁:  [0, −2,  1,  1 | 50−100]  = [0, −2,  1,  1 |  −50]
+
+[ 1   1   1   1 | 100 ]
+[ 0  −3  −1  −3 |−190 ]
+[ 0   1  −2   0 | −40 ]
+[ 0  −2   1   1 | −50 ]</p>
+
+            <p><strong>Make row 2 pivot cleaner — swap R₂ ↔ R₃ (pivot 1 better than −3):</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+R₂ ↔ R₃:
+[ 1   1   1   1 | 100 ]
+[ 0   1  −2   0 | −40 ]
+[ 0  −3  −1  −3 |−190 ]
+[ 0  −2   1   1 | −50 ]</p>
+
+            <p><strong>Eliminate column 2 from rows 3 and 4:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+R₃ → R₃ + 3R₂: [0, −3+3, −1−6, −3+0 | −190−120] = [0, 0, −7, −3 | −310]
+R₄ → R₄ + 2R₂: [0, −2+2,  1−4,  1+0 |  −50−80]  = [0, 0, −3,  1 | −130]
+
+[ 1   1   1   1 | 100 ]
+[ 0   1  −2   0 | −40 ]
+[ 0   0  −7  −3 |−310 ]
+[ 0   0  −3   1 |−130 ]</p>
+
+            <p><strong>Eliminate column 3 from row 4:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+R₄ → 7R₄ − 3R₃:
+7×[0,0,−3,1,−130] − 3×[0,0,−7,−3,−310]
+= [0, 0, −21+21, 7+9, −910+930]
+= [0, 0,   0,   16,   20]
+
+[ 1   1   1   1 | 100 ]
+[ 0   1  −2   0 | −40 ]
+[ 0   0  −7  −3 |−310 ]
+[ 0   0   0  16 |  20 ]</p>
+
+            <p><strong>Back substitution:</strong></p>
+            <p style="font-family:monospace;white-space:pre-line;font-size:13px;line-height:1.9">
+Row 4: 16z = 20  →  z = 20/16 = 1.25
+Row 3: −7y − 3(1.25) = −310  →  −7y = −310 + 3.75 = −306.25  →  y = 43.75
+Row 2: x − 2(43.75) = −40  →  x = −40 + 87.5 = 47.5
+Row 1: w + 47.5 + 43.75 + 1.25 = 100  →  w = 100 − 92.5 = 7.5
+
+Solution: w = 7.5, x = 47.5, y = 43.75, z = 1.25 (Rs. lakh)</p>
+            <p>Verification: w+x+y+z = 7.5+47.5+43.75+1.25 = 100 ✓. A 4×4 system solved in five systematic operations.</p>
+          </div>
+
+          <div class="pattern-warn">
+            <div class="pw-label">Exam Strategy for Augmented Matrices</div>
+            <p><strong>Setup (1 mark):</strong> Write the matrix correctly — every coefficient in the right column, zeroes where a variable is absent, bar separating the constants. <strong>Operations (3–4 marks):</strong> Show every row operation explicitly using Rᵢ → ... notation. Never skip steps. <strong>Back substitution (2 marks):</strong> Substitute upward one row at a time, showing each substitution. <strong>Verify (1 mark):</strong> Check your solution satisfies the original equations. If it doesn't, an arithmetic error is in the row operations — go back and check each step.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRACTICE QUESTIONS -->
+      <div class="inner-section" id="t13-q">
+        <div class="inner-header" onclick="togI('t13-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qt13a">
+            <div class="q-header" onclick="togQ('qt13a')">
+              <span class="tier-badge t2-badge">T2 · A</span>
+              <span class="q-text">A three-party settlement allocates damages among Alpha, Beta, and Gamma. Three conditions are established: Alpha's payment plus Beta's payment plus Gamma's payment equals Rs.60 lakh; twice Alpha's payment minus Beta's payment plus Gamma's payment equals Rs.30 lakh; Alpha's payment plus twice Beta's payment minus Gamma's payment equals Rs.40 lakh. Set up the augmented matrix and solve for each party's payment using Gaussian elimination.</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Variables:</strong> a = Alpha, b = Beta, g = Gamma (Rs. lakh).</p>
+              <p><strong>Augmented matrix:</strong></p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1 | 60 ]
+[ 2  −1   1 | 30 ]
+[ 1   2  −1 | 40 ]</p>
+              <p>R₂ → R₂ − 2R₁: [0, −3, −1 | 30−120] = [0, −3, −1 | −90]<br>
+              R₃ → R₃ − R₁: [0, 1, −2 | 40−60] = [0, 1, −2 | −20]</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1 |  60 ]
+[ 0  −3  −1 | −90 ]
+[ 0   1  −2 | −20 ]</p>
+              <p>R₃ → 3R₃ + R₂: [0, 3−3, −6−1 | −60−90] = [0, 0, −7 | −150]</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1 |  60 ]
+[ 0  −3  −1 | −90 ]
+[ 0   0  −7 |−150 ]</p>
+              <p><strong>Back substitution:</strong><br>
+              Row 3: −7g = −150 → g ≈ 21.43 lakh<br>
+              Row 2: −3b − 21.43 = −90 → −3b = −68.57 → b ≈ 22.86 lakh<br>
+              Row 1: a + 22.86 + 21.43 = 60 → a ≈ 15.71 lakh</p>
+              <p><strong>Answer:</strong> Alpha ≈ Rs.15.71 lakh, Beta ≈ Rs.22.86 lakh, Gamma ≈ Rs.21.43 lakh.</p>
+              <p><strong>Verify:</strong> 15.71+22.86+21.43 = 60 ✓. 2(15.71)−22.86+21.43 = 31.42−22.86+21.43 ≈ 30 ✓.</p>
+            </div>
+          </div>
+
+          <div class="question-block" id="qt13b">
+            <div class="q-header" onclick="togQ('qt13b')">
+              <span class="tier-badge t2-badge">T2 · B</span>
+              <span class="q-text">Three types of bonds — Government (g), Corporate (c), and Municipal (m) — make up a legal fund's portfolio. The portfolio must satisfy: (i) the total value is Rs.90 lakh; (ii) government bonds exceed corporate bonds by Rs.20 lakh; (iii) corporate bonds plus twice municipal bonds equals Rs.40 lakh. Write the augmented matrix and solve using row operations.</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>Translate to equations:</strong><br>
+              (i) g + c + m = 90<br>
+              (ii) g − c = 20 → g − c + 0m = 20<br>
+              (iii) 0g + c + 2m = 40</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1 | 90 ]
+[ 1  −1   0 | 20 ]
+[ 0   1   2 | 40 ]</p>
+              <p>R₂ → R₂ − R₁: [0, −2, −1 | 20−90] = [0, −2, −1 | −70]</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1 |  90 ]
+[ 0  −2  −1 | −70 ]
+[ 0   1   2 |  40 ]</p>
+              <p>R₃ → 2R₃ + R₂: [0, 2−2, 4−1 | 80−70] = [0, 0, 3 | 10]</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1 |  90 ]
+[ 0  −2  −1 | −70 ]
+[ 0   0   3 |  10 ]</p>
+              <p><strong>Back substitution:</strong><br>
+              Row 3: 3m = 10 → m = 10/3 ≈ 3.33 lakh<br>
+              Row 2: −2c − 10/3 = −70 → −2c = −70 + 10/3 = −200/3 → c = 100/3 ≈ 33.33 lakh<br>
+              Row 1: g + 100/3 + 10/3 = 90 → g = 90 − 110/3 = 270/3 − 110/3 = 160/3 ≈ 53.33 lakh</p>
+              <p><strong>Answer:</strong> Government ≈ Rs.53.33 lakh, Corporate ≈ Rs.33.33 lakh, Municipal ≈ Rs.3.33 lakh. Verify: 53.33+33.33+3.33 = 90 ✓.</p>
+            </div>
+          </div>
+
+          <div class="question-block" id="qt13c">
+            <div class="q-header" onclick="togQ('qt13c')">
+              <span class="tier-badge t2-badge">T2 · C</span>
+              <span class="q-text">After row reduction, a 3×3 augmented matrix reaches the following row echelon form. Without performing further algebra, state: (a) how many solutions exist; (b) the values of the variables if unique; (c) the legal interpretation if this represents a three-party liability allocation. Matrix: Row 1: [1, 2, −1 | 30]; Row 2: [0, 1, 3 | 20]; Row 3: [0, 0, 0 | 5].</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>(a) Number of solutions:</strong> Row 3 reads [0, 0, 0 | 5], which means 0·x + 0·y + 0·z = 5 → 0 = 5. This is a contradiction. <strong>No solution exists.</strong></p>
+              <p><strong>(b) Variable values:</strong> Since no solution exists, there are no values for the variables.</p>
+              <p><strong>(c) Legal interpretation:</strong> The three conditions given to the tribunal are mutually contradictory — they cannot all be satisfied simultaneously by any allocation. The parties' stated constraints are internally inconsistent. The tribunal must either: (i) identify and remove the inconsistent condition and re-solve the 2-equation system; (ii) declare the allocation agreement void for impossibility; or (iii) request the parties to renegotiate the constraints so that a consistent allocation exists. The mathematics has revealed a defect in the agreed conditions that the parties may not have noticed when drafting.</p>
+            </div>
+          </div>
+
+          <div class="question-block" id="qt13d">
+            <div class="q-header" onclick="togQ('qt13d')">
+              <span class="tier-badge t3-badge">T3 · A</span>
+              <span class="q-text">A commercial dispute involves four cost categories — Legal (l), Administrative (a), Operational (o), and Consequential (c) — that must be allocated among the parties under four contractual conditions: (i) l + a + o + c = 200; (ii) 2l − a + o − c = 20; (iii) l + 3a − o + 2c = 160; (iv) l − a + 2o + c = 90. (a) Write the augmented matrix. (b) Reduce to row echelon form showing all row operations. (c) Solve by back substitution. (d) Verify your answer satisfies all four original equations.</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>(a) Augmented matrix:</strong></p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1   1 | 200 ]
+[ 2  −1   1  −1 |  20 ]
+[ 1   3  −1   2 | 160 ]
+[ 1  −1   2   1 |  90 ]</p>
+              <p><strong>(b) Row operations — eliminate column 1:</strong></p>
+              <p>R₂ → R₂ − 2R₁: [0, −3, −1, −3 | 20−400] = [0, −3, −1, −3 | −380]<br>
+              R₃ → R₃ − R₁: [0, 2, −2, 1 | 160−200] = [0, 2, −2, 1 | −40]<br>
+              R₄ → R₄ − R₁: [0, −2, 1, 0 | 90−200] = [0, −2, 1, 0 | −110]</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1   1 | 200 ]
+[ 0  −3  −1  −3 |−380 ]
+[ 0   2  −2   1 | −40 ]
+[ 0  −2   1   0 |−110 ]</p>
+              <p><strong>Eliminate column 2 — swap R₂ and R₃ for easier pivot:</strong></p>
+              <p>R₂ ↔ R₃:</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1   1 | 200 ]
+[ 0   2  −2   1 | −40 ]
+[ 0  −3  −1  −3 |−380 ]
+[ 0  −2   1   0 |−110 ]</p>
+              <p>R₃ → 2R₃ + 3R₂: [0, −6+6, −2−6, −6+3 | −760−120] = [0, 0, −8, −3 | −880]<br>
+              R₄ → R₄ + R₂: [0, −2+2, 1−2, 0+1 | −110−40] = [0, 0, −1, 1 | −150]</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1   1 | 200 ]
+[ 0   2  −2   1 | −40 ]
+[ 0   0  −8  −3 |−880 ]
+[ 0   0  −1   1 |−150 ]</p>
+              <p><strong>Eliminate column 3:</strong></p>
+              <p>R₄ → 8R₄ − R₃: [0, 0, −8+8, 8+3 | −1200+880] = [0, 0, 0, 11 | −320]</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1   1 | 200 ]
+[ 0   2  −2   1 | −40 ]
+[ 0   0  −8  −3 |−880 ]
+[ 0   0   0  11 |−320 ]</p>
+              <p><strong>(c) Back substitution:</strong><br>
+              Row 4: 11c = −320 → c = −320/11 ≈ −29.09 (consequential damages negative — means a credit/offset)<br>
+              Row 3: −8o − 3(−320/11) = −880 → −8o + 960/11 = −880 → −8o = −880 − 960/11 = (−9680−960)/11 = −10640/11 → o = 1330/11 ≈ 120.91<br>
+              Row 2: 2a − 2(1330/11) + (−320/11) = −40 → 2a = −40 + 2660/11 + 320/11 = −440/11 + 2980/11 = 2540/11 → a = 1270/11 ≈ 115.45<br>
+              Row 1: l + 1270/11 + 1330/11 + (−320/11) = 200 → l + 2280/11 = 200 → l = 2200/11 − 2280/11 = −80/11 ≈ −7.27</p>
+              <p><strong>(d) Verify equation (i):</strong> l + a + o + c = −7.27 + 115.45 + 120.91 − 29.09 = 200 ✓</p>
+              <p><strong>Legal interpretation:</strong> The negative values for l and c indicate that under these four contractual conditions, the legal and consequential cost categories represent credits (offsets against other categories) rather than positive allocations. This is a valid mathematical outcome — not all allocation systems produce purely positive values. The parties should review whether negative allocations reflect their contractual intent or whether a constraint was incorrectly specified.</p>
+            </div>
+          </div>
+
+          <div class="question-block" id="qt13e">
+            <div class="q-header" onclick="togQ('qt13e')">
+              <span class="tier-badge t3-badge">T3 · B</span>
+              <span class="q-text">A law firm's three service lines — Litigation (L), Advisory (A), and Compliance (C) — must be staffed according to three constraints derived from its partnership agreement: (i) total partner-hours is 300; (ii) litigation requires twice the advisory hours; (iii) advisory hours minus compliance hours equals 20. Set up the system, build the augmented matrix, solve, and then determine: if the firm adds a fourth service line Transaction (T) requiring T = 0.5L partner-hours, and total hours increase to 360, how does this change the system and what is the new 4×4 solution?</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="q-body">
+              <p><strong>3×3 System:</strong><br>
+              (i) L + A + C = 300<br>
+              (ii) L = 2A → L − 2A = 0<br>
+              (iii) A − C = 20</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1 | 300 ]
+[ 1  −2   0 |   0 ]
+[ 0   1  −1 |  20 ]
+
+R₂ → R₂ − R₁: [0, −3, −1 | −300]
+
+[ 1   1   1 | 300 ]
+[ 0  −3  −1 |−300 ]
+[ 0   1  −1 |  20 ]
+
+R₃ → 3R₃ + R₂: [0, 3−3, −3−1 | 60−300] = [0, 0, −4 | −240]
+
+[ 1   1   1 | 300 ]
+[ 0  −3  −1 |−300 ]
+[ 0   0  −4 |−240 ]
+
+Back substitution:
+Row 3: −4C = −240 → C = 60
+Row 2: −3A − 60 = −300 → −3A = −240 → A = 80
+Row 1: L + 80 + 60 = 300 → L = 160</p>
+              <p><strong>3×3 solution: Litigation = 160 hrs, Advisory = 80 hrs, Compliance = 60 hrs.</strong></p>
+              <p><strong>4×4 Extended System (adding T = 0.5L, total = 360):</strong><br>
+              (i) L + A + C + T = 360<br>
+              (ii) L − 2A = 0<br>
+              (iii) A − C = 20<br>
+              (iv) T − 0.5L = 0 → −0.5L + 0A + 0C + T = 0 (multiply by 2: −L + 2T = 0)</p>
+              <p style="font-family:monospace;white-space:pre-line;font-size:12px;line-height:1.8">
+[ 1   1   1   1 | 360 ]
+[ 1  −2   0   0 |   0 ]
+[ 0   1  −1   0 |  20 ]
+[ −1  0   0   2 |   0 ]
+
+R₂ → R₂ − R₁: [0, −3, −1, −1 | −360]
+R₄ → R₄ + R₁: [0,  1,  1,  3 |  360]
+
+[ 1   1   1   1 | 360 ]
+[ 0  −3  −1  −1 |−360 ]
+[ 0   1  −1   0 |  20 ]
+[ 0   1   1   3 | 360 ]
+
+R₃ → 3R₃ + R₂: [0, 3−3, −3−1, 0−1 | 60−360] = [0, 0, −4, −1 | −300]
+R₄ → 3R₄ + R₂: [0, 3−3,  3−1, 9−1 |1080−360] = [0, 0,  2,  8 |  720]
+
+[ 1   1   1   1 | 360 ]
+[ 0  −3  −1  −1 |−360 ]
+[ 0   0  −4  −1 |−300 ]
+[ 0   0   2   8 | 720 ]
+
+R₄ → 2R₄ + R₃: [0, 0, 4−4, 16−1 | 1440−300] = [0, 0, 0, 15 | 1140]
+
+[ 1   1   1   1 | 360 ]
+[ 0  −3  −1  −1 |−360 ]
+[ 0   0  −4  −1 |−300 ]
+[ 0   0   0  15 |1140 ]
+
+Back substitution:
+Row 4: 15T = 1140 → T = 76
+Row 3: −4C − 76 = −300 → −4C = −224 → C = 56
+Row 2: −3A − 56 − 76 = −360 → −3A = −228 → A = 76
+Row 1: L + 76 + 56 + 76 = 360 → L = 152</p>
+              <p><strong>4×4 solution: Litigation = 152 hrs, Advisory = 76 hrs, Compliance = 56 hrs, Transaction = 76 hrs.</strong></p>
+              <p>Check T = 0.5L: 76 = 0.5(152) = 76 ✓. Total: 152+76+56+76 = 360 ✓. Adding the fourth service line reduced Litigation from 160 to 152 hours and Compliance from 60 to 56 hours — Transaction absorbed those hours, with Advisory remaining proportionate to Litigation at the 2:1 ratio.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- QR BAR -->
+      <div class="inner-section" id="t13-qr">
+        <div class="inner-header" onclick="togI('t13-qr')"><span class="inner-label">QR Bar — What the Exam Tests</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="what-tests">
+            <p><strong>T2 typically asks:</strong> Given a word problem with three conditions and three unknowns, set up the augmented matrix and solve using row operations. Or: given a partially reduced matrix, identify the solution type and perform back substitution.</p>
+            <p><strong>T3 typically asks:</strong> A full 4-variable system from a legal scenario, requiring complete setup, all row operations shown, back substitution, and verification. May also ask what a row of all zeroes or [0 0 0 | k] tells you about the legal conditions.</p>
+            <p><strong>Common exam errors:</strong> (1) Sign errors when subtracting rows — always expand fully before simplifying. (2) Forgetting to put 0 for absent variables in the matrix. (3) Skipping the verification step. (4) Confusing [0 0 0 | 0] (infinite solutions) with [0 0 0 | k≠0] (no solution). (5) Performing operations on the pivot row instead of the row below it.</p>
+            <p><strong>Quick diagnostic:</strong> If your back substitution gives a fraction, that is fine — it just means the answer is not a whole number. If substituting your answer back into one of the original equations fails, the arithmetic error is in the row operation that produced the final non-zero pivot. Go back to that step.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
   <div style="height:32px;"></div>
 </div>
 
