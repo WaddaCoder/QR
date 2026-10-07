@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR-II · Permutations, Combinations & Probability</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0E0E1A;--ink-soft:#3A3A4A;--ink-faint:#6B6B7B;--page:#F9F8F5;--rule:#E2DDD6;--bar-bg:#F0EDE6;--bar-border:#C9A84C;
+    --c1:#7A35C4;--c2:#C43560;--t2:#1A5C3A;--t3:#5C1A1A;--ez:#2E5C8A;--md:#8A5C1A;--hd:#5C1A2E;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;color:var(--ink);background:var(--page);padding-bottom:80px;}
+  .site-header{background:var(--ink);padding:32px 20px 24px;}
+  .site-header .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--bar-border);margin-bottom:6px;}
+  .site-header h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#F9F8F5;line-height:1.25;}
+  .site-header .subtitle{font-size:13px;color:#A0A8B0;margin-top:5px;}
+  .progress-strip{display:flex;align-items:center;gap:12px;background:#F0EDE6;padding:10px 20px;border-bottom:1px solid var(--rule);}
+  .ps-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap;}
+  .progress-bar-outer{flex:1;height:4px;background:var(--rule);border-radius:2px;}
+  .progress-bar-inner{height:4px;border-radius:2px;background:var(--bar-border);}
+  .ps-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);white-space:nowrap;}
+  .container{max-width:680px;margin:0 auto;padding:0 16px;}
+  .controls{display:flex;gap:8px;padding:16px 0 4px;}
+  .ctrl-btn{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 14px;border:1px solid var(--rule);background:#fff;border-radius:2px;cursor:pointer;color:var(--ink-soft);}
+  .ctrl-btn:hover{background:var(--ink);color:#fff;}
+  .section-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-faint);padding:18px 0 6px;border-bottom:1px solid var(--rule);margin-bottom:12px;}
+  /* Topic cards */
+  .topic-card{border:1px solid var(--rule);border-left:4px solid transparent;border-radius:2px;margin-bottom:10px;overflow:hidden;background:#fff;}
+  .topic-header{display:flex;align-items:center;gap:10px;padding:15px 18px;cursor:pointer;user-select:none;}
+  .topic-header:hover{background:#F4F2EF;}
+  .lec-tag{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.1em;color:#fff;padding:3px 8px;border-radius:1px;white-space:nowrap;flex-shrink:0;}
+  .topic-title{flex:1;font-size:16px;font-weight:600;color:var(--ink);line-height:1.3;}
+  .chevron{width:18px;height:18px;color:var(--ink-faint);flex-shrink:0;transition:transform 0.2s;}
+  .topic-card.open .chevron{transform:rotate(180deg);}
+  .topic-body{display:none;border-top:1px solid var(--rule);}
+  .topic-card.open .topic-body{display:block;}
+  /* Inner sections */
+  .inner-section{border-bottom:1px solid var(--rule);}
+  .inner-section:last-child{border-bottom:none;}
+  .inner-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;cursor:pointer;user-select:none;background:#FAFAF8;}
+  .inner-header:hover{background:#F4F2EF;}
+  .inner-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;}
+  .inner-chevron{width:16px;height:16px;color:var(--ink-faint);transition:transform 0.2s;}
+  .inner-section.open .inner-chevron{transform:rotate(180deg);}
+  .inner-body{display:none;padding:4px 20px 20px;}
+  .inner-section.open .inner-body{display:block;}
+  p{font-size:15px;margin-top:10px;line-height:1.7;}
+  p:first-child{margin-top:0;}
+  strong{color:var(--ink);}
+  .notation{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;background:#F4F2EF;border:1px solid var(--rule);border-radius:2px;padding:12px 14px;margin-top:12px;}
+  .hl{color:var(--ink);font-weight:600;}
+  .example-block{background:#F9F8F5;border:1px solid var(--rule);border-radius:2px;padding:14px 16px;margin-top:10px;}
+  .ex-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;}
+  .ex-label.easy{color:var(--ez);}
+  .ex-label.medium{color:var(--md);}
+  .ex-label.hard{color:var(--hd);}
+  .pattern-warn{background:#FFF8ED;border:1px solid #E8D080;border-radius:2px;padding:12px 14px;margin-top:12px;}
+  .pw-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#9A7A10;margin-bottom:6px;}
+  /* Questions */
+  .question-block{border:1px solid var(--rule);border-radius:2px;margin-top:8px;overflow:hidden;background:#fff;}
+  .q-header{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;}
+  .q-header:hover{background:#F4F2EF;}
+  .tier-badge{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.08em;white-space:nowrap;padding:3px 7px;border-radius:1px;flex-shrink:0;margin-top:1px;}
+  .t2-badge{background:var(--t2);color:#fff;}
+  .t3-badge{background:var(--t3);color:#fff;}
+  .q-text{flex:1;font-size:14px;color:var(--ink);line-height:1.5;}
+  .q-chevron{width:16px;height:16px;color:var(--ink-faint);flex-shrink:0;transition:transform 0.2s;margin-top:2px;}
+  .question-block.open .q-chevron{transform:rotate(180deg);}
+  .q-body{display:none;padding:0 14px 14px;border-top:1px solid var(--rule);}
+  .question-block.open .q-body{display:block;}
+  .q-body p{font-size:14px;margin-top:8px;}
+  .what-tests{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);background:#F4F2EF;border-radius:1px;padding:7px 10px;margin-top:10px;line-height:1.6;}
+  /* QR Bar */
+  .bar-lens{background:#F0EDE6;border:1px solid var(--bar-border);border-radius:2px;padding:10px 14px;margin-top:8px;}
+  .bar-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#8B6914;margin-bottom:6px;}
+  .bar-content{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:var(--ink-soft);}
+  /* Nav strip */
+  .nav-strip{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--ink);margin-top:32px;}
+  .nav-link{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#A0A8B0;text-decoration:none;padding:6px 10px;}
+  .nav-link:hover{color:#fff;}
+  .site-footer{margin-top:0;padding:20px;border-top:1px solid var(--rule);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.08em;}
+  .font-bar{background:#1A1A2A;border-top:1px solid #2A2A3A;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;}
+  .font-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A8090;white-space:nowrap;}
+  .font-presets{display:flex;gap:6px;}
+  .fp-btn{font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid #3A3A4A;background:none;color:#A0A8B0;border-radius:2px;cursor:pointer;line-height:1;padding:7px 12px;transition:background 0.15s,color 0.15s;}
+  .fp-btn:hover{background:#2A2A3A;color:#F9F8F5;}
+  .fp-btn.active{background:var(--bar-border);color:#1A1A2A;border-color:var(--bar-border);}
+  .fp-btn:nth-child(1){font-size:11px;}.fp-btn:nth-child(2){font-size:13px;}.fp-btn:nth-child(3){font-size:15px;}
+  .fp-btn:nth-child(4){font-size:17px;}.fp-btn:nth-child(5){font-size:19px;}
+  @media(max-width:420px){.site-header h1{font-size:18px;}.topic-title{font-size:14px;}}
+  @media (min-width:1024px) and (orientation:landscape){
+    .container{max-width:1280px;padding:0 24px;}.site-header{padding:32px 32px 26px;}
+    .site-header h1{font-size:26px;}.progress-strip{padding:12px 32px;}
+    .controls{padding:18px 0 6px;}body{font-size:17px;}p{font-size:16px;}
+    .topic-header{padding:18px 22px;}.topic-title{font-size:19px;}
+    .inner-header{padding:15px 22px;}.inner-body{padding:6px 24px 24px;}
+    .notation{font-size:14px;padding:14px 16px;}.example-block{padding:16px 18px;}
+    .example-block p{font-size:15px;}.q-header{padding:14px 16px;}
+    .q-text{font-size:15px;}.q-body{padding:0 16px 16px;}.q-body p{font-size:15px;}
+  }
+</style>
+<style id="fs-override"></style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">QR-II · Asian Institute of Law · LLB Sem II · 2026</div>
+  <h1>Permutations, Combinations &amp; Probability</h1>
+  <div class="subtitle">GQR-201 · Dr. Tariq Ismaeel · 2 topics</div>
+</header>
+
+<div class="progress-strip">
+  <span class="ps-label">Topics</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:100%"></div></div>
+  <span class="ps-count">2 / 2</span>
+</div>
+
+<div class="container">
+  <div class="controls">
+    <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+    <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TOPIC 1 — PERMUTATIONS & COMBINATIONS
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label">Counting Methods — The Engine of Probability</div>
+
+  <div class="topic-card" id="pc01" style="border-left-color:var(--c1)">
+    <div class="topic-header" onclick="tog('pc01')">
+      <span class="lec-tag" style="background:var(--c1)">COUNTING</span>
+      <div class="topic-title">Permutations &amp; Combinations — Ordered vs Unordered Selection</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <!-- Language First -->
+      <div class="inner-section open" id="pc01-l">
+        <div class="inner-header" onclick="togI('pc01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p>Counting is not just arithmetic — it is about <strong>systematically enumerating all possible arrangements or selections</strong> without missing or double-counting any. Two questions drive every counting problem:</p>
+          <p><strong>1. Does order matter?</strong> If selecting President then Vice-President from 10 candidates, choosing Ali first then Bilal is different from choosing Bilal first then Ali. Order matters — this is a <strong>permutation</strong>.</p>
+          <p><strong>2. Or does order not matter?</strong> If selecting a committee of 2 from 10 candidates, {Ali, Bilal} and {Bilal, Ali} are the same committee. Order does not matter — this is a <strong>combination</strong>.</p>
+          <p>The key word test: "arrange", "order", "rank", "schedule", "first/second/third" → <strong>permutation</strong>. "Choose", "select", "committee", "group", "team", "sample" → <strong>combination</strong>.</p>
+          <p><strong>Factorial (n!)</strong> is the foundation: n! = n × (n-1) × (n-2) × … × 2 × 1. It counts the number of ways to arrange n distinct objects in a line. By convention, 0! = 1.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">The One Mistake That Costs Marks</div>
+            <p>Applying P(n,r) when the question asks for a committee (order doesn't matter), or applying C(n,r) when the question asks for a ranking (order does matter). Always identify the order question before writing any formula. The examiner writes questions to test exactly this distinction.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mechanics & Notation -->
+      <div class="inner-section" id="pc01-m">
+        <div class="inner-header" onclick="togI('pc01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+<span class="hl">Factorial</span>: n! = n × (n−1) × (n−2) × … × 1 &nbsp;·&nbsp; 0! = 1<br>
+Example: 5! = 5×4×3×2×1 = 120<br>
+<br>
+<span class="hl">Permutation P(n,r)</span> = n! / (n−r)!<br>
+"Arrange r objects chosen from n distinct objects (order matters)"<br>
+P(5,2) = 5!/(5−2)! = 5!/3! = (5×4×3×2×1)/(3×2×1) = 20<br>
+<br>
+<span class="hl">Combination C(n,r)</span> = n! / [r! × (n−r)!]<br>
+"Choose r objects from n distinct objects (order does NOT matter)"<br>
+C(5,2) = 5!/[2!×3!] = 120/[2×6] = 120/12 = 10<br>
+<br>
+<span class="hl">Relationship</span>: P(n,r) = C(n,r) × r!<br>
+Each combination can be arranged in r! ways → P = C × r!<br>
+<br>
+<span class="hl">Key identity</span>: C(n,r) = C(n, n−r)<br>
+Choosing 3 from 10 = choosing which 7 to LEAVE OUT = C(10,7) = C(10,3)<br>
+<br>
+<span class="hl">Multiplication principle</span>: If task A has m ways and task B has n ways,<br>
+and they are done independently, total ways = m × n
+          </div>
+          <div class="pattern-warn">
+            <div class="pw-label">Quick Shortcut for Permutations</div>
+            <p>P(n,r) = n × (n−1) × (n−2) × … (r terms). So P(8,3) = 8 × 7 × 6 = 336. You don't need to expand the full factorial. Write r terms starting from n, each decreasing by 1.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worked Examples -->
+      <div class="inner-section" id="pc01-ex">
+        <div class="inner-header" onclick="togI('pc01-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label easy">Easy — Identifying P vs C and Computing</div>
+            <p>A law firm has 8 associates. (a) In how many ways can a President, Vice-President, and Secretary be chosen? (b) In how many ways can a 3-person welfare committee be chosen?</p>
+            <p><strong>(a) Order matters</strong> (distinct roles) → Permutation.<br>P(8,3) = 8!/(8−3)! = 8!/5! = 8×7×6 = <strong>336 ways</strong>.</p>
+            <p><strong>(b) Order does not matter</strong> (committee members are interchangeable) → Combination.<br>C(8,3) = 8!/[3!×5!] = (8×7×6)/(3×2×1) = 336/6 = <strong>56 ways</strong>.</p>
+            <p>Note: P(8,3) = 336 = 56 × 6 = C(8,3) × 3! — the relationship holds.</p>
+          </div>
+          <div class="example-block">
+            <div class="ex-label medium">Medium — Mixed-Group Committee (Classic Exam Pattern)</div>
+            <p>A 5-person arbitration panel is to be selected from 6 lawyers and 4 economists. The panel must include exactly 3 lawyers and 2 economists. In how many ways can this panel be formed?</p>
+            <p>The selection of lawyers and economists are <strong>independent tasks</strong>, so use the multiplication principle.</p>
+            <p>Ways to choose 3 lawyers from 6: C(6,3) = 6!/[3!×3!] = 720/[6×6] = 720/36 = <strong>20</strong>.</p>
+            <p>Ways to choose 2 economists from 4: C(4,2) = 4!/[2!×2!] = 24/[2×2] = 24/4 = <strong>6</strong>.</p>
+            <p>Total panels = 20 × 6 = <strong>120 ways</strong>.</p>
+            <div class="pattern-warn"><div class="pw-label">Why Multiply?</div><p>Each of the 20 lawyer groupings can be paired with each of the 6 economist groupings. The two choices are independent — the multiplication principle applies: 20 × 6 = 120.</p></div>
+          </div>
+          <div class="example-block">
+            <div class="ex-label hard">Hard — Constrained Arrangement</div>
+            <p>A court has 5 judges who must be seated in a row for a panel photograph. (a) How many arrangements are possible with no restrictions? (b) How many if the Chief Justice must sit in the middle seat? (c) How many if two particular judges (A and B) must NOT sit next to each other?</p>
+            <p><strong>(a) No restriction:</strong> Arrange 5 distinct people in 5 seats → 5! = 120.</p>
+            <p><strong>(b) Chief Justice fixed in seat 3:</strong> The remaining 4 judges fill the 4 remaining seats → 4! = 24 arrangements.</p>
+            <p><strong>(c) A and B not adjacent:</strong> Use complementary counting.<br>
+            Total arrangements = 120.<br>
+            Arrangements where A and B ARE adjacent: treat AB as a single unit → 4 units to arrange = 4! = 24. But A and B within the unit can switch → 24 × 2 = 48.<br>
+            Arrangements where A and B are NOT adjacent = 120 − 48 = <strong>72</strong>.</p>
+            <p><strong>Strategy note:</strong> Whenever a "not" or "cannot" condition appears, compute the complement — (total) − (the bad arrangements) — rather than trying to enumerate the valid ones directly.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Practice Questions -->
+      <div class="inner-section" id="pc01-q">
+        <div class="inner-header" onclick="togI('pc01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qpc01a">
+            <div class="q-header" onclick="togQ('qpc01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A court registry must assign 4 different cases to 4 different judges. How many different assignment arrangements are possible? Then compute: in how many arrangements is Judge Raza assigned specifically to the fraud case?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Total assignments (4 cases, 4 judges, each case to exactly one judge): this is a permutation of 4 judges assigned to 4 cases = 4! = <strong>24</strong>.</p>
+              <p>Arrangements where Raza gets fraud: fix Raza → fraud. The remaining 3 judges are assigned to 3 remaining cases in 3! = 6 ways. Answer: <strong>6</strong>.</p>
+              <p>Cross-check: 6/24 = 1/4. Since Raza is equally likely to be assigned any of the 4 cases, exactly 1/4 of all arrangements have him on fraud. ✓</p>
+              <div class="what-tests">n! for complete permutations · fix one assignment and count the rest (n−1)! · cross-check via probability: 1/n of total</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpc01b">
+            <div class="q-header" onclick="togQ('qpc01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">A bar council is selecting a 4-person disciplinary committee from 10 senior advocates. (a) How many committees are possible? (b) Advocate Kamran must be on the committee. How many committees include Kamran? (c) Advocates Kamran and Rania refuse to serve together. How many valid committees are there?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> C(10,4) = 10!/[4!×6!] = (10×9×8×7)/(4×3×2×1) = 5040/24 = <strong>210</strong>.</p>
+              <p><strong>(b)</strong> Fix Kamran on the committee. Choose 3 remaining members from the other 9: C(9,3) = 9!/[3!×6!] = (9×8×7)/6 = 504/6 = <strong>84</strong>.</p>
+              <p><strong>(c)</strong> Use complementary counting. Committees with BOTH Kamran and Rania: fix both, choose 2 from remaining 8: C(8,2) = 28. Valid committees = 210 − 28 = <strong>182</strong>.</p>
+              <div class="what-tests">C(n,r) for unordered selection · fix one person → choose (r−1) from (n−1) · complement: total − (both included) · C(8,2) for "both fixed, choose rest"</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpc01c">
+            <div class="q-header" onclick="togQ('qpc01c')"><span class="inner-label"></span><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A law school selects a moot court team of 3 from 5 LLB students and 4 LLM students. The team must include at least 1 LLM student. How many valid teams are possible?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>Method: complementary counting.</strong><br>
+              Total teams of 3 from 9 students: C(9,3) = (9×8×7)/6 = 84.<br>
+              Teams with NO LLM students (all 3 from LLB only): C(5,3) = (5×4×3)/6 = 10.<br>
+              Teams with at least 1 LLM = 84 − 10 = <strong>74</strong>.</p>
+              <p><strong>Verify by direct count:</strong> Exactly 1 LLM: C(4,1)×C(5,2) = 4×10 = 40. Exactly 2 LLM: C(4,2)×C(5,1) = 6×5 = 30. Exactly 3 LLM: C(4,3)×C(5,0) = 4×1 = 4. Total: 40+30+4 = 74. ✓</p>
+              <div class="what-tests">Complement for "at least" conditions · C(9,3) total − C(5,3) all-LLB = teams with ≥1 LLM · verify by direct enumeration of cases</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpc01d">
+            <div class="q-header" onclick="togQ('qpc01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">A tribunal shortlists 7 candidates for 3 positions: Chief, Deputy, and Secretary (all distinct roles). (a) How many ways can the 3 positions be filled? (b) If the top 2 candidates (by rank) must fill the Chief and Deputy positions (either order), how many ways can all 3 positions be filled?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> Distinct roles → order matters → Permutation. P(7,3) = 7×6×5 = <strong>210</strong>.</p>
+              <p><strong>(b)</strong> Top 2 candidates must fill Chief and Deputy (either order): 2 ways to assign them to these two roles. Then 5 remaining candidates fill the Secretary role: 5 ways. Total = 2 × 5 = <strong>10</strong>.</p>
+              <div class="what-tests">P(n,r) = n×(n-1)×…(r terms) for distinct roles · constrained permutation: fix top 2, count their arrangements, multiply by remaining choices · 2! × 5 = 10</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpc01e">
+            <div class="q-header" onclick="togQ('qpc01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A legal aid organisation has 12 volunteers: 7 lawyers and 5 paralegals. They must form a 5-person taskforce with these constraints: (i) At least 3 lawyers. (ii) If lawyer Farida is selected, paralegal Nadia must also be selected. How many valid taskforces are possible?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Step 1: Count valid teams satisfying constraint (i) — at least 3 lawyers.</p>
+              <p>Case A — exactly 3 lawyers, 2 paralegals: C(7,3)×C(5,2) = 35×10 = 350.<br>
+              Case B — exactly 4 lawyers, 1 paralegal: C(7,4)×C(5,1) = 35×5 = 175.<br>
+              Case C — exactly 5 lawyers, 0 paralegals: C(7,5)×C(5,0) = 21×1 = 21.<br>
+              Total satisfying (i) = 350+175+21 = <strong>546</strong>.</p>
+              <p>Step 2: Apply constraint (ii) — if Farida in, Nadia must be in. Subtract the invalid teams: teams that include Farida but NOT Nadia.</p>
+              <p>Invalid teams: Farida in, Nadia out. Fix Farida (lawyer), exclude Nadia. Choose 4 more from the remaining 10 (6 lawyers + 4 paralegals, Nadia excluded), with at least 2 more lawyers (since we need ≥3 total lawyers and Farida is 1).</p>
+              <p>Sub-case A2 — Farida + 2 more lawyers + 2 from 4 paralegals: C(6,2)×C(4,2) = 15×6 = 90.<br>
+              Sub-case B2 — Farida + 3 more lawyers + 1 from 4 paralegals: C(6,3)×C(4,1) = 20×4 = 80.<br>
+              Sub-case C2 — Farida + 4 more lawyers + 0 paralegals: C(6,4)×C(4,0) = 15×1 = 15.<br>
+              Invalid total = 90+80+15 = <strong>185</strong>.</p>
+              <p>Valid taskforces = 546 − 185 = <strong>361</strong>.</p>
+              <div class="what-tests">Multi-case enumeration for "at least" · conditional constraint via complement (include Farida, exclude Nadia) · careful sub-case recount after fixing Farida but blocking Nadia · answer: 361</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpc01f">
+            <div class="q-header" onclick="togQ('qpc01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">A judge must schedule 6 hearings in a day: 4 civil cases and 2 criminal cases. (a) Total arrangements with no restriction? (b) All civil cases must be heard consecutively (as a block)? (c) The two criminal cases cannot be in the first two time slots? (d) Civil and criminal cases must strictly alternate (impossible here — explain why, then find the most alternating arrangement possible)?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> 6! = <strong>720</strong>.</p>
+              <p><strong>(b)</strong> Treat 4 civil cases as 1 block. Arrange 3 units (block + 2 criminal) = 3! = 6. Within the block, 4 civil can arrange = 4! = 24. Total = 6×24 = <strong>144</strong>.</p>
+              <p><strong>(c)</strong> Criminal cases not in slots 1 or 2. The 2 criminal cases must occupy 2 of the remaining 4 slots (3, 4, 5, 6). Choose 2 slots for criminal: C(4,2) = 6 ways. Arrange 2 criminal in those slots: 2! = 2. Arrange 4 civil in remaining 4 slots: 4! = 24. Total = 6×2×24 = <strong>288</strong>.</p>
+              <p><strong>(d)</strong> Strict alternation (C-Cr-C-Cr-C-Cr or Cr-C-Cr-C-Cr-C) requires equal numbers of each type (3 and 3). With 4 civil and 2 criminal, perfect alternation is impossible — you cannot fit 4 civil and 2 criminal into a strictly alternating pattern of 6 slots.</p>
+              <p>Most alternating: no two criminal cases consecutive AND maximise the gaps between them. With 2 criminal among 6 slots, an optimal arrangement places the 2 criminal cases in non-adjacent slots (at least 2 civil between them). Place criminal in slots i and j where j≥i+2. Valid slot pairs from {1,2,3,4,5,6}: (1,3),(1,4),(1,5),(1,6),(2,4),(2,5),(2,6),(3,5),(3,6),(4,6) = 10 slot-pair choices. Arrange 2 criminal in those 2 slots: 2! = 2. Arrange 4 civil in remaining 4 slots: 4! = 24. Total = 10×2×24 = <strong>480</strong>.</p>
+              <div class="what-tests">Block method for consecutive items · restricted slots via C(available,needed)×r! · why alternation fails (unequal counts) · "most alternating" = no two of same type consecutive = C(available_slots, 2 criminal) counting non-adjacent pairs</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpc01g">
+            <div class="q-header" onclick="togQ('qpc01g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A law firm has 9 partners. They need to form: (i) a 3-person litigation team (roles: Lead, Second, Third — distinct); (ii) a separate 2-person advisory committee (unordered). The same partner cannot serve on both. How many ways can both teams be simultaneously staffed?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>The teams are formed simultaneously from 9 partners with no overlap allowed (a partner cannot serve on both).</p>
+              <p>Step 1: Choose and assign the 3-person litigation team (order matters — distinct roles): P(9,3) = 9×8×7 = 504.</p>
+              <p>Step 2: 6 partners remain. Choose 2 for the advisory committee (order does not matter): C(6,2) = 15.</p>
+              <p>Total = 504 × 15 = <strong>7,560</strong>.</p>
+              <p>Alternative approach: First choose 5 partners for the combined pool, then assign roles. Choose 5 from 9: C(9,5) = 126. Assign 3 roles to 3 of the 5: P(5,3) = 60. The remaining 2 form the committee: 1 way (only one group of 2 remains). Total = 126 × 60 = 7,560. ✓</p>
+              <div class="what-tests">Sequential selection with no overlap: P(9,3) for ordered team, then C(6,2) for unordered committee from remainder · multiply sequential independent selections · alternative: choose pool then assign</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- QR Bar -->
+      <div class="inner-section" id="pc01-bar">
+        <div class="inner-header" onclick="togI('pc01-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Core Formulas</div><div class="bar-content">n! = n×(n−1)×…×1 &nbsp;·&nbsp; 0! = 1<br>P(n,r) = n!/(n−r)! = n×(n−1)×…×(n−r+1)<br>C(n,r) = n!/[r!×(n−r)!] &nbsp;·&nbsp; P(n,r) = C(n,r)×r!</div></div>
+          <div class="bar-lens"><div class="bar-label">Order Matters?</div><div class="bar-content">YES (roles, ranks, sequence, positions) → P(n,r)<br>NO (committee, group, team, sample, set) → C(n,r)<br>Key words: "arrange/order/first…" → P · "choose/select/committee…" → C</div></div>
+          <div class="bar-lens"><div class="bar-label">Key Strategies</div><div class="bar-content">Complement: at least X = total − (less than X) · Constraint: fix the constrained item first, count the rest · Block method: treat consecutive group as 1 unit · Multiplication: independent choices multiply</div></div>
+          <div class="bar-lens"><div class="bar-label">Common Values</div><div class="bar-content">C(4,2)=6 · C(5,2)=10 · C(6,2)=15 · C(7,2)=21<br>C(5,3)=10 · C(6,3)=20 · C(7,3)=35 · C(8,3)=56<br>C(9,3)=84 · C(10,3)=120 · C(10,4)=210</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TOPIC 2 — INTRODUCTION TO PROBABILITY
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label" style="margin-top:20px;">Probability — Quantifying Uncertainty</div>
+
+  <div class="topic-card" id="pr01" style="border-left-color:var(--c2)">
+    <div class="topic-header" onclick="tog('pr01')">
+      <span class="lec-tag" style="background:var(--c2)">PROB</span>
+      <div class="topic-title">Introduction to Probability — Classical Models, Rules &amp; Conditional Reasoning</div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="topic-body">
+
+      <!-- Language First -->
+      <div class="inner-section open" id="pr01-l">
+        <div class="inner-header" onclick="togI('pr01-l')"><span class="inner-label">Language First</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p><strong>Probability</strong> is a number between 0 and 1 (or 0% and 100%) that measures how likely an event is. 0 means impossible; 1 means certain. Every probability question starts with defining the <strong>sample space S</strong> — the complete set of all possible outcomes.</p>
+          <p>An <strong>event</strong> is any subset of the sample space. The <strong>classical (equally likely) model</strong> gives: P(A) = (number of outcomes in A) / (total outcomes in S). This is where combinations become essential — counting the outcomes in A and in S.</p>
+          <p>Two events are <strong>mutually exclusive</strong> if they cannot both happen at the same time (no overlap). Two events are <strong>independent</strong> if knowing one happened tells you nothing about whether the other happened. These sound similar but are completely different — mutually exclusive events are actually <em>maximally dependent</em> (if one happens, the other definitely doesn't).</p>
+          <p><strong>Conditional probability</strong> P(A|B) = "the probability of A given that B has already happened." When B is known to have occurred, the sample space shrinks to just B's outcomes.</p>
+          <div class="pattern-warn">
+            <div class="pw-label">The Two Concepts Everyone Confuses</div>
+            <p><strong>Mutually exclusive ≠ Independent.</strong> Mutually exclusive: P(A∩B) = 0 — they cannot both occur. Independent: P(A∩B) = P(A)×P(B) — knowing B gives no information about A. If two events are mutually exclusive AND both have positive probability, they CANNOT be independent (because knowing one occurred makes the other impossible — very informative). The exam loves testing this distinction.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mechanics & Notation -->
+      <div class="inner-section" id="pr01-m">
+        <div class="inner-header" onclick="togI('pr01-m')"><span class="inner-label">Mechanics &amp; Notation</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="notation">
+<span class="hl">Classical probability</span>: P(A) = |A| / |S| &nbsp;·&nbsp; 0 ≤ P(A) ≤ 1<br>
+<br>
+<span class="hl">Complement rule</span>: P(A') = 1 − P(A) &nbsp;·&nbsp; "not A"<br>
+Use this whenever "at least one" appears: P(at least one) = 1 − P(none)<br>
+<br>
+<span class="hl">Addition rule (general)</span>: P(A∪B) = P(A) + P(B) − P(A∩B)<br>
+<span class="hl">Addition rule (mutually exclusive)</span>: P(A∪B) = P(A) + P(B) &nbsp;·&nbsp; [since P(A∩B)=0]<br>
+<br>
+<span class="hl">Multiplication rule (general)</span>: P(A∩B) = P(A) × P(B|A)<br>
+<span class="hl">Multiplication rule (independent)</span>: P(A∩B) = P(A) × P(B)<br>
+<br>
+<span class="hl">Conditional probability</span>: P(A|B) = P(A∩B) / P(B) &nbsp;·&nbsp; [P(B) > 0]<br>
+<br>
+<span class="hl">Test for independence</span>: A and B are independent iff P(A|B) = P(A)<br>
+&nbsp;&nbsp;equivalently: P(A∩B) = P(A) × P(B)<br>
+<br>
+<span class="hl">Probability using combinations</span>:<br>
+P(event) = C(favourable_ways) / C(total_ways)<br>
+e.g. P(choose 2 women from 5W+3M) = C(5,2)/C(8,2) = 10/28 = 5/14
+          </div>
+        </div>
+      </div>
+
+      <!-- Worked Examples -->
+      <div class="inner-section" id="pr01-ex">
+        <div class="inner-header" onclick="togI('pr01-ex')"><span class="inner-label">Worked Examples</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="example-block">
+            <div class="ex-label easy">Easy — Classical Probability with Counting</div>
+            <p>A bag contains 6 red marbles and 4 blue marbles. Two marbles are drawn at random without replacement. Find the probability that both are red.</p>
+            <p>Total ways to draw 2 from 10: C(10,2) = 45.<br>
+            Ways to draw 2 red from 6: C(6,2) = 15.<br>
+            P(both red) = 15/45 = <strong>1/3 ≈ 0.333</strong>.</p>
+            <p>Alternative using multiplication rule: P(1st red) × P(2nd red | 1st red) = (6/10) × (5/9) = 30/90 = 1/3. ✓</p>
+          </div>
+          <div class="example-block">
+            <div class="ex-label medium">Medium — Addition Rule and Conditional Probability</div>
+            <p>In a batch of 20 contract files, 8 contain errors and 6 are overdue. 3 files are both errored and overdue. A clerk picks one file at random. (a) P(error or overdue)? (b) P(overdue | error)?</p>
+            <p><strong>(a)</strong> P(A∪B) = P(A) + P(B) − P(A∩B) = 8/20 + 6/20 − 3/20 = <strong>11/20 = 0.55</strong>.</p>
+            <p><strong>(b)</strong> P(overdue | error) = P(overdue ∩ error) / P(error) = (3/20) / (8/20) = 3/8 = <strong>0.375</strong>.</p>
+            <p>Interpretation: knowing the file has errors raises the probability it is also overdue from 6/20 = 30% to 37.5% — the events are not independent.</p>
+          </div>
+          <div class="example-block">
+            <div class="ex-label hard">Hard — Probability Requiring Combinations (Confirmed Exam Pattern)</div>
+            <p>A 5-person jury is randomly selected from 8 women and 7 men (15 total). Find: (a) P(exactly 3 women); (b) P(at least 1 woman); (c) P(majority women — more women than men).</p>
+            <p>Total ways: C(15,5) = 3003.</p>
+            <p><strong>(a)</strong> Exactly 3 women, 2 men: C(8,3)×C(7,2) = 56×21 = 1176. P = 1176/3003 = <strong>0.3917</strong>.</p>
+            <p><strong>(b)</strong> At least 1 woman = 1 − P(0 women) = 1 − C(8,0)×C(7,5)/3003 = 1 − 1×21/3003 = 1 − 21/3003 = 2982/3003 = <strong>0.9930</strong>.</p>
+            <p><strong>(c)</strong> Majority women = 3W+2M or 4W+1M or 5W+0M:<br>
+            3W2M: C(8,3)×C(7,2) = 56×21 = 1176.<br>
+            4W1M: C(8,4)×C(7,1) = 70×7 = 490.<br>
+            5W0M: C(8,5)×C(7,0) = 56×1 = 56.<br>
+            Total = 1722. P = 1722/3003 = <strong>0.5734</strong>.</p>
+            <div class="pattern-warn"><div class="pw-label">Why Complement for "at least 1"</div><p>Directly computing "at least 1 woman" requires summing P(1W), P(2W), P(3W), P(4W), P(5W) — five separate calculations. The complement "no women" is one calculation. Always use complement for "at least one" problems.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Practice Questions -->
+      <div class="inner-section" id="pr01-q">
+        <div class="inner-header" onclick="togI('pr01-q')"><span class="inner-label">Practice Questions</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+
+          <div class="question-block" id="qpr01a">
+            <div class="q-header" onclick="togQ('qpr01a')"><span class="tier-badge t2-badge">T2 · A</span><span class="q-text">A law firm has 12 case files: 5 criminal, 4 civil, 3 corporate. One file is picked at random. (a) P(criminal or civil)? (b) P(not corporate)? (c) Are "criminal" and "civil" mutually exclusive? Are they independent?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> P(criminal) = 5/12, P(civil) = 4/12. Since a file cannot be both: P(criminal or civil) = 5/12 + 4/12 = 9/12 = <strong>3/4</strong>.</p>
+              <p><strong>(b)</strong> P(not corporate) = 1 − 3/12 = 1 − 1/4 = <strong>3/4</strong>.</p>
+              <p><strong>(c) Mutually exclusive:</strong> Yes — a file is exactly one type; it cannot be criminal AND civil simultaneously. P(criminal ∩ civil) = 0.</p>
+              <p><strong>Independent:</strong> No. P(criminal) × P(civil) = (5/12)(4/12) = 20/144 ≠ 0 = P(criminal ∩ civil). Because they are mutually exclusive, knowing one occurred makes the other impossible — they are the opposite of independent.</p>
+              <div class="what-tests">Addition rule for mutually exclusive · complement rule · mutually exclusive ≠ independent · two ME events with positive probability cannot be independent</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpr01b">
+            <div class="q-header" onclick="togQ('qpr01b')"><span class="tier-badge t2-badge">T2 · B</span><span class="q-text">Two judges independently review an appeal. Judge A approves the appeal with probability 0.6; Judge B approves with probability 0.5. Find: (a) P(both approve); (b) P(at least one approves); (c) P(exactly one approves).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Reviews are independent.</p>
+              <p><strong>(a)</strong> P(A∩B) = P(A)×P(B) = 0.6×0.5 = <strong>0.30</strong>.</p>
+              <p><strong>(b)</strong> P(at least one) = 1 − P(neither) = 1 − (1−0.6)(1−0.5) = 1 − (0.4)(0.5) = 1 − 0.20 = <strong>0.80</strong>.</p>
+              <p><strong>(c)</strong> Exactly one = P(A only) + P(B only) = P(A)×P(B') + P(A')×P(B) = 0.6×0.5 + 0.4×0.5 = 0.30 + 0.20 = <strong>0.50</strong>.</p>
+              <p>Cross-check: 0.30 (both) + 0.50 (exactly one) + 0.20 (neither) = 1.00. ✓</p>
+              <div class="what-tests">Independent events: P(A∩B) = P(A)×P(B) · complement for "at least one" · exactly one = P(A)P(B') + P(A')P(B) · partition check: both + exactly one + neither = 1</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpr01c">
+            <div class="q-header" onclick="togQ('qpr01c')"><span class="tier-badge t2-badge">T2 · C</span><span class="q-text">A committee of 4 is randomly selected from 6 lawyers (L) and 4 judges (J). Find: (a) P(exactly 2 lawyers); (b) P(at least 3 lawyers); (c) P(all 4 are from the same profession).</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Total: C(10,4) = 210.</p>
+              <p><strong>(a)</strong> Exactly 2L, 2J: C(6,2)×C(4,2) = 15×6 = 90. P = 90/210 = <strong>3/7 ≈ 0.429</strong>.</p>
+              <p><strong>(b)</strong> At least 3L = exactly 3L + exactly 4L.<br>
+              3L,1J: C(6,3)×C(4,1) = 20×4 = 80.<br>
+              4L,0J: C(6,4)×C(4,0) = 15×1 = 15.<br>
+              P = (80+15)/210 = 95/210 = <strong>19/42 ≈ 0.452</strong>.</p>
+              <p><strong>(c)</strong> All 4 lawyers: C(6,4) = 15. All 4 judges: C(4,4) = 1. P = 16/210 = <strong>8/105 ≈ 0.076</strong>.</p>
+              <div class="what-tests">C(n,r)/C(total,r) for classical probability · case enumeration for "at least" · addition for mutually exclusive outcomes · C(4,4)=1 (only one way to choose all judges)</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpr01d">
+            <div class="q-header" onclick="togQ('qpr01d')"><span class="tier-badge t2-badge">T2 · D</span><span class="q-text">In a survey of 100 lawyers: 60 handle corporate law (C), 40 handle criminal law (K), 15 handle both. A lawyer is selected at random. (a) P(C or K)? (b) P(C | K) and P(K | C)? (c) Test whether C and K are independent.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> P(C∪K) = 60/100 + 40/100 − 15/100 = 85/100 = <strong>0.85</strong>.</p>
+              <p><strong>(b)</strong> P(C|K) = P(C∩K)/P(K) = (15/100)/(40/100) = 15/40 = <strong>3/8 = 0.375</strong>.<br>
+              P(K|C) = P(C∩K)/P(C) = (15/100)/(60/100) = 15/60 = <strong>1/4 = 0.25</strong>.</p>
+              <p><strong>(c)</strong> Test: P(C)×P(K) = 0.60×0.40 = 0.24. P(C∩K) = 0.15. Since 0.24 ≠ 0.15, C and K are <strong>not independent</strong>. P(C|K)=0.375 ≠ P(C)=0.60 confirms this. Knowing a lawyer handles criminal law changes the probability they also handle corporate (from 60% to 37.5%).</p>
+              <div class="what-tests">General addition rule · conditional probability formula · independence test: P(A∩B) vs P(A)×P(B) · P(A|B) ≠ P(A) confirms dependence</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpr01e">
+            <div class="q-header" onclick="togQ('qpr01e')"><span class="tier-badge t3-badge">T3 · A</span><span class="q-text">A selection committee of 3 is randomly chosen from 5 senior and 4 junior lawyers (9 total). Given that the committee contains at least 1 senior lawyer, what is the conditional probability that it contains exactly 2 senior lawyers?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>This is a conditional probability question. Let A = "exactly 2 senior" and B = "at least 1 senior." We need P(A|B) = P(A∩B)/P(B). Since A⊂B (if exactly 2 senior, then at least 1 senior is satisfied), P(A∩B) = P(A).</p>
+              <p>Total: C(9,3) = 84.</p>
+              <p>P(A) = C(5,2)×C(4,1)/84 = 10×4/84 = 40/84.</p>
+              <p>P(B) = 1 − P(no senior) = 1 − C(5,0)×C(4,3)/84 = 1 − 1×4/84 = 80/84.</p>
+              <p>P(A|B) = (40/84)/(80/84) = 40/80 = <strong>1/2 = 0.5</strong>.</p>
+              <p>Intuition: once you condition on "at least 1 senior", the impossible case (all junior) is removed, and the remaining possible committees split evenly between "exactly 2 senior" (40) and "all other non-zero-senior" cases: 1-senior = C(5,1)×C(4,2)=30 and 3-senior = C(5,3)×C(4,0)=10; total = 30+40+10=80. Exactly 2 senior = 40/80 = 1/2.</p>
+              <div class="what-tests">P(A|B) = P(A∩B)/P(B) · since A⊂B, P(A∩B)=P(A) · complement for "at least 1" in denominator · verify: 1-senior(30) + 2-senior(40) + 3-senior(10) = 80 ✓</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpr01f">
+            <div class="q-header" onclick="togQ('qpr01f')"><span class="tier-badge t3-badge">T3 · B</span><span class="q-text">In a commercial court, 60% of cases involve contracts (C), 30% involve torts (T), and 20% involve both. An analyst claims: "Contracts and torts are positively associated — contract cases are more likely to also involve torts." A second analyst says: "They are negatively associated — most tort cases are pure tort." (a) Compute P(T|C) and P(C|T). (b) Test independence. (c) Evaluate both analysts' claims. (d) Explain how the same data can produce two apparently opposite verbal descriptions.</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p><strong>(a)</strong> P(T|C) = P(T∩C)/P(C) = 0.20/0.60 = <strong>1/3 ≈ 0.333</strong>.<br>
+              P(C|T) = P(T∩C)/P(T) = 0.20/0.30 = <strong>2/3 ≈ 0.667</strong>.</p>
+              <p><strong>(b)</strong> P(C)×P(T) = 0.60×0.30 = 0.18 ≠ 0.20 = P(C∩T). Not independent. P(T|C) = 0.333 > P(T) = 0.30 → C and T are <strong>positively associated</strong>: contract cases are slightly more likely to also involve torts than the unconditional rate.</p>
+              <p><strong>(c)</strong> First analyst (positive association): correct. P(T|C)=0.333 > P(T)=0.30. Knowing it's a contract case slightly increases the probability of also involving torts.</p>
+              <p>Second analyst (negatively associated via "most pure tort"): P(only T) = P(T) − P(T∩C) = 0.30−0.20 = 0.10; P(T∩C) = 0.20. So 2/3 of tort cases ALSO involve contracts — the second analyst has the sign backwards. Most tort cases are not pure tort.</p>
+              <p><strong>(d)</strong> Both analysts are looking at different conditional directions. A↔B association is symmetric (if A positively predicts B, B positively predicts A), but the magnitude of prediction differs: P(T|C)=0.333 (contract predicts tort weakly) vs P(C|T)=0.667 (tort strongly predicts contract). The second analyst confused the marginal rates P(only T) with the conditional probability P(T|C). Direction of association is a property of the joint distribution, not of the marginal or complement frequencies. Both P(T|C) > P(T) and P(C|T) > P(C) confirm positive association — the two directional facts always agree in sign.</p>
+              <div class="what-tests">P(T|C)=1/3 · P(C|T)=2/3 · positive association confirmed: P(T|C) > P(T) · both conditional directions agree in sign · second analyst confused P(only T) with P(T|C) · P(C|T)=2/3 means 2/3 of tort cases also have contracts</div>
+            </div>
+          </div>
+
+          <div class="question-block" id="qpr01g">
+            <div class="q-header" onclick="togQ('qpr01g')"><span class="tier-badge t3-badge">T3 · C</span><span class="q-text">A criminal appeal panel has 3 judges. Each judge independently votes to uphold or overturn a conviction. Judge A upholds with probability 0.7, Judge B with probability 0.6, Judge C with probability 0.5. The appeal is overturned if a majority (2 or 3 judges) vote to overturn. Find the probability the conviction is overturned. Then: a new Chief Justice insists that if Judge A votes to overturn, Judge B must also (B becomes certain to overturn given A overturns). How does this change the probability?</span><svg class="q-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="q-body">
+              <p>Let O = overturn. P(Oₐ)=0.3, P(O_b)=0.4, P(O_c)=0.5. Uphold: P(Uₐ)=0.7, P(U_b)=0.6, P(U_c)=0.5.</p>
+              <p><strong>Part 1 (independent):</strong> Overturned if ≥2 vote to overturn.<br>
+              P(A&B overturn, C upholds) = 0.3×0.4×0.5 = 0.060<br>
+              P(A&C overturn, B upholds) = 0.3×0.6×0.5 = 0.090<br>
+              P(B&C overturn, A upholds) = 0.7×0.4×0.5 = 0.140<br>
+              P(all 3 overturn) = 0.3×0.4×0.5 = 0.060<br>
+              P(overturned) = 0.060+0.090+0.140+0.060 = <strong>0.350</strong>.</p>
+              <p><strong>Part 2 (B depends on A):</strong> Now P(O_b | Oₐ) = 1.0 and P(O_b | Uₐ) = original unconditional rate adjusted. The problem states B is "certain to overturn given A overturns" — interpret as: if A overturns, B definitely overturns; if A upholds, B's probability remains 0.4 (unchanged by the constraint since only the A-overturn case is specified).</p>
+              <p>Case: A upholds (prob 0.7): B and C remain independent. Overturned iff B and C both overturn: P = 0.4×0.5 = 0.20. Contributes: 0.7×0.20 = 0.140.<br>
+              Case: A overturns (prob 0.3): B certainly overturns. Now A and B both overturn — so majority is guaranteed regardless of C. P(overturned | A overturns) = 1. Contributes: 0.3×1 = 0.300.</p>
+              <p>P(overturned) = 0.140 + 0.300 = <strong>0.440</strong>.</p>
+              <p>Effect: the dependency between A and B raises the overturn probability from 35% to 44%. Judicial independence matters not just for fairness but for the statistical properties of panel decisions.</p>
+              <div class="what-tests">Enumerate all majority cases (2-of-3 and 3-of-3) · multiply independent probabilities · sum mutually exclusive cases · dependency: partition on A, apply conditional on each branch · 0.35 → 0.44 shows dependency inflates overturn probability</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- QR Bar -->
+      <div class="inner-section" id="pr01-bar">
+        <div class="inner-header" onclick="togI('pr01-bar')"><span class="inner-label">QR Bar — Quick Reference</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <div class="bar-lens"><div class="bar-label">Core Formulas</div><div class="bar-content">P(A) = |A|/|S| · P(A') = 1−P(A)<br>P(A∪B) = P(A)+P(B)−P(A∩B)<br>P(A∩B) = P(A)×P(B|A) = P(B)×P(A|B)<br>P(A|B) = P(A∩B)/P(B)</div></div>
+          <div class="bar-lens"><div class="bar-label">Key Distinctions</div><div class="bar-content">Mutually exclusive: P(A∩B)=0, cannot both occur<br>Independent: P(A∩B)=P(A)×P(B), P(A|B)=P(A)<br>ME with P(A)>0,P(B)>0 → NOT independent<br>Independent → not necessarily mutually exclusive</div></div>
+          <div class="bar-lens"><div class="bar-label">Strategies</div><div class="bar-content">"At least 1" → use complement: 1−P(none)<br>Combinations in denominator: C(n,r) for total equally likely outcomes<br>Conditional → shrink sample space to B · Partition on A: total = P(E|A)P(A) + P(E|A')P(A')</div></div>
+          <div class="bar-lens"><div class="bar-label">Probability + Combinations</div><div class="bar-content">P(event) = C(favourable)/C(total)<br>Draw k from (m+n): denom = C(m+n,k)<br>Exactly j of type A: C(m,j)×C(n,k−j) / C(m+n,k)<br>At least 1 of A: 1 − C(n,k)/C(m+n,k)</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="nav-strip">
+  <a class="nav-link" href="qr2-part4-bivariate-regression.html">← Part 4</a>
+  <a class="nav-link" href="qr2-index.html">⌂ Home</a>
+  <a class="nav-link" href="qr2-part5-statistical-inference.html">Part 5 →</a>
+</div>
+<div class="font-bar">
+  <span class="font-bar-label">Text size</span>
+  <div class="font-presets">
+    <button class="fp-btn" onclick="setFont(14)" data-size="14">A</button>
+    <button class="fp-btn" onclick="setFont(16)" data-size="16">A</button>
+    <button class="fp-btn" onclick="setFont(18)" data-size="18">A</button>
+    <button class="fp-btn" onclick="setFont(21)" data-size="21">A</button>
+    <button class="fp-btn" onclick="setFont(24)" data-size="24">A</button>
+  </div>
+</div>
+<footer class="site-footer">
+  QR-II · Permutations, Combinations &amp; Probability · Asian Institute of Law · LLB Sem II 2026
+</footer>
+
+<script>
+  function tog(id){document.getElementById(id).classList.toggle('open');}
+  function togI(id){document.getElementById(id).classList.toggle('open');}
+  function togQ(id){document.getElementById(id).classList.toggle('open');}
+  function expandAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.add('open'));}
+  function collapseAll(){document.querySelectorAll('.topic-card,.inner-section,.question-block').forEach(e=>e.classList.remove('open'));}
+  function setFont(size){
+    var s=size/16;
+    document.getElementById('fs-override').textContent=[
+      'body{font-size:'+size+'px !important;}',
+      'p{font-size:'+Math.round(15*s)+'px !important;}',
+      '.site-header h1{font-size:'+Math.round(22*s)+'px !important;}',
+      '.topic-title{font-size:'+Math.round(16*s)+'px !important;}',
+      '.inner-label{font-size:'+Math.round(10*s)+'px !important;}',
+      '.notation{font-size:'+Math.round(13*s)+'px !important;}',
+      '.example-block p,.pattern-warn p,.bar-lens p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-text{font-size:'+Math.round(14*s)+'px !important;}',
+      '.q-body p{font-size:'+Math.round(14*s)+'px !important;}',
+      '.what-tests{font-size:'+Math.round(11*s)+'px !important;}',
+    ].join('');
+    document.querySelectorAll('.fp-btn').forEach(function(b){
+      b.classList.toggle('active',parseInt(b.dataset.size)===size);
+    });
+  }
+  setFont(16);
+</script>
+</body>
+</html>
