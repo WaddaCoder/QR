@@ -344,10 +344,86 @@ and they are done independently, total ways = m × n
           <p>An <strong>event</strong> is any subset of the sample space. The <strong>classical (equally likely) model</strong> gives: P(A) = (number of outcomes in A) / (total outcomes in S). This is where combinations become essential — counting the outcomes in A and in S.</p>
           <p>Two events are <strong>mutually exclusive</strong> if they cannot both happen at the same time (no overlap). Two events are <strong>independent</strong> if knowing one happened tells you nothing about whether the other happened. These sound similar but are completely different — mutually exclusive events are actually <em>maximally dependent</em> (if one happens, the other definitely doesn't).</p>
           <p><strong>Conditional probability</strong> P(A|B) = "the probability of A given that B has already happened." When B is known to have occurred, the sample space shrinks to just B's outcomes.</p>
+          <p><strong>With replacement vs. without replacement</strong> — this single phrase decides which multiplication rule applies, and exam questions hinge on it constantly. <em>With replacement</em>: after drawing an item you put it back before the next draw. The pool stays the same size; successive draws are independent → use P(A∩B) = P(A) × P(B). <em>Without replacement</em>: the item stays out. The pool shrinks by one; successive draws are dependent → use P(A∩B) = P(A) × P(B|A), where P(B|A) uses the reduced pool size. Key signals in exam language: "drawn and replaced / returned / put back" = with replacement; "drawn and set aside / not replaced / two are drawn simultaneously" = without replacement. When no replacement instruction is given for a committee or team selection, it is always without replacement.</p>
           <div class="pattern-warn">
             <div class="pw-label">The Two Concepts Everyone Confuses</div>
             <p><strong>Mutually exclusive ≠ Independent.</strong> Mutually exclusive: P(A∩B) = 0 — they cannot both occur. Independent: P(A∩B) = P(A)×P(B) — knowing B gives no information about A. If two events are mutually exclusive AND both have positive probability, they CANNOT be independent (because knowing one occurred makes the other impossible — very informative). The exam loves testing this distinction.</p>
           </div>
+        </div>
+      </div>
+
+      <!-- Everyday Examples -->
+      <div class="inner-section" id="pr01-ev">
+        <div class="inner-header" onclick="togI('pr01-ev')"><span class="inner-label">Everyday Examples — Recognising the Scenario</span><svg class="inner-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="inner-body">
+          <p style="color:var(--ink-soft);margin-bottom:1rem;">Every probability question is a disguised version of one of these standard scenarios. Recognise the scenario first — the formula follows automatically.</p>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Coin Flip</div>
+            <p><strong>Sample space (1 flip):</strong> S = {H, T} → |S| = 2. Each outcome equally likely: P(H) = P(T) = ½.<br>
+            <strong>Multiple flips:</strong> S grows as 2ⁿ. Two flips: {HH, HT, TH, TT} → 4 outcomes. Three flips: 8 outcomes.<br>
+            <strong>How the question is usually framed:</strong> "A fair coin is tossed 3 times. Find the probability of getting exactly 2 heads." → count favourable outcomes from the list {HHT, HTH, THH} = 3, so P = 3/8. Or use C(3,2)/2³ = 3/8.<br>
+            <strong>With/without replacement:</strong> Each flip is independent — the coin has no memory. This is always a with-replacement scenario.</p>
+          </div>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Single Die (Dice)</div>
+            <p><strong>Sample space:</strong> S = {1, 2, 3, 4, 5, 6} → |S| = 6.<br>
+            <strong>Common events:</strong> P(even) = 3/6 = ½ · P(odd) = ½ · P(prime) = 3/6 = ½ (primes: 2, 3, 5) · P(greater than 4) = 2/6 = ⅓ (outcomes 5, 6) · P(multiple of 3) = 2/6 = ⅓.<br>
+            <strong>How the question is usually framed:</strong> "A die is rolled once. What is the probability of getting a number greater than 2 and even?" → favourable: {4, 6} → P = 2/6 = ⅓. Watch for the word "and" — it means intersection.</p>
+          </div>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Two Dice (Most Common Exam Scenario)</div>
+            <p><strong>Sample space:</strong> 6 × 6 = 36 equally likely ordered pairs (die 1, die 2).<br>
+            <strong>Classic exam targets:</strong><br>
+            · P(sum = 7) = 6/36 = 1/6 → pairs: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1).<br>
+            · P(sum = 2) = 1/36 → only (1,1). P(sum = 12) = 1/36 → only (6,6).<br>
+            · P(sum ≥ 10) = 6/36 = 1/6 → {(4,6),(5,5),(6,4),(5,6),(6,5),(6,6)}.<br>
+            · P(doubles) = 6/36 = 1/6 → {(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)}.<br>
+            <strong>How the question is usually framed:</strong> "Two fair dice are rolled simultaneously. Find the probability that the sum is 8." → count pairs summing to 8: (2,6),(3,5),(4,4),(5,3),(6,2) = 5. P = 5/36.<br>
+            <strong>Key trap:</strong> (3,5) and (5,3) are different outcomes — order matters in the 36-outcome sample space.</p>
+          </div>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Standard Deck of Cards (52 Cards)</div>
+            <p><strong>Structure:</strong> 4 suits (Hearts ♥, Diamonds ♦, Clubs ♣, Spades ♠) × 13 values (Ace, 2–10, Jack, Queen, King) = 52 cards. Each suit has 13 cards; each value appears in 4 suits.<br>
+            <strong>Key counts:</strong> Face cards (J, Q, K) = 12 total (3 per suit). Aces = 4. Red cards = 26 (hearts + diamonds). Black = 26.<br>
+            <strong>Common events:</strong> P(Ace) = 4/52 = 1/13 · P(Heart) = 13/52 = 1/4 · P(Face card) = 12/52 = 3/13 · P(Ace of Spades) = 1/52.<br>
+            <strong>How the question is usually framed:</strong> "Two cards are drawn without replacement. Find P(both Aces)." → P = (4/52) × (3/51) = 12/2652 = 1/221. Note the denominator shrinks from 52 to 51 — without replacement in action.</p>
+          </div>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Bag of Coloured Marbles / Balls (Classic With/Without Replacement)</div>
+            <p><strong>Why this scenario matters:</strong> It is the textbook demonstration of the with/without replacement distinction.<br>
+            <strong>With replacement:</strong> "A bag has 5 red and 3 blue. One is drawn, noted, and put back. A second is drawn." → draws are independent. P(both red) = (5/8) × (5/8) = 25/64.<br>
+            <strong>Without replacement:</strong> Same bag, but the first ball stays out. → P(both red) = (5/8) × (4/7) = 20/56 = 5/14.<br>
+            <strong>How the question is usually framed:</strong> "A bag contains 6 red and 4 blue marbles. Two are drawn at random. Find P(one of each colour)." → Without replacement: P = [C(6,1)×C(4,1)] / C(10,2) = 24/45 = 8/15. Or using sequential rule: (6/10)×(4/9) + (4/10)×(6/9) = 24/90 + 24/90 = 48/90 = 8/15. ✓</p>
+          </div>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Keys on a Key Ring / Beads in a Rosary (Arrangement Scenarios)</div>
+            <p><strong>Keys on a ring (linear permutation variant):</strong> "In how many ways can 5 keys be arranged on a key ring?" This is a circular permutation: (5−1)! = 4! = 24. But if the ring can be flipped (i.e., clockwise = anticlockwise), divide by 2: 24/2 = 12.<br>
+            <strong>How this links to probability:</strong> "5 keys are placed on a ring in a random order. What is the probability that the front-door key is next to the car key?" → total arrangements = (5−1)!/2 = 12. Favourable: treat the two keys as a block → (4−1)!/2 × 2 = 6. P = 6/12 = ½.<br>
+            <strong>Beads in a rosary:</strong> Identical scenario — a rosary is a circular arrangement that can be flipped. A rosary of n distinct beads has (n−1)!/2 distinct arrangements. The word "rosary" or "necklace" in an exam question is the signal to use circular permutations with the flip-symmetry halving.</p>
+          </div>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Roulette Wheel</div>
+            <p><strong>Structure:</strong> European roulette: 37 slots (0–36). American roulette: 38 slots (0, 00, 1–35). Each slot equally likely per spin.<br>
+            <strong>Common probabilities (European):</strong> P(specific number) = 1/37 ≈ 0.027 · P(red or black, excluding 0) = 18/37 ≈ 0.486 · P(even number, excluding 0) = 18/37.<br>
+            <strong>How the question is usually framed:</strong> "A roulette wheel has 37 equally likely outcomes. What is the probability of winning on two consecutive spins on the same number?" → Each spin is independent (the wheel has no memory): P = (1/37) × (1/37) = 1/1369.<br>
+            <strong>Key concept:</strong> Roulette is always with replacement — each spin resets completely. This is the canonical example of independent repeated trials.</p>
+          </div>
+
+          <div class="example-block" style="border-left-color:var(--c2);">
+            <div class="ex-label" style="background:#F9E8EE;color:#8A1A3A;">Urn Model (The Abstract Template Behind All of the Above)</div>
+            <p>When an exam uses an unfamiliar object — files in a drawer, patients in a ward, contracts in a pile — mentally map it to an urn: <em>n total items, k of type A, rest of type B. Draw r items with/without replacement. Find P(j of type A).</em><br>
+            <strong>Without replacement → combinations:</strong> P = C(k,j) × C(n−k, r−j) / C(n,r).<br>
+            <strong>With replacement → multiply independent probabilities:</strong> P = C(r,j) × (k/n)ʲ × ((n−k)/n)^(r−j) [this is the binomial formula — not required for GQR-201 but the combinations formula above handles all exam questions you will see].<br>
+            <strong>Recognition rule:</strong> If the question says "selected" or "chosen" with no mention of putting back → without replacement. If it says "each independently" or "repeated" → with replacement.</p>
+          </div>
+
         </div>
       </div>
 
@@ -522,6 +598,8 @@ e.g. P(choose 2 women from 5W+3M) = C(5,2)/C(8,2) = 10/28 = 5/14
           <div class="bar-lens"><div class="bar-label">Core Formulas</div><div class="bar-content">P(A) = |A|/|S| · P(A') = 1−P(A)<br>P(A∪B) = P(A)+P(B)−P(A∩B)<br>P(A∩B) = P(A)×P(B|A) = P(B)×P(A|B)<br>P(A|B) = P(A∩B)/P(B)</div></div>
           <div class="bar-lens"><div class="bar-label">Key Distinctions</div><div class="bar-content">Mutually exclusive: P(A∩B)=0, cannot both occur<br>Independent: P(A∩B)=P(A)×P(B), P(A|B)=P(A)<br>ME with P(A)>0,P(B)>0 → NOT independent<br>Independent → not necessarily mutually exclusive</div></div>
           <div class="bar-lens"><div class="bar-label">Strategies</div><div class="bar-content">"At least 1" → use complement: 1−P(none)<br>Combinations in denominator: C(n,r) for total equally likely outcomes<br>Conditional → shrink sample space to B · Partition on A: total = P(E|A)P(A) + P(E|A')P(A')</div></div>
+          <div class="bar-lens"><div class="bar-label">With / Without Replacement</div><div class="bar-content">With replacement → independent → P(A∩B) = P(A)×P(B) · pool size unchanged<br>Without replacement → dependent → P(A∩B) = P(A)×P(B|A) · pool shrinks by 1 each draw<br>Signal words: "put back / returned" = WITH · "set aside / simultaneously" = WITHOUT<br>Committee/team selection with no instruction = always WITHOUT</div></div>
+          <div class="bar-lens"><div class="bar-label">Everyday Scenario Quick Map</div><div class="bar-content">Coin: |S|=2ⁿ per n flips, independent (always with replacement)<br>Single die: |S|=6 · Two dice: |S|=36 (ordered pairs, count carefully)<br>Cards: 52 total, 4 suits×13 values, 4 aces, 12 face cards<br>Marbles/Urn: with replacement→multiply · without→C(k,j)×C(n−k,r−j)/C(n,r)<br>Roulette: independent spins, European=37 slots, American=38<br>Key ring/Rosary: circular permutation → (n−1)!/2 distinct arrangements</div></div>
           <div class="bar-lens"><div class="bar-label">Probability + Combinations</div><div class="bar-content">P(event) = C(favourable)/C(total)<br>Draw k from (m+n): denom = C(m+n,k)<br>Exactly j of type A: C(m,j)×C(n,k−j) / C(m+n,k)<br>At least 1 of A: 1 − C(n,k)/C(m+n,k)</div></div>
         </div>
       </div>
